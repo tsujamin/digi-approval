@@ -56,7 +56,11 @@ Before an applicant can begin a workflow, they must register as a user.
 Once they register with their name and contact details, they will be presented with a dashboard showing at a glance:
  * **Workflows that they can commence.** Once a workflow is commenced, the directorate is notified, and the application is assigned to an approver.
  * **Any existing applications that they have begun**, and the stage those applications are at. Applicants can pull up the details of their applications and see the entire history in one place. They can then make sure that they have completed any steps necessary for them to complete. The approver responsible for their application is notified whenever the applicant completes a step.
- * **Any completed applications**, should they need to re-download any documents/approvals.
+ * **A link to access completed applications**, should they need to re-download any documents/approvals.
+
+A very loose concept of what this might look like is below:
+
+![User wireframe](./imgs/user-wireframe.png?raw=true)
 
 
 ### Using the system: approvers
@@ -68,6 +72,9 @@ When an approver logs in, they can see at a glance:
  * The status of those applications: are they waiting on the applicant, or are they "in my court"?
 
 Approvers can then pull up an application for which they are responsible, see its entire history in one place, and take any steps necessary to progress it. The applicant is notified whenever the approver completes a step.
+
+A very loose concept of what this might look like is below:
+![Approver wireframe](./imgs/approver-wireframe.png?raw=true)
 
 ### Using the system: managers
 
