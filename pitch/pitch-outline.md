@@ -24,7 +24,7 @@ Our concept can be summarised as a flexible, web-based *workflow engine*.
 
 ### What is a workflow?
 
-A workflow is a tailored set of steps to achieve a particular outcome. For example, applying for a permit to serve alcohol is a workflow, and applying for a permit for traffic managment is a workflow.
+A workflow is a tailored set of steps to achieve a particular outcome. For example, applying for a permit to serve alcohol is a workflow, and applying for a permit for traffic managment is a workflow. Workflows can contain other workflows, and have optional steps, so the entire process of organising an event could be one big workflow.
 
 The concept of a workflow is sufficiently flexible to encompass the range of steps and options in a practical approval process.
  * Workflows can contain steps that an applicant must take, and steps that an approving agency must take. These steps can contain a variety of steps: applicants steps can involve uploading documents, filling in forms, and so on; agency steps can include review, approval, etc.
@@ -56,6 +56,7 @@ Before an applicant can begin a workflow, they must register as a user.
 Once they register with their name and contact details, they will be presented with a dashboard showing at a glance:
  * **Workflows that they can commence.** Once a workflow is commenced, the directorate is notified, and the application is assigned to an approver.
  * **Any existing applications that they have begun**, and the stage those applications are at. Applicants can pull up the details of their applications and see the entire history in one place. They can then make sure that they have completed any steps necessary for them to complete. The approver responsible for their application is notified whenever the applicant completes a step.
+ * **A link to contact the approver assigned to help them progress their workflow**.
  * **A link to access completed applications**, should they need to re-download any documents/approvals.
 
 A very loose concept of what this might look like is below:
@@ -82,10 +83,9 @@ Managers are responsible for allocating approvers to handle various requests. A 
 
 ### Summary of concept
 
-???
- * Flexible
- * Changes do not require programmer intervention
- * Dealing with consistent person, with flexiblity to move if necessary
+The key advantages of our approach are:
+ * Flexiblity: changes to procedures not require programmer intervention
+ * Applicants dealing with a consistent approver, while the directorate retains the flexibility to change approvers if the circumstances require it.
  * Central repository for information and state: all parties involved can see the progress at a glance, who has to take the next step.
 
 
@@ -132,6 +132,12 @@ Our current proposed stack is:
 
 If necessary, we may substitute other standard, proven, open-source technologies.
 
+[django]: http://django.org "Django"
+[nginx]: http://nginx.org/en "nginx"
+[rabbitmq]: http://rabbitmq.com "RabbitMQ"
+[postgres]: http://postgresql.org "PostgreSQL"
+[swift]: http://swift.openstack.org "OpenStack Swift"
+
 Your proposed project milestones
 ================================
 
@@ -141,6 +147,21 @@ The critical dependencies
 =========================
 
 *Please tell us what you are assuming, what you will need, to develop your idea into a proper proof-of-concept (POC) with associated case study report.*
+
+Key Assumptions
+---------------
+
+ * Directorate procedures are, or can be, reduced to a workflow. Given that they are bureaucratic processes, this should be possible.
+
+ 
+Key Requirements
+---------------
+
+ * Directorate involvement to help define a proof-of-concept workflow.
+ * Directorate feedback to inform and refine the prototype as it develops.
+ * Some costs, as detailed below.
+
+
 
 Likely costs
 ============
@@ -158,9 +179,17 @@ Your full solution assessment
 
 *Tell us what you think would be involved in turning your concept into a fully working, scalable solution for the challenge.*
 
-The full details for our proof-of-concept are listed above. Assuming our proof-of-concept is successful, the following major steps would be required to deploy it publically.
-* Deployment on government servers.
-* Training of users within departments.
+The full details for our proof-of-concept are listed above. 
+
+Assuming our proof-of-concept is successful, the following major steps would be required to deploy it publically:
+* **The services of a skilled graphics designer**. We have a range of coding and user-experience skills, but we lack good graphics skills. A skilled graphics designer would be needed to make things pretty and consistent with the rest of the visual identity across the ACT government.
+* **A further period of development**. Our prototype will inevitably have some rough edges. It will need an extra couple of months of full-time work to bring it up to a deployable standard, especially with regards to:
+    * accessibility (e.g. to WCAG 2.0 standard)
+    * load-testing
+    * fault tolerance and testing
+    * documentation
+* **Deployment on government servers.**
+* **Training of users within departments.** This is probably going to be the most time-consuming aspect of a final deployment. Users will need to be trained to work with the application, create work-flows, and IT staff will need to be trained to support the system.
 
 Your eligibility
 ================
