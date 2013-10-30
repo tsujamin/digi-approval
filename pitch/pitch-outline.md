@@ -8,30 +8,39 @@ Your concept of how to address it
 
 *We need enough detail to be able to assess the viability, practicality, supportability, and costs for what you propose.*
 
+Our solution is a web based *workflow engine*, that provides superior flexibility to directorates, a consistent user interface to applicants, and utilises standardised components so it can be constructed within 3 months and maintained cheaply and easily.
+
 Underlying concept
 -------------------------
 
 Our concept can be summarised as a flexible, web-based *workflow engine*. 
+
+### Introducing our characters
+ * An *applicant* is someone trying to organise an event or apply for a permit.
+ * A *directorate* is the body that an applicant must work with to get one or more of the permits they require. Within a directorate, there are 3 roles:
+    * An *administrator*, who sets up the application process in terms of workflows, as detailed bleow.
+    * An *approver* works with an applicant to progress their application.
+    * A *manager* is responsible for balancing the workload amongst approvers.
 
 ### What is a workflow?
 
 A workflow is a tailored set of steps to achieve a particular outcome. For example, applying for a permit to serve alcohol is a workflow, and applying for a permit for traffic managment is a workflow.
 
 The concept of a workflow is sufficiently flexible to encompass the range of steps and options in a practical approval process.
- * Workflows do not need to be linear. For example, if an event management plan is insufficient, rather than rejecting the entire application, the applicant can be directed back to resubmitting the event management plan until it is satisfactory.
- TODO IMAGE HERE
  * Workflows can contain steps that an applicant must take, and steps that an approving agency must take. These steps can contain a variety of steps: applicants steps can involve uploading documents, filling in forms, and so on; agency steps can include review, approval, etc.
  * Applicants and agencies can be notified when the application changes from one state to another, for example by email.
- * Workflows can be easily visualised as flow charts, so the status of an application is clear to the applicant and to the approving agency at a glance.
+ * Workflows do not need to be linear. For example, if an event management plan is insufficient, rather than rejecting the entire application, the applicant can be directed back to resubmitting the event management plan until it is satisfactory.
+ TODO IMAGE HERE
+ * Workflows can be easily visualised as flow charts, so the status of an application is clear to the applicant and to the approving directorate at a glance.
  * Workflows can contain information about time limits: for example if required documentation is not sumbitted within the required time period, the workflow can automatically transition to an expired state.
  * Workflows can bring together all the relevant documentation in one place. A step that requires an applicant to upload a document can contain information about what the document is supposed to contain. Steps that an approver must take can include information about how a document is to be reviewed, so as to ensure consistency amongst staff. This information is not shown to applicants, so internal processes can be documented.
  * Workflows can contain other workflows: for example a workflow for running an event could guide an applicant through the relevant approvals. Each of those approvals is its own workflow, so if an applicant knows they only need a specific permit, they can do that workflow individually. (This also means that individual directorates can update and improve the workflows for which they are responsible, without it breaking the overall process.)
 
 ### Setting up the system
 
-Before an applicant can use the system, directorates must create workflows.
- * A web interface will allow directorates to build fully functional workflows without requiring additional code to be written. The directorate will be able to specify the steps in the workflow, whether they are done by staff or the applicant, and provide any information necessary for each step to be completed.
- * The web interface will be able to present the workflow as a flow chart, so that management can easily verify that the web process matches up with legislative requirements and existing processes.
+Before an applicant can use the system, an administrator must create workflows.
+ * A web interface will allow administrators to build fully functional workflows without requiring additional code to be written. The administrator will be able to specify the steps in the workflow, whether they are done by approvers or the applicant, and provide any information necessary for each step to be completed.
+ * The web interface will be able to present the workflow as a flow chart, so that management within the directorate can easily verify that the web process matches up with legislative requirements and existing processes.
  * The workflow will not be presented to the public until it is expressly made live.
 
 ### Using the system: applicant
@@ -56,7 +65,6 @@ Approvers can then pull up an application for which they are responsible, see it
 
 ### Using the system: managers
 
-
 Managers are responsible for allocating approvers to handle various requests. A manager assigns a workflow that has just commenced to an approver, and is able to re-allocate in-progress workflows if needed. (For example, if an approver is ill or leaves the directorate.)
 
 ### Summary of concept
@@ -71,7 +79,26 @@ Managers are responsible for allocating approvers to handle various requests. A 
 Implementation
 --------------------
 
+We intend to implent the system in [Django][django], a well known web framework for the Python programming language. Django is used on sites that deal with millions of hits, so it is known to be able to scale. It is also has a large community of users: if we are hit by a bus, it will be easy to find Django developers to keep the system running.
 
+The implementation will focus on scalability, security and portability.
+
+### Scalibility
+
+The solution has been designed from the ground up for scalability, by decoupling and disaggregating functions into layers that are known to be scalable.
+
+As the diagram shows, TODO DIAGRAM, our solution can be decomposed into a web layer, an application layer, a worker layer and a database layer. Each of these layers is horizontally scalable: if heavy usage of the web layer is detected, additional web server can be added without requring any changes to the application code. Similarly, if the database is slow, the database layer can be scaled without requiring the application code to be changed. Each layer can be scaled to suit demand, allowing scaling to address the bottleneck without adding unnecessary infrastructure.
+
+### Security
+
+Our system is designed to be able to solidly *authenticate* users, determine what those user are *authorised* to do, ensure the *integrity* of their actions and the system as a whole, while maintaining *confidentially* of applicant and directorate information, using industry best practices.
+
+We will deploy SSL at the front end to ensure applicant passwords and information is encrypted while in transit. We will be implementing as much functionality as possible through standard libraries, reducing the scope for security flaws and error on our part.
+
+### Portability
+We will be developing our system on Amazon Web Services (AWS), however our system will not depend on any feature of the AWS infrastructure. This gives the flexibility to either keep the final system on AWS infrastruture, or move it to government systems, without requiring chunks of the software to be rewritten.
+
+We will be ensuring this by using industry-standard, open-source technologies throughout.
 
 Your proposed project milestones
 ================================
