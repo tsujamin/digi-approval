@@ -28,11 +28,17 @@ A workflow is a tailored set of steps to achieve a particular outcome. For examp
 
 The concept of a workflow is sufficiently flexible to encompass the range of steps and options in a practical approval process.
  * Workflows can contain steps that an applicant must take, and steps that an approving agency must take. These steps can contain a variety of steps: applicants steps can involve uploading documents, filling in forms, and so on; agency steps can include review, approval, etc.
- * Applicants and agencies can be notified when the application changes from one state to another, for example by email.
+ * Applicants and approvers are notified when the application changes from one state to another, for example by email.
  * Workflows do not need to be linear. For example, if an event management plan is insufficient, rather than rejecting the entire application, the applicant can be directed back to resubmitting the event management plan until it is satisfactory.
- TODO IMAGE HERE
  * Workflows can be easily visualised as flow charts, so the status of an application is clear to the applicant and to the approving directorate at a glance.
  * Workflows can contain information about time limits: for example if required documentation is not sumbitted within the required time period, the workflow can automatically transition to an expired state.
+
+A sample workflow demonstrating these features is below. This workflow is a very simple sample about an approval process involving an event management plan. Steps an applicant takes are blue, and steps approvers take are green.
+
+![Sample workflow](./imgs/sample-workflow.png?raw=true)
+
+
+Workflows, as we have conceptualised them, have other benefits too:
  * Workflows can bring together all the relevant documentation in one place. A step that requires an applicant to upload a document can contain information about what the document is supposed to contain. Steps that an approver must take can include information about how a document is to be reviewed, so as to ensure consistency amongst staff. This information is not shown to applicants, so internal processes can be documented.
  * Workflows can contain other workflows: for example a workflow for running an event could guide an applicant through the relevant approvals. Each of those approvals is its own workflow, so if an applicant knows they only need a specific permit, they can do that workflow individually. (This also means that individual directorates can update and improve the workflows for which they are responsible, without it breaking the overall process.)
 
@@ -87,9 +93,13 @@ The implementation will focus on scalability, security and portability.
 
 The solution has been designed from the ground up for scalability, by decoupling and disaggregating functions into layers that are known to be scalable.
 
-As the diagram shows, TODO DIAGRAM, our solution can be decomposed into a web layer, an application layer, a worker layer and a database layer. 
+As the diagram below, our solution can be decomposed into a web layer, an application layer, a set of asynchronous workers and a storage layer (file store and database).
 
-Each of these layers is horizontally scalable: if heavy usage of the web layer is detected, additional web server can be added without requring any changes to the application code. Similarly, if the database is slow, the database layer can be scaled without requiring the application code to be changed. 
+![Application architecture](./imgs/tech-overview.png?raw=true) 
+
+Each of these layers is horizontally scalable: if heavy usage of the web layer is detected, additional web server can be added without requring any changes to the application code. Similarly, if the database is slow, the database layer can be scaled without requiring the application code to be changed. An example of a scaled up configuration is shown below.
+
+![Scaled application](./imgs/tech-scaling.png?raw=true)
 
 Each layer can be scaled to suit demand, allowing scaling to address the bottleneck without adding unnecessary infrastructure. Similarly, the whole system can be scaled down: the entire system could concievably be run on a single server if demand is not too great.
 
