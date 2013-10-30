@@ -119,7 +119,7 @@ We will deploy SSL at the front end to ensure applicant passwords and informatio
 We will also be taking a proactive approach to security wherever possible. For example, a major source of security flaws arise from not verifying user input. Our system will make sure that we that user input is valid, make sure that uploaded documents are of the expected format and are free from known viruses, and so on, *before* they are presented to approvers.
 
 ### Portability
-We will be developing our system on Amazon Web Services (AWS), however our system will not depend on any feature of the AWS infrastructure. This gives the flexibility to either keep the final system on AWS infrastruture, or, if control over data is a concern, to move it to government systems, without requiring chunks of the software to be rewritten. TODO FIX THIS MASSIVE RUN-ON SENTENCE.
+We will be developing our system on Amazon Web Services (AWS), however our system will not depend on any feature of the AWS infrastructure. This provides flexibility in regards to the systems final hosting environment; whether that be AWS or not. For example if control of data is a concern, the system could be moved to government systems without needing to rewrite sections of the codebase.
 
 We will be ensuring this by using proven, industry-standard, open-source technologies throughout. 
 
