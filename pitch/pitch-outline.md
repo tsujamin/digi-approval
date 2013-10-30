@@ -13,8 +13,7 @@ Underlying concept
 
 Our concept can be summarised as a flexible, web-based *workflow engine*. 
 
-What is a workflow?
--------------------
+### What is a workflow?
 
 A workflow is a tailored set of steps to achieve a particular outcome. For example, applying for a permit to serve alcohol is a workflow, and applying for a permit for traffic managment is a workflow.
 
@@ -28,25 +27,24 @@ The concept of a workflow is sufficiently flexible to encompass the range of ste
  * Workflows can bring together all the relevant documentation in one place. A step that requires an applicant to upload a document can contain information about what the document is supposed to contain. Steps that an approver must take can include information about how a document is to be reviewed, so as to ensure consistency amongst staff. This information is not shown to applicants, so internal processes can be documented.
  * Workflows can contain other workflows: for example a workflow for running an event could guide an applicant through the relevant approvals. Each of those approvals is its own workflow, so if an applicant knows they only need a specific permit, they can do that workflow individually. (This also means that individual directorates can update and improve the workflows for which they are responsible, without it breaking the overall process.)
 
-Creating a workflow
--------------------
+### Setting up the system
 
 Before an applicant can use the system, directorates must create workflows.
  * A web interface will allow directorates to build fully functional workflows without requiring additional code to be written. The directorate will be able to specify the steps in the workflow, whether they are done by staff or the applicant, and provide any information necessary for each step to be completed.
  * The web interface will be able to present the workflow as a flow chart, so that management can easily verify that the web process matches up with legislative requirements and existing processes.
  * The workflow will not be presented to the public until it is expressly made live.
 
-Using a workflow: applicant
----------------------------
+### Using the system: applicant
 
-Before an applicant can begin a workflow, they must register as a user. Once they register with their name and contact details, they will be presented with a dashboard showing at a glance:
+Before an applicant can begin a workflow, they must register as a user. 
+
+Once they register with their name and contact details, they will be presented with a dashboard showing at a glance:
  * **Workflows that they can commence.** Once a workflow is commenced, the directorate is notified, and the application is assigned to an approver.
  * **Any existing applications that they have begun**, and the stage those applications are at. Applicants can pull up the details of their applications and see the entire history in one place. They can then make sure that they have completed any steps necessary for them to complete. The approver responsible for their application is notified whenever the applicant completes a step.
  * **Any completed applications**, should they need to re-download any documents/approvals.
 
 
-Using a workflow: approvers
--------------------------------------
+### Using the system: approvers
 
 The workflow system streamlines the job of those tasked with improving applications and makes it easy for them to provide excellent service.
 
@@ -56,13 +54,12 @@ When an approver logs in, they can see at a glance:
 
 Approvers can then pull up an application for which they are responsible, see its entire history in one place, and take any steps necessary to progress it. The applicant is notified whenever the approver completes a step.
 
-Using a workflow: managers
--------------------------------------
+### Using the system: managers
+
 
 Managers are responsible for allocating approvers to handle various requests. A manager assigns a workflow that has just commenced to an approver, and is able to re-allocate in-progress workflows if needed. (For example, if an approver is ill or leaves the directorate.)
 
-Summary of concept
---------------
+### Summary of concept
 
 ???
  * Flexible
