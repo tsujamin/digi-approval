@@ -87,18 +87,33 @@ The implementation will focus on scalability, security and portability.
 
 The solution has been designed from the ground up for scalability, by decoupling and disaggregating functions into layers that are known to be scalable.
 
-As the diagram shows, TODO DIAGRAM, our solution can be decomposed into a web layer, an application layer, a worker layer and a database layer. Each of these layers is horizontally scalable: if heavy usage of the web layer is detected, additional web server can be added without requring any changes to the application code. Similarly, if the database is slow, the database layer can be scaled without requiring the application code to be changed. Each layer can be scaled to suit demand, allowing scaling to address the bottleneck without adding unnecessary infrastructure.
+As the diagram shows, TODO DIAGRAM, our solution can be decomposed into a web layer, an application layer, a worker layer and a database layer. 
+
+Each of these layers is horizontally scalable: if heavy usage of the web layer is detected, additional web server can be added without requring any changes to the application code. Similarly, if the database is slow, the database layer can be scaled without requiring the application code to be changed. 
+
+Each layer can be scaled to suit demand, allowing scaling to address the bottleneck without adding unnecessary infrastructure. Similarly, the whole system can be scaled down: the entire system could concievably be run on a single server if demand is not too great.
 
 ### Security
 
 Our system is designed to be able to solidly *authenticate* users, determine what those user are *authorised* to do, ensure the *integrity* of their actions and the system as a whole, while maintaining *confidentially* of applicant and directorate information, using industry best practices.
 
-We will deploy SSL at the front end to ensure applicant passwords and information is encrypted while in transit. We will be implementing as much functionality as possible through standard libraries, reducing the scope for security flaws and error on our part.
+We will deploy SSL at the front end to ensure applicant passwords and information is encrypted while in transit. We will be implementing as much functionality as possible through standard libraries, reducing the scope for security flaws and error on our part. 
+
+We will also be taking a proactive approach to security wherever possible. For example, a major source of security flaws arise from not verifying user input. Our system will make sure that we that user input is valid, make sure that uploaded documents are of the expected format and are free from known viruses, and so on, *before* they are presented to approvers.
 
 ### Portability
-We will be developing our system on Amazon Web Services (AWS), however our system will not depend on any feature of the AWS infrastructure. This gives the flexibility to either keep the final system on AWS infrastruture, or move it to government systems, without requiring chunks of the software to be rewritten.
+We will be developing our system on Amazon Web Services (AWS), however our system will not depend on any feature of the AWS infrastructure. This gives the flexibility to either keep the final system on AWS infrastruture, or, if control over data is a concern, to move it to government systems, without requiring chunks of the software to be rewritten. TODO FIX THIS MASSIVE RUN-ON SENTENCE.
 
-We will be ensuring this by using industry-standard, open-source technologies throughout.
+We will be ensuring this by using proven, industry-standard, open-source technologies throughout. 
+
+Our current proposed stack is:
+ * Our web layer will be implemented with [nginx][nginx].
+ * As discussed, our application layer will be implemented with Django.
+ * Our worker layer will be implented using [RabbitMQ][rabbitmq]. Having a worker model allows us to perform time-consuming tasks such as scanning for viruses or sending emails without making our user interface non-responsive.
+ * Our database layer will be implemented with [PostgreSQL][postgres].
+ * Our file storage layer will be implemented using [OpenStack Swift][swift].
+
+If necessary, we may substitute other standard, proven, open-source technologies.
 
 Your proposed project milestones
 ================================
@@ -115,10 +130,20 @@ Likely costs
 
 *To be involved you have to be prepared to give your time voluntarily. So other than your (or your team’s) time, are there any other costs you anticipate incurring in developing your POC. Note that the DCC will fund innovator expenses (based on valid receipts) to a maximum of $5,000.*
 
+Our main cost will be hosting. To ensure we design in a scalable way, we will be using a number of instances on AWS. This prevents us from accidentally making assumptions that will not hold true if the system is scaled up. Our estimate is for 6 AWS t1.micro instances for 3 months, for an estimated $75/month, or $225 for the duration of the bake-off.
+
+We will also have some one-off costs associated with an SSL certificate. This will cost around $75.
+
+Our total estimated costs are $300.
+
 Your full solution assessment
 =============================
 
 *Tell us what you think would be involved in turning your concept into a fully working, scalable solution for the challenge.*
+
+The full details for our proof-of-concept are listed above. Assuming our proof-of-concept is successful, the following major steps would be required to deploy it publically.
+* Deployment on government servers.
+* Training of users within departments.
 
 Your eligibility
 ================
