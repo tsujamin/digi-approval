@@ -201,3 +201,7 @@ I, Daniel Axtens, declare:
 I, Andrew Donnellan, declare:
  * I am an ACT resident and a tertiary student at The Australian National University (u4837946)
  * There are no conflicts of interest arising if I am involved in implementing the challenge.
+
+I, Benjamin Roberts, declare:
+ * I am an ACT resident and a tertiary student at The Australian National University (u5350335)
+ * There are no conflicts of interest arising if I am involved in implementing the challenge.
