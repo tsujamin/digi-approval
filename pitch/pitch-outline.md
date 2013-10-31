@@ -197,3 +197,7 @@ Your eligibility
 I, Daniel Axtens, declare:
  * I am a tertiary student at the Australian National University. My university ID is u5376292.
  * There are no conflicts of interest arising if I am involved in implementing the challenge.
+
+I, Andrew Donnellan, declare:
+ * I am an ACT resident and a tertiary student at The Australian National University (u4837946)
+ * There are no conflicts of interest arising if I am involved in implementing the challenge.
