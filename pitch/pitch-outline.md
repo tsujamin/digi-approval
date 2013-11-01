@@ -1,12 +1,14 @@
 Your summary of the Challenge
 =============================
 
-*We want your own words here for the Challenge you decide to tackle.*
+A thriving, vibrant city should make it easy for citizens and small businesses to run public events. At the same time,  regulations and permit systems are needed to make sure that events are run in a safe, community-friendly and sustainable way.
+
+Unfortunately, the proliferation of regulations and permits has made running events into something more akin to navigating a maze. The point of this challenge it to provide Canberrans with a simple, efficient way to navigate the maze.
+
+The goal of the challenge is to provide residents and businesses with a clear, streamlined way to navigate the various approvals required. The system should provide a central point of contact, so that, as far as possible, a single public servant sees the process through from start to finish and is able to help resolve problems as they come up. The system should lay out the requirements clearly, providing tools like checklists to ensure that applicants understand what is required of them and can meet those requirements with a minimum of fuss.
 
 Your concept of how to address it
 ================================
-
-*We need enough detail to be able to assess the viability, practicality, supportability, and costs for what you propose.*
 
 Our solution is a web based *workflow engine*, that provides superior flexibility to directorates, a consistent user interface to applicants, and utilises standardised components so it can be constructed within 3 months and maintained cheaply and easily.
 
@@ -143,10 +145,16 @@ Your proposed project milestones
 
 *As per above, the bake-off projects will run for approximately 3 months.*
 
+We propose the following milestones:
+
+* By the end of week 1: Infrastructure set up, technology stack working.
+* By the end of week 4: Static (manually coded) workflows work.
+* During week 9/10: Dynamic (user entered) workflows can be created and work.
+We will then use the time until the end of week 12 to polish the user interface and catch up on any missed milestones. Providing this "buffer time" means we are better equiped to deal with any unexpected issues that develop.
+
+
 The critical dependencies
 =========================
-
-*Please tell us what you are assuming, what you will need, to develop your idea into a proper proof-of-concept (POC) with associated case study report.*
 
 Key Assumptions
 ---------------
@@ -162,11 +170,8 @@ Key Requirements
  * Some costs, as detailed below.
 
 
-
 Likely costs
 ============
-
-*To be involved you have to be prepared to give your time voluntarily. So other than your (or your team’s) time, are there any other costs you anticipate incurring in developing your POC. Note that the DCC will fund innovator expenses (based on valid receipts) to a maximum of $5,000.*
 
 Our main cost will be hosting. To ensure we design in a scalable way, we will be using a number of instances on AWS. This prevents us from accidentally making assumptions that will not hold true if the system is scaled up. Our estimate is for 6 AWS t1.micro instances for 3 months, for an estimated $75/month, or $225 for the duration of the bake-off.
 
@@ -177,12 +182,10 @@ Our total estimated costs are $300.
 Your full solution assessment
 =============================
 
-*Tell us what you think would be involved in turning your concept into a fully working, scalable solution for the challenge.*
-
 The full details for our proof-of-concept are listed above. 
 
 Assuming our proof-of-concept is successful, the following major steps would be required to deploy it publically:
-* **The services of a skilled graphics designer**. We have a range of coding and user-experience skills, but we lack good graphics skills. A skilled graphics designer would be needed to make things pretty and consistent with the rest of the visual identity across the ACT government.
+* **The services of a skilled graphics designer**. We have a range of coding and user-experience skills, but we lack good graphics skills. A skilled graphics designer would be needed to make things aesthetically appealing and consistent with the rest of the visual identity across the ACT government.
 * **A further period of development**. Our prototype will inevitably have some rough edges. It will need an extra couple of months of full-time work to bring it up to a deployable standard, especially with regards to:
     * accessibility (e.g. to WCAG 2.0 standard)
     * load-testing
