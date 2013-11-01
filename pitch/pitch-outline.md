@@ -35,7 +35,7 @@ The concept of a workflow is sufficiently flexible to encompass the range of ste
  * Workflows can be easily visualised as flow charts, so the status of an application is clear to the applicant and to the approving directorate at a glance.
  * Workflows can contain information about time limits: for example if required documentation is not sumbitted within the required time period, the workflow can automatically transition to an expired state.
 
-A sample workflow demonstrating these features is below. This workflow is a very simple sample about an approval process involving an event management plan. Steps an applicant takes are blue, and steps approvers take are green.
+A sample workflow demonstrating these features is below. This workflow is a very simple sample of an approval process involving an event management plan. Steps an applicant takes are blue, and steps approvers take are green.
 
 ![Sample workflow](./imgs/sample-workflow.png?raw=true)
 
@@ -87,7 +87,7 @@ Managers are responsible for allocating approvers to handle various requests. A 
 
 The key advantages of our approach are:
  * Flexiblity: changes to procedures not require programmer intervention
- * Applicants dealing with a consistent approver, while the directorate retains the flexibility to change approvers if the circumstances require it.
+ * Consistency: Applicants deal with a consistent approver, while the directorate retains the flexibility to change approvers if the circumstances require it.
  * Central repository for information and state: all parties involved can see the progress at a glance, who has to take the next step.
 
 
@@ -150,6 +150,7 @@ We propose the following milestones:
 * By the end of week 1: Infrastructure set up, technology stack working.
 * By the end of week 4: Static (manually coded) workflows work.
 * During week 9/10: Dynamic (user entered) workflows can be created and work.
+
 We will then use the time until the end of week 12 to polish the user interface and catch up on any missed milestones. Providing this "buffer time" means we are better equiped to deal with any unexpected issues that develop.
 
 
