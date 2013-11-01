@@ -3,9 +3,9 @@ Your summary of the Challenge
 
 A thriving, vibrant city should make it easy for citizens and small businesses to run public events. At the same time,  regulations and permit systems are needed to make sure that events are run in a safe, community-friendly and sustainable way.
 
-Unfortunately, the proliferation of regulations and permits has made running events into something more akin to navigating a maze. The point of this challenge it to provide Canberrans with a simple, efficient way to navigate the maze.
+Unfortunately, the proliferation of regulations and permits has made running events into something more akin to navigating a maze. The point of this challenge it to provide Canberrans with a simple, efficient way to navigate that maze.
 
-The goal of the challenge is to provide residents and businesses with a clear, streamlined way to navigate the various approvals required. The system should provide a central point of contact, so that, as far as possible, a single public servant sees the process through from start to finish and is able to help resolve problems as they come up. The system should lay out the requirements clearly, providing tools like checklists to ensure that applicants understand what is required of them and can meet those requirements with a minimum of fuss.
+The goal of the challenge is to provide residents and businesses with a clear, streamlined way to navigate the various approvals required. The system should provide a central point of contact so that, as far as possible, a single public servant sees the process through from start to finish and is able to help resolve problems as they come up. The system should lay out the requirements clearly, providing tools like checklists to ensure that applicants understand what is required of them and can meet those requirements with a minimum of fuss.
 
 Your concept of how to address it
 ================================
