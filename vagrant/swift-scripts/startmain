@@ -1,0 +1,6 @@
+#!/bin/bash
+sudo bash -c "mkdir -p /var/cache/swift /var/cache/swift2 /var/cache/swift3 /var/cache/swift4
+chown vagrant:vagrant /var/cache/swift*
+mkdir -p /var/run/swift
+chown vagrant:vagrant /var/run/swift
+swift-init main start"
