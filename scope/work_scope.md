@@ -10,11 +10,11 @@ The system provides the flexibility for workflows to adapt to changing business 
 
 ## 2. Stakeholders ##
 ### Territory and Municipal Services (TAMS)  ###
-
+The current public unleased land permit approval process falls under the jurisdiction of **Territory and Municipal Services (TAMS)** in association with **Parks and Conservation Services (PACS)**. These organisations are the target operators of our system and as such their needs and requirements are of high importance. Where possible and time permitting the system will implement the functionality that through our consultation process they have identified as desirable.
 ### Shared Services ICT (SSICT) ###
-
+**Shared Services ICT** is responsible for maintaining the ACT Governments ICT ecosystem and serves to host several of their current systems. This imposes the requirement for the system to follow SSICT's guidelines regarding permissible software and systems.
 ### Customers ###
-
+This project was submitted as part of the **Digital Canberra Challenge** by a community group which frequently engages in event organising. Part of the systems purpose is to address the concerns of these customers; making the process of event approval a simpler, more efficient process. Whilst the team has yet to engage in community consultation regarding the system we plan to contact the organisation that submitted the challenge and incorporate their feedback into our design process
 
 ## 3. Inclusions ##
 The projects specific inclusions fall into two distinct categories: those which were initially pitched and those that, through consultation with stakeholders, were identified subsequently. The priority of the team is to produce a prototype demonstrating the advantages and strengths of a workflow based system within the challenge timeframe. What follows is a list of functionality inclusions that are considered **"in scope"** of the project but it must be noted that not all may make it into this iteration of the system.
@@ -40,10 +40,8 @@ The consultation period showed us that a major component in the current permit a
 
 #### Reporting and Querying Facilities ####
 Our consultation also introduced us to the current system where querying of the database is readily available and reports used for distribution could be easily generated. Ideally our system would provide similar functionality as not to disrupt current organisational practices.
-
 #### Soft Warnings Regarding Optionality and Processing Time ####
 Currently a reasonable amount of correspondence between customers and TAMS/PACS occurs in relation to whether a permit application need be lodged; consuming valuable processing time. There are also cases where customers lodge applications short of time and within the reserved application processing period of 28 days. This can result in dissatisfaction when approval is not received before the event date. In both of these cases the system may provide a soft warning to the user informing them or warning them of these circumstances; resulting in reduced workload for approvers
-
 #### Payment Systems ####
 Several application varieties currently require payment of some variety. As such the system must provide facilities for workflows to require financial payment at certain stages.
 
@@ -61,6 +59,4 @@ While the following requirements and functionality may not be implementable in t
 + A fully deployed system would, in the future, likely be extended to incorporate permit applications such as those for waste-skip placement and land development.
 + The deployed system would require integration with several of the territories current systems, such as the TRIM document management system and the ACT Government payment portal.
 + It is the desire of several project stakeholders that the future system would serve as a land booking availability portal also. A future cross-integration with the "Booking a government service" challenge was mentioned in passing as a possibility.
-
-## 6. Milestones and Deliverables ##
-
++ As a fully implemented system would likely reside on SSICT infrastructure the system must follow their deployment guidelines. At the present time the majority of the software stack adheres to these guidelines and due to the modular nature of the system the remainder (specifically the DBMS and deployment operating system) should be easily transferable. 
