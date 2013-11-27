@@ -43,7 +43,7 @@ The project's specific inclusions fall into two distinct categories: those which
 
 ## Consultation Based Inclusions ##
 ### Multiple Stakeholder Approval Management ###
-The consultation period showed us that a major component in the current permit application process is seeking approval from the various relevant stakeholders; the AFP and ACTIA for example. This requires inter-agency communication, can result in the customers application requiring modification and in some cases such requests may go unanswered by the relevant agency. Ideally the proposed system will help alleviate problems arising from stakeholder approval using the following methods:
+The consultation period showed us that a major component in the current permit application process is seeking approval from the relevant stakeholders (e.g. AFP, ESA, ACTIA). This requires inter-agency communication, can result in the customers application requiring modification and in some cases such requests may go unanswered by the relevant agency. Ideally the proposed system will help alleviate problems arising from stakeholder approval using the following methods:
 
 + The system will provide the opportunity for workflow stages to automatically identify relevant stakeholders.
 + Upon receiving an application, an approver will be able to refer sections of it to the relevant stakeholders. 
