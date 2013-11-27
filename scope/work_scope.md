@@ -3,21 +3,30 @@
 % 28 November 2013
 
 # Project Overview #
-DigiACTive intends to construct a workflow based approval system for use in event permit application and review. In the proposed design a workflow refers to a series of steps, each with certain criteria and a completing party, that are used to model approval processes. The system will be provided as a browser-based application built on a framework of highly portable open-source technologies. 
+DigiACTive intends to construct a workflow-based system for use in event permit application, assessment and approval. In the proposed design, a workflow refers to a series of steps, each with certain criteria and a completing/approving party, that are used to model approval processes. The system will be provided as a browser-based application built on a framework of highly portable open source technologies. 
 
-Within the applications several roles and interfaces exist. **Adminstrators** of the system will be able to modify and implement new workflows in-browser without the need to write additional code. **Customers** will be provided with an interface allowing new applications to be lodged, pending applications continued and completed applications reviewed. A **Manager** will have the power to delegate the processing of customers applications to various **Reviewers** within the appropriate department.
+Within the system, several roles and interfaces exist to serve the needs of different stakeholders.
 
-The system provides the flexibility for workflows to adapt to changing business rules and processes, a great deal of consistency in the review process and can act as a **one-stop permit shop** for both customers and directorates. A more detailed description of the systems workflow model and software stack can be found in the initial pitch outline.
+ * **Adminstrators** of the system will be able to modify and implement new workflows in-browser without the need to write additional code
+ * **Customers** will be provided with an interface allowing new applications to be lodged, pending applications continued and completed applications reviewed
+ * **Managers** have the power to delegate the processing of customers' applications to various **Reviewers** within the appropriate area
+
+The system will provide flexibility for modifying workflows to adapt to changing business rules and processes, improved consistency in the review and assessment process, and can act as a **one-stop permit shop** for both customers and directorates. A more detailed description of the system's workflow model and software stack can be found in the initial pitch outline.
 
 # Stakeholders #
 ## Territory and Municipal Services (TAMS) ##
-The current public unleased land permit approval process falls under the jurisdiction of **Territory and Municipal Services (TAMS)** in association with **Parks and Conservation Services (PACS)**. These organisations are the target operators of our system and as such their needs and requirements are of high importance. Where possible and time permitting the system will implement the functionality that through our consultation process they have identified as desirable.
+The current public unleased land permit approval process falls under the jurisdiction of the **Licensing and Compliance Section, Parks and City Services Division** within the **Territory and Municipal Services Directorate (TAMS)**. Other units within TAMS also play a role in the approval process -- their requirements are similar to those for **Other Government Agencies** described below. In a production environment, TAMS Licensing and Compliance would be the primary Government user of the system and hold primary administrative and budgetary control over the system. At present, TAMS manages permits using a number of legacy systems which inhibit effective processing of applications. During the consultation process, TAMS have identified a number of requirements, based on their experience with legacy systems, which have been taken into account and will be implemented where possible.
 
 ## Shared Services ICT (SSICT) ##
-**Shared Services ICT** is responsible for maintaining the ACT Government's ICT ecosystem and serves to host several of their current systems. This imposes the requirement for the system to follow SSICT's guidelines regarding permissible software and systems.
+**Shared Services ICT (SSICT)** is responsible for hosting and maintaining the ACT Government's ICT systems. SSICT has a number of policies and procedures in place regarding the Government's software configuration. In a production environment, SSICT would most likely be responsible for hosting and administering the system, and as such the system would be required to comply with these policies. In defining the scope of the project, SSICT's requirements have been taken into account.
+
+## Other Government Agencies ##
+The permit approval process involves several government agencies, including the **Emergency Services Agency**, the **Australian Federal Police**, the **ACT Insurance Authority** and the **Environment Protection Authority**. Each agency is responsible for ensuring that applications meet the relevant requirements within the agency's areas of interest. Each agency has its own policies, procedures and systems for handling applications. The system will be designed so as to allow agencies to communicate effectively with TAMS and customers, approving or denying relevant sections of applications where necessary.
 
 ## Customers ##
-This project was submitted as part of the **Digital Canberra Challenge** by a community group which frequently engages in event organising. Part of the systems purpose is to address the concerns of these customers; making the process of event approval a simpler, more efficient process. Whilst the team has yet to engage in community consultation regarding the system we plan to contact the organisation that submitted the challenge and incorporate their feedback into our design process
+The system's customers include individuals, community organisations, businesses and other government agencies, who are collectively responsible for submitting more than 2,500 permit applications per year. Customers have an expectation of high-quality service from the Government, and have the right to a timely and fair decision on their permit applications. The system should ensure the permit application process is as simple and efficient as possible from the customer's point of view.
+
+This project was submitted as part of the **Digital Canberra Challenge** by a community group, MusicACT, which organises public events on a regular basis. Whilst we have yet to engage in community consultation, we intend to collect and incorporate their feedback during the project's design phase.
 
 # Inclusions #
 The project's specific inclusions fall into two distinct categories: those which were initially pitched and those that, through consultation with stakeholders, were identified subsequently. The priority of the team is to produce a prototype demonstrating the advantages and strengths of a workflow based system within the challenge timeframe. What follows is a list of functionality inclusions that are considered **"in scope"** of the project but it must be noted that not all may make it into this iteration of the system.
