@@ -75,3 +75,12 @@ While the following requirements and functionality may not be implementable in t
 + The deployed system would require integration with several of the territories current systems, such as the TRIM document management system and the ACT Government payment portal.
 + It is the desire of several project stakeholders that the future system would serve as a land booking availability portal also. A future cross-integration with the "Booking a government service" challenge was mentioned in passing as a possibility.
 + As a fully implemented system would likely reside on SSICT infrastructure the system must follow their deployment guidelines. At the present time the majority of the software stack adheres to these guidelines and due to the modular nature of the system the remainder (specifically the DBMS and deployment operating system) should be easily transferable. 
+
+# Milestones #  
+Coinciding with the development stage of the system we propose the following set of milestones. They are primarily those proposed in the original pitch adjusted to match the periods agreed to during the kick-off workshop. 
+
+## 1. Implement a Event Permit Application System with a pre-configured workflow (12/12/13 - 11/1/14) ##
+
+## 2. Pilot test the Milestone One implementation of the system with relevant stakeholders (11/1/14 - 18/1/14) ##
+
+## 3. Implement dynamic workflow functionality within the Event Permit Application System (18/1/14 - 19/02/14) ##
