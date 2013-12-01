@@ -121,13 +121,36 @@ Should TAMS wish to convert the PoC into a full system, the project scoping proc
 **NICTA**
 
 + Ana Belgum is the key point of contact.
++ Michael Phillips is the Manager, eGov Cluster.
 
 # Approved by: #
 
+**TAMS**
+
 Signature: _________________________
 
-Name:
+Name: Fleur Flanery
 
-Position:
+Position: Director, City Services
+
+Date:
+
+**DigiACTive**
+
+Signature: _________________________
+
+Name: Benjamin Roberts
+
+Position: Director
+
+Date:
+
+**NICTA**
+
+Signature: _________________________
+
+Name: Michael Phillips
+
+Position: Manager, eGov Cluster
 
 Date:
