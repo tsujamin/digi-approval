@@ -109,8 +109,18 @@ Should TAMS wish to convert the PoC into a full system, the project scoping proc
 
 ## Key Personell ##
 
+**TAMS**
+
 + Rachel Reid is the key point of contact.
-+ Fleur Flanery is <>TODO<>
++ Fleur Flanery is the Director, City Services.
+
+**DigiACTive**
+
++ Benjamin Roberts is the key point of contact.
+
+**NICTA**
+
++ Ana Belgum is the key point of contact.
 
 # Approved by: #
 
