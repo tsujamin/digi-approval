@@ -5,7 +5,7 @@
 # Objectives and Scope #
 
 ## Objectives ##
-DigiACTive intends to construct a workflow-based system for use in event permit application, assessment and approval. In the proposed design, a workflow refers to a series of steps, each with certain criteria and a completing/approving party, that are used to model approval processes. The system will be provided as a browser-based application built on a framework of highly portable open source technologies. 
+DigiACTive intends to construct a workflow-based system for use in the assessment and approval of open space for events. In the proposed design, a workflow refers to a series of steps, each with certain criteria and a completing/approving party, that are used to model approval processes. The system will be provided as a browser-based application built on a framework of highly portable open source technologies. 
 
 Within the system, several roles and interfaces exist to serve the needs of different stakeholders.
 
@@ -16,7 +16,9 @@ Within the system, several roles and interfaces exist to serve the needs of diff
 The system will provide flexibility for modifying workflows to adapt to changing business rules and processes, improved consistency in the review and assessment process, and can act as a **one-stop permit shop** for both customers and directorates. A more detailed description of the system's workflow model and software stack can be found in the initial pitch outline.
 
 ## Scope: Inclusions ##
-The project's specific inclusions fall into two distinct categories: those which were initially pitched and those that, through consultation with stakeholders, were identified subsequently. The priority of the team is to produce a prototype demonstrating the advantages and strengths of a workflow based system within the challenge timeframe. What follows is a list of functionality inclusions that are considered **"in scope"** of the project but it must be noted that not all may make it into this iteration of the system.
+The priority for DigiACTive is to produce a prototype to assess the use of open space for events using a  workflow based system within the Digitial Canberra Challenge timeframe (by mid-February). The project has two key feature areas: a portal for customer to government interaction; and an efficient framework for multiple stakeholder approval management.
+
+**What follows is a list of functionality inclusions that are considered "in scope" for the project. However, due to time constraints, *not everything may make it into this first iteration of the system*.**
 
 ### Initial Proposal Inclusions ###
 + The system will be modeled on workflows with various stages. Stages can involve the customer providing relevant documents, can lapse or continue after a specified period of time and can contain sub-workflows. Transitioning from one stage to another can emit notifications to the appropriate parties.
@@ -39,7 +41,7 @@ The consultation period showed us that a major component in the current permit a
 + Notifications can be emitted to the stakeholder and approver in the case of non-respondance.
 
 #### Reporting and Querying Facilities ####
-Our consultation also introduced us to the current system where querying of the database is readily available and reports used for distribution could be easily generated. Ideally our system would provide similar functionality as not to disrupt current organisational practices.
+Our consultation also introduced us to the current system where querying of the database is readily available and reports used for distribution could be easily generated. Ideally our system would provide similar functionality. For the sake of procedural consistency we would initially model our reports similar to those produced by the current database system. 
 
 #### Soft Warnings Regarding Optionality and Processing Time ####
 Currently a reasonable amount of correspondence between customers and TAMS/PACS occurs in relation to whether a permit application need be lodged; consuming valuable processing time. There are also cases where customers lodge applications short of time and within the reserved application processing period of 28 days. This can result in dissatisfaction when approval is not received before the event date. In both of these cases the system may provide a soft warning to the user informing them or warning them of these circumstances; resulting in reduced workload for approvers
@@ -51,7 +53,7 @@ Several application varieties currently require payment of some variety. As such
 The following serves to document those ideas and concepts discussed in the planing workshop and in subsequent consultation that are considered exclusions of the current project. The system as implemented in this stage of the project excludes:
 
 + Automatic assessment of the appropriateness of an event in a given location.
-+ The management of land availability and booking calendar for use by customers during the application process. 
++ The management of land availability and booking calendar *for use by customers* during the application process. (This information will be available to staff through the reporting functionality.) 
 + While payment integration will be a consideration during the development, specific integration with the ACT Government's current payment gateway will not be developed. 
 + The system will not serve as a general information portal regarding the territories public land and facilities. This is excluded due to such a portal being general and static enough that it could be developed separate to this system at a different time.
 
