@@ -9,7 +9,7 @@ DigiACTive intends to construct a workflow-based system for use in the assessmen
 
 Within the system, several roles and interfaces exist to serve the needs of different stakeholders.
 
- * **Adminstrators** of the system will be able to modify and implement new workflows in-browser without the need to write additional code
+ * **Administrators** of the system will be able to modify and implement new workflows in-browser without the need to write additional code
  * **Customers** will be provided with an interface allowing new applications to be lodged, pending applications continued and completed applications reviewed
  * **Managers** have the power to delegate the processing of customers' applications to various **Reviewers** within the appropriate area
 
@@ -21,7 +21,7 @@ The priority for DigiACTive is to produce a prototype to assess the use of open 
 **What follows is a list of functionality inclusions that are considered "in scope" for the project. However, due to time constraints, *not everything may make it into this first iteration of the system*.**
 
 ### Initial Proposal Inclusions ###
-+ The system will be modeled on workflows with various stages. Stages can involve the customer providing relevant documents, can lapse or continue after a specified period of time and can contain sub-workflows. Transitioning from one stage to another can emit notifications to the appropriate parties.
++ The system will be modelled on workflows with various stages. Stages can involve the customer providing relevant documents, can lapse or continue after a specified period of time and can contain sub-workflows. Transitioning from one stage to another can emit notifications to the appropriate parties.
 + Administrators will be provided with a management interface where workflows can be created and modified. Such workflows will be rendered as flowcharts for comparison and verification against the corresponding directorate procedures.
 + Managers will be provided an interface which summaries pending applications and allows them to be assigned to a relevant and available approver.
 + Approvers will be provided an interface where they can communicate with and view/process the application of their customers.
@@ -75,7 +75,7 @@ Coinciding with the development stage of the system we propose the following set
 3. Implement dynamic workflow functionality within the Event Permit Application System (18/1/14 - 19/02/14)
 
 ## Governance ##
-The project is goverened according to Section 6 of the e-Government Cluster Collaborative Project Agreement. A Project Board has been constituted to oversee the project consisting of representatives from the ACT Government, NICTA and DigiACTive. 
+The project is governed according to Section 6 of the e-Government Cluster Collaborative Project Agreement. A Project Board has been constituted to oversee the project consisting of representatives from the ACT Government, NICTA and DigiACTive. 
 
 ## Reporting ##
 
@@ -99,7 +99,7 @@ This project was submitted as part of the **Digital Canberra Challenge** by a co
 # Risks #
 As the project is run through Digitial Canberra Challenge, and the final deliverable is a Proof of Concept rather than a full system, it poses low risk.
 
-+ At the proof of concept stage, the system is not public-facing. No data is collected from members of the public. This eliminates a range of privacy risks, and also the risk of any embarassing public malfunction.
++ At the proof of concept stage, the system is not public-facing. No data is collected from members of the public. This eliminates a range of privacy risks, and also the risk of any embarrassing public malfunction.
 + Any confidential or internal information from the ACT government is protected by the confidentiality provisions of the e-Government Cluster Collaborative Project Agreement.
 
 # Resource Management #
@@ -109,7 +109,7 @@ The Digital Canberra Challenge has provided a $5000 budget for reimbursements. D
 
 Should TAMS wish to convert the PoC into a full system, the project scoping process would need to be repeated, and different funding arrangements developed.
 
-## Key Personell ##
+## Key Personnel ##
 
 **TAMS**
 
