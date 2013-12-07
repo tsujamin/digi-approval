@@ -11,9 +11,9 @@ The objective is two-fold:
 
 # Outcomes #
 
-Initially, the desired outcome of the proof of concept is that TAMS will engage in a further project to convert the prototype into a full system.
+Initially, the desired outcome of the proof of concept is that TAMS will be able to make a fully informed decision whether or not to engage in a further project to convert the prototype into a full system.
 
-The desired outcomes of commissioning, developing and deploying a full system are:
+Should TAMS proceed, the desired outcomes of commissioning, developing and deploying a full system are likely to be:
 
 + To increase efficiency of government approval processes, especially multi-agency approvals.
 + To improve the consumer experience ... TODO
@@ -30,9 +30,7 @@ There are two main outputs:
 
 Documented in scope document, attached. (TODO attach)
 
-# Assumptions and Constraints #
-
-TODO
+The document also details the assumptions and constraints for the project.
 
 # Governance and Reporting #
 
@@ -59,18 +57,39 @@ The project budget is $5000, which is available to DigiACTive for recipted expen
 
 # Risk Management #
 
-## Risks to successful delivery of the outcomes ##
+At this stage, the output is a proof of concept leading to an outcome of informed decision making.
 
-What could go wrong?
+## Present Risks ##
 
-+ Unexpected difficulty. Very likely to occur at various points throughout project.
-+ Scope creep/change - mitigated by signed scope document.
+The risks to the initial outcome are limited:
+
+**Risks:**
+
++ **Unexpected difficulty of technical component leading to unsatisfactory POC**
+    + *Likelihood*: Very likely to occur at various points throughout project.
+    + *Severity*: Potentially severe.
+    + *Evaluation*: Requires action. See below.
+
++ **Scope creep/change**
+    + This has been effectively mitigated by the signed scope document, and requires no further action.
+
++ **Conflict in requirements/direction from stakeholders** TODO
+    + TAMS/community groups pushing in different directions due to different foci, pain points.
+    + Reasonably likely in feedback stage.
+    + Ultimately a governance issue?
+
++ **DigiACTive team newness/inexperience leading to poor performance** ...
+    + *Likelihood*: Moderate.
+    + *Severity*: Potentially severe.
 
 
+### Management Plan: unexpected technical difficulty ###
 
-## Risks arising from the outcomes ##
+### Management Plan: DigiACTive team ###
 
-The project poses low risk to TAMS.
+
+## Avoided Risks/Out of scope risks ##
+Should the go-ahead be given after the conclusion of the PoC for scoping, development and deployment of a final system, the risks would need to be reassessed. However, as it stands, the project poses low risk to TAMS:
 
 + **The output is a proof of concept that is not publicly accessible.** This closes off a large range of risks:
    + No confidential user data can be lost or stolen as no confidential user data will enter the system.
@@ -81,11 +100,7 @@ The project poses low risk to TAMS.
 + The DCC budget is for expense reimbursement only, and is capped at $5000. This money is managed by NICTA.
 
 
-Overall, the project poses low risk to TAMS.
-
 # Related Projects #
-
-## Digital Canberra Challenge 2 ##
 
 ## Future extensions ##
 
@@ -105,8 +120,7 @@ Now:
 Future work:
 
 + WCAG 2 (accessibility)
-
-# Quality Control #
++ ACTgov visual identity
 
 # Project Closure and Evaluation #
 
