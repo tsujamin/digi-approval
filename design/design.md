@@ -187,7 +187,7 @@ The POC will be developed in such a way as to make that future work as easy as p
 
 # Ongoing Quality Control #
 
-Firstly, the outputs are a proof of concept, so an output is "fit for purpose" inasmuch as it provides a realistic basis on which TAMS can evaluate the feasibility of converting the POC into a full system.
+Firstly, the outputs are a proof of concept, so an output is "fit for purpose" if it provides a realistic basis on which TAMS can evaluate the feasibility of converting the POC into a full system.
 
 Given the limited duration of the project, there are two major opportunities to verify that the outputs are fit for purpose:
 + In the initial testing of a static workflow.
