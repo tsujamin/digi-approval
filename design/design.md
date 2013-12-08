@@ -44,6 +44,8 @@ There are two main outputs:
 
 The project has been scoped in the attached scope document, which also documents the assumptions and constraints.
 
+TODO attach
+
 # Governance and Reporting #
 
 Per the project agreement, the project is guided by the Project Board.
@@ -113,6 +115,24 @@ The risks to the initial outcome are limited:
     + *Evaluation*: Managed through the Digital Canberra Challenge/Collaborative Agreement governance structure.
 
 ### Management Plan: unexpected technical difficulty ###
+It is virtually inevitable in a technical project that some aspect will prove to be unexpectedly difficult.
+
+A number of steps have been taken to reduce the likelihood of this becoming a show-stopping issue:
+
++ The scope has been managed and restricted. In particular several systems that are unnecessary for a POC and are fiddly and time consuming have been put out of the scope.
++ The project has been designed around well known and widely used tools that have proven to be flexible and scalable: we know the tools are up to the task.
+
+We also have a number of strategies to allow us to manage any issues that as they come up:
+
++ The nature of the POC allows us to "stub out" functionality, to show how it would look and work without actually implementing it. 
+
+    For example, we have decided to "stub out" the payment system by making it pretend that all transactions succeed without actually doing anything. This allows us to integrate payment steps into workflows, without spending our limited time implementing or integrating with a payment system.
+
++ Our regular meetings allow us to raise unexpected challenges, potentially finding novel ways around these problems that satisfy stakeholders' requirements in a way that is easier to implement.
+
++ Our links with NICTA, the innovation community in Canberra, and with the ANU provide us with networks to find experts to help us resolve any issues we are still stuck with.
+
+Ultimately, this is an unavoidable risk that all software projects bear. We are confident that our mitigation strategies are sufficient.
 
 ### Management Plan: DigiACTive team ###
 The DigiACTive team is new, and therefore has all the usual risks of new groups and new companies.
@@ -136,31 +156,58 @@ Risks will need to be reassessed should TAMS wish to proceed to a full system af
 
 # Related Projects #
 
+The closest related work that DigiACTive is aware of is the existing smart-form system. Apart from that, DigiACTive is unaware of any related projects currently ongoing within PACS.
+
+Looking outside of PACS, the other Digital Canberra Challenge project, for the booking of drivers' license tests, is tangentially related in that it's a booking system, but proceeds from a much simpler model - there is no need for multi-agency involvement, for example.
+
 ## Future extensions ##
 
-The project scope is explicitly restricted to a proof of concept. 
-
-### Extend project ###
-
-### Integrate "Plan Your Picnic" material: Google Maps frontend ###
+The project scope is explicitly restricted to a proof of concept. Should the project proceed to a full system, there are a couple of related projects:
++ Plan Your Picnic (<http://planyourpicnic.org.au>) has been identified as the basis for a possible "front end" to the booking system to allow users to discover the most appropriate land for their use case.
++ More generally, the scoping process identified the desire to build a portal of mostly static information about the available public spaces in the ACT.
 
 # Guidelines & Standards #
 
-Now:
+While the project is being developed, the project will be built in line with the following guidelines and standards:
 
-+ SSL
-+ SSICT standards
++ Industry best practise for security and confidentiality, including the use of:
+    + Secure Sockets Layer
+	+ Storage of passwords using salts and a password based key derivation function rather than a simple hashing function.
+	+ Use of parameterised queries to avoid SQL injection attacks.
+	+ Use of proven frameworks over "in house" or DIY technologies.
++ Correct and valid use of technologies such as HTML and CSS, such that all pages pass W3C validation.
++ SSICT standards, such that a full solution can be hosted on SSICT infrastructure with a minimum of fuss.
 
-Future work:
+Before the POC can be deployed, future work will be required to bring it in line with to following other standards:
 
-+ WCAG 2.0 compliance (accessibility)
++ WCAG 2.0 compliance, so as the system meets legislative/human rights requirements for accessibility.
 + ACT Government branding/visual identity
+
+The POC will be developed in such a way as to make that future work as easy as possible.
+
+# Ongoing Quality Control #
+
+Firstly, the outputs are a proof of concept, so an output is "fit for purpose" inasmuch as it provides a realistic basis on which TAMS can evaluate the feasibility of converting the POC into a full system.
+
+Given the limited duration of the project, there are two major opportunities to verify that the outputs are fit for purpose:
++ In the initial testing of a static workflow.
++ In the final evaluation of the POC for the Digital Canberra Challenge judging process.
+
+In addition, the ongoing reporting provides a regular snapshot of progress and an opportunity to make sure the project stays on track.
+
+There is no formal issue reporting system: emails will suffice. Should the project proceed to a full system, an proper issue/bug tracker will be reconsidered.
 
 # Project Closure and Evaluation #
 
-+ It's finishing at 1 Mar whether we like it or not.
-+ DCC evaluation
-+ TAMS internal evaluation - "gate" for go/no-go of next stage
+The initial project has a hard deadline of 1 March 2014, due to the nature of the Digital Canberra Challenge and the terms of the Project Agreement.
+
+Prior to the deadline, DigiACTive will develop a case study documenting its experience.
+
+Following the deadline, the following steps will be taken to close out the project.
+
++ NICTA evaluates the Proof of Concept and Case Study document for the purposes of deciding a winner in the Digital Canberra Challenge competition.
++ TAMS undertakes an internal evaluation of the proof of concept, leading to a go/no-go decision about undertaking the full system.
++ DigiACTive reassesses its ongoing viability and team in light of TAMS' decision.
 
 # Attachment: Functional Brief #
 
