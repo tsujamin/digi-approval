@@ -1,4 +1,12 @@
+% Digital Canberra Challenge -- Project Design
+% DigiACTive Pty Ltd (ABN 62 166 886 871)
+% XX December 2013
+
 # Background #
+
+The ACT Government controls large portions of land within the ACT as public unleased land, including many public parks and nature reserves that are regularly used for events. Holding an event on public unleased land generally requires a permit. Parks and City Services handles approximately 2,500 permit applications per year, covering a wide range of events. Permit applications for large events can be highly complex, involving approval from four or five other government agencies and many pages of supporting documentation.
+
+The current software used for handling land use permits is basic and provides only rudimentary features for managing the permit approval process -- it does not provide an end-to-end system to manage applications from initial submission through to final approval. In particular, all communication with applicants and with other agencies/stakeholders is handled manually via email -- the officer handling the application must manually update the database when an applicant submits an updated document or another agency approves or rejects an application. This process is time-consuming and error-prone.
 
 TODO Insert relevant background.
 
@@ -51,7 +59,7 @@ The project is scheduled by the Gantt chart produced by TAMS and stored on the e
 
 # Budget #
 
-The project budget is $5000, which is available to DigiACTive for recipted expense through NICTA.
+The project budget is $5,000, which is available to DigiACTive for receipted expenses through NICTA.
 
 # Stakeholders & Communication Strategy #
 
@@ -119,8 +127,8 @@ Now:
 
 Future work:
 
-+ WCAG 2 (accessibility)
-+ ACTgov visual identity
++ WCAG 2.0 compliance (accessibility)
++ ACT Government branding/visual identity
 
 # Project Closure and Evaluation #
 
