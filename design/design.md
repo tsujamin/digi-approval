@@ -76,7 +76,8 @@ The Collaborative Agreement defines the interests and communication strategy for
 ## Community Parties ##
 
 + **MusicACT**
-
+    + *Stakeholder interest*: MusicACT set the original challenge. Their interest is in the challenge POC being developed into a full system to improve their experience in dealing with government for the activities they organise. They have identified a number of pain points which they would like to see improved. They see this project as part of a broader process of improving government services.
+	+ *Communication strategy*: DigiACTive has consulted them in the scoping process and will also work with them in the user testing part of the process.
 
 ## Other affected parties ##
 
@@ -102,16 +103,14 @@ The risks to the initial outcome are limited:
 + **Scope creep/change**
     + This has been effectively mitigated by the signed scope document, and requires no further action.
 
-+ **Conflict in requirements/direction from stakeholders** TODO
++ **Conflict in requirements/direction from stakeholders**
     + TAMS/community groups pushing in different directions due to different foci, pain points.
-    + Reasonably likely in feedback stage.
-    + Ultimately a governance issue?
+    + Ultimately this will be managed by the Project Board.
 
 + **DigiACTive team newness/inexperience leading to poor performance**
     + *Likelihood*: Moderate.
     + *Severity*: Potentially severe.
     + *Evaluation*: Managed through the Digital Canberra Challenge/Collaborative Agreement governance structure.
-
 
 ### Management Plan: unexpected technical difficulty ###
 
