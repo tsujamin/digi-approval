@@ -1,6 +1,6 @@
 % Digital Canberra Challenge -- Project Design
 % DigiACTive Pty Ltd (ABN 62 166 886 871)
-% XX December 2013
+% 9 December 2013
 
 # Background #
 
@@ -43,8 +43,6 @@ There are two main outputs:
 # Scope of Work/Assumptions and Constraints #
 
 The project has been scoped in the attached scope document, which also documents the assumptions and constraints.
-
-TODO attach
 
 # Governance and Reporting #
 
@@ -209,6 +207,149 @@ Following the deadline, the following steps will be taken to close out the proje
 + TAMS undertakes an internal evaluation of the proof of concept, leading to a go/no-go decision about undertaking the full system.
 + DigiACTive reassesses its ongoing viability and team in light of TAMS' decision.
 
-# Attachment: Functional Brief #
+# Attachment: Scope Document #
 
-# Attachment: Technical Brief # 
+TODO attach in LaTeX
+
+# Attachment: Technical Brief #
+
+This technical brief updates and extends the original pitch outline available on the eGov Cluster shared folder.
+
+The application considers the following "characters":
+
+ * An *applicant* is someone trying to organise an event or apply for a permit.
+ * There are one or more *agencies* or *directorates*.
+
+    An *agency* is a body that an applicant must work with to get one or more of the permits they require. In this POC, all applications are initially made to TAMS/PACS, which is an agency.
+ 
+    Within an agency, there are 3 roles:
+
+    * An *administrator*, who sets up the application process in terms of workflows, as detailed bleow.
+    * An *approver* works with an applicant to progress their application.
+    * A *manager* is responsible for balancing the workload amongst approvers.
+
+    As part of the application process, an applicant may also deal with other agencies:
+
+    * An applicant may apply directly to the agency for a related permit from within the system.
+    * An approver may send part of the application to another agency for feedback/approval.
+
+    Agencies may be either *in the system* or *out of the system*.
+
+    * Agencies that are *in the system* have their own administrators, approvers and managers: they are set up within the DigiApproval system.
+    * Agencies that are *out of the system* have approvals sent to them by email. Emails to and from them are stored with the application in a correspondence register.
+
+    This provides a way for the system to interoperate with agencies without them needing to take up the system internally.
+
+## User Interface ##
+
+Based on our pitch, we see the user interface unfolding as follows.
+
+### Applicant
+
+Before an applicant can begin a workflow, they must register as a user. 
+
+Once they register with their name and contact details, they will be presented with a dashboard showing at a glance:
+
+ * **Workflows that they can commence.** Once a workflow is commenced, the directorate is notified, and the application is assigned to an approver.
+ * **Any existing applications that they have begun**, and the stage those applications are at. Applicants can pull up the details of their applications and see the entire history in one place. They can then make sure that they have completed any steps necessary for them to complete. The approver responsible for their application is notified whenever the applicant completes a step.
+ * **A link to contact the approver assigned to help them progress their workflow**.
+ * **A link to access completed applications**, should they need to re-download any documents/approvals, and to help them avoid duplicating effort if they arrange repeated events.
+
+A very loose concept of what this might look like is below:
+
+![User wireframe](./imgs/user-wireframe.png?raw=true)
+
+
+### Approvers
+
+When an approver logs in, they can see at a glance:
+
+* The applications for which they are responsible.
+* The status of those applications:
+    * Are they waiting on the applicant?
+    * Are they waiting on another agency? Is that agency responding promptly, or have they taken too long?
+    * Are they "in my court"?
+
+Approvers can then pull up an application for which they are responsible, see, in one place:
+
++ The entire history of the application
++ All the communications that have been exchanged
++ How long the application has been pending, both internally, and with any other agencies involved
++ Any steps necessary to progress it.
+
+The applicant is notified whenever the approver completes a step, and approvers (and possibly applicants) are notified when an involved agency provides feedback.
+
+A very loose concept of what this might look like is below. (This concept sketch doesn't include the multi-agency amendments, but that is in scope for the POC.)
+![Approver wireframe](./imgs/approver-wireframe.png?raw=true)
+
+### Managers ###
+
+A manager will have a simple user interface to assign a workflow that has just commenced to an approver, and is able to re-allocate in-progress workflows if needed. (For example, if an approver is ill or leaves the directorate.)
+
+Managers will also be able to generate reports, as follows.
+
+### Reporting ###
+Based on stakeholder consultation, a reporting front-end has been added, that can generate reports on (at a minimum):
+
++ A calendar basis: for a day, what permits have been approved?
++ A location basis: for a location, what permits have been approved?
++ A "state" basis: how many approvals are pending? How many have been granted/rejected recently? By whom?
+
+All reports can be generated by managers and administrators. Some reports (calendar/location) can be generated by approvers so as they do not double-book events.
+
+## Technology Stack ##
+
+Our solution can be decomposed into a web layer, an application layer, a set of asynchronous workers and a storage layer (file store and database).
+
+![Application architecture](./imgs/tech-overview.png?raw=true) 
+
+Each of these layers is horizontally scalable.
+
+The system will be implemented in [Django][django]. Django:
+
++ is a well known web framework for the Python programming language.
++ is used on sites that deal with millions of hits, so it is known to be able to scale.
++ has a large community of users. It will be easy to find Django developers to keep the system running.
+
+The implementation focuses on scalability, security and portability to SSICT systems. It is being built around:
+
+ * **Operating System**: CentOS
+     * Largely equivalent to the RHEL environment prescribed by SSICT.
+     * Furthermore, our stack should also port without issue to Solaris, as preferred by SSICT.
+ * **Provisioning**: [Chef][chef], meeting the SSICT requirement for managed configuration over ad-hoc configuration.
+ * **Web server**: [nginx][nginx], deploying SSL throughout.
+ * **Application**: Django:
+     * Python 3.3 in preference to 2.7.
+     * A preference for using existing modules as opposed to developing our own functionality.
+     * The workflow engine is [SpiffWorkflow][spiff].
+ * **Worker layer**: [RabbitMQ][rabbitmq], interfaced through [Celery][celery].
+    * Virus scanning workers will be implemented in [ClamAV][clamav], or possibly stubbed out if we run out of time.
+    * Email workers will send mail through Amazon SES, using the SMTP interface for simple transition to SSICT infrastructure.
+ * **Database**: [PostgreSQL][postgres].
+     * Transition to an Oracle database to meet SSICT requirements should be straightforward.
+ * **File storage**: [OpenStack Swift][swift].
+ * **Front end**: [Bootstrap][bootstrap] and [HTML5 boilerplate][h5bp]
+     * Developed with an eye towards standards compliance, accessibility and extensibility.
+
+We will be developing our system on Amazon Web Services (AWS), however, all the technologies have been chosen with a view to the code being hosted on SSICT servers should the prototype proceed to a full system.
+
+### Security
+
+Our system is designed to be able to solidly *authenticate* users, determine what those user are *authorised* to do, ensure the *integrity* of their actions and the system as a whole, while maintaining *confidentially* of applicant and directorate information, using industry best practices.
+
+We will deploy SSL at the front end to ensure applicant passwords and information is encrypted while in transit. We will be implementing as much functionality as possible through standard libraries, reducing the scope for security flaws and error on our part. 
+
+We will also be taking a proactive approach to security wherever possible. For example, a major source of security flaws arise from not verifying user input. Our system will make sure that we that user input is valid, make sure that uploaded documents are of the expected format and are free from known viruses, and so on, *before* they are presented to approvers.
+
+
+[django]: http://django.org "Django"
+[nginx]: http://nginx.org/en "nginx"
+[rabbitmq]: http://rabbitmq.com "RabbitMQ"
+[postgres]: http://postgresql.org "PostgreSQL"
+[swift]: http://swift.openstack.org "OpenStack Swift"
+[chef]: http://www.opscode.com/chef/ "Chef"
+[celery]: http://www.celeryproject.org/ "Celery"
+[clamav]: http://www.clamav.net/lang/en/ "Clam AntiVirus"
+[spiff]: https://github.com/knipknap/SpiffWorkflow "SpiffWorkflow"
+[bootstrap]: http://getbootstrap.com/ "Bootstrap"
+[h5bp]: http://html5boilerplate.com/ "HTML5 Boilerplate"
