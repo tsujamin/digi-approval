@@ -10,11 +10,11 @@ The current software used for handling land use permits is basic and provides on
 
 The process of scoping the project also revealed the following pain points that inform this project:
 
-+ Approvals have to go through multiple agencies, which often fail to respond in time. The proliferation of contacts and lines of communication is difficult to manage.
-+ It is unclear what permits are needed, leading to lots of unnecessary back-and-forth between the department and applicants.
++ Approvals have to go through multiple agencies, which often fail to respond in a timely manner (if at all). The proliferation of contacts and lines of communication is difficult to manage.
++ It is unclear what permits are needed to organise an event, leading to lots of unnecessary back-and-forth between the department and applicants.
 + Applicants are often unaware how long the process is likely to take, leading to disappointment when permits are not ready in time.
-+ Applicants are often unaware of what the different agencies need, leading to lots of to-ing and fro-ing to sort out the correct details.
-+ Applicants are frustrated at how much work has to be done "from scratch" each time.
++ Applicants are often unaware of the requirements of the different agencies, leading to lots of lengthy, time consuming and ultimately avoidable dialogs between parties.
++ Applicants are frustrated at how much work has to be done "from scratch" each time they organise an event.
 
 # Objective #
 
@@ -76,18 +76,22 @@ The Collaborative Agreement defines the interests and communication strategy for
 ## Community Parties ##
 
 + **MusicACT**
-    + *Stakeholder interest*: MusicACT set the original challenge. Their interest is in the challenge POC being developed into a full system to improve their experience in dealing with government for the activities they organise. They have identified a number of pain points which they would like to see improved. They see this project as part of a broader process of improving government services.
+    + *Stakeholder interest*: MusicACT set the original challenge. Their interest is in the challenge POC being developed into a full system, thereby improving their experience in dealing with government whilst organising their events. They have identified a number of pain points which they would like to see improved. They see this project as part of a broader process of improving government services.
 	+ *Communication strategy*: DigiACTive has consulted them in the scoping process and will also work with them in the user testing part of the process.
-
+  
++ **Tuggeranong Community Festival**
+    + *Stakeholder interest*: As the organisers of a large event in the territory they have an interest in the event organisation process being streamlined. They have highlighted a need for transparency and visibility regarding an applications processing status. They also identified a need for clarification of the relevant stakeholders requirements when issuing approvals.
+    + *Communication strategy*: DigiACTive has consulted them in the scoping process and will also work with them in the user testing part of the process.
+    
 ## Other affected parties ##
 
 + **SSICT**
-    + *Stakeholder interest*: SSICT is responsible for the servers that the code would run on if the POC is converted to a full system. At this stage, none of the code runs on SSICT servers.
+    + *Stakeholder interest*: SSICT is responsible for the servers that the project would run on if the POC is converted to a full system. At this stage, none of the code is hosted on SSICT servers.
     + *Communication strategy*: SSICT's requirements are represented by their standards document. The solution is designed to comply with these standards. There is no ongoing communications planned with SSICT at this point.
 
 + **Other Agencies**:
     + *Stakeholder Interest*: The permit approval process involves several government agencies, including the **Emergency Services Agency**, the **Australian Federal Police**, the **ACT Insurance Authority** and the **Environment Protection Authority**. Each agency is responsible for ensuring that applications meet the relevant requirements within the agency's areas of interest. Each agency has its own policies, procedures and systems for handling applications. 
-    + *Communication Strategy*: These agency's interestes have been accounted for in the system design. Provision has been made for agencies to communicate effectively with TAMS staff and customers, whether they choose to adopt the system or remain with existing processes and systems (see the Technical Brief for more details). There is no ongoing communications planned with these agencies at this point.
+    + *Communication Strategy*: These agency's interests have been accounted for in the system design. Provision has been made for agencies to communicate effectively with TAMS staff and customers, whether they choose to adopt the system or remain with existing processes and systems (see the Technical Brief for more details). There is no ongoing communications planned with these agencies at this point.
 
 
 # Risk Management #
@@ -122,28 +126,28 @@ It is virtually inevitable in a technical project that some aspect will prove to
 
 A number of steps have been taken to reduce the likelihood of this becoming a show-stopping issue:
 
-+ The scope has been managed and restricted. In particular several systems that are unnecessary for a POC and are fiddly and time consuming have been put out of the scope.
++ The scope has been managed and restricted. In particular several systems that are unnecessary and difficult/time-consuming for a POC have been put out of the scope.
 + The project has been designed around well known and widely used tools that have proven to be flexible and scalable: we know the tools are up to the task.
 
 We also have a number of strategies to allow us to manage any issues that as they come up:
 
 + The nature of the POC allows us to "stub out" functionality, to show how it would look and work without actually implementing it. 
 
-    For example, we have decided to "stub out" the payment system by making it pretend that all transactions succeed without actually doing anything. This allows us to integrate payment steps into workflows, without spending our limited time implementing or integrating with a payment system.
+    For example, we have decided to "stub out" the payment system by assuming a transaction will succeed without completing further processing. This allows us to integrate payment steps into workflows, without spending our limited time implementing or integrating with a payment system.
 
 + Our regular meetings allow us to raise unexpected challenges, potentially finding novel ways around these problems that satisfy stakeholders' requirements in a way that is easier to implement.
 
-+ Our links with NICTA, the innovation community in Canberra, and with the ANU provide us with networks to find experts to help us resolve any issues we are still stuck with.
++ Our links with NICTA, the innovation community in Canberra and with the ANU provide us with networks of experts that can help us resolve issues we may encounter.
 
 Ultimately, this is an unavoidable risk that all software projects bear. We are confident that our mitigation strategies are sufficient.
 
 ### Management Plan: DigiACTive team ###
-The DigiACTive team is new, and therefore has all the usual risks of new groups and new companies.
+The DigiACTive team is new, and therefore has  the usual risks of new groups and companies.
 
 The risks are largely mitigated by the structure of the Digital Canberra Challenge and the governance arrangements from the Collaborative Agreement.
 
 + The fortnightly meetings provide the *accountability* necessary to detect problems early.
-+ The involvement of NICTA and their experience with early stage commercialisation provides the *resources* and *networks* for DigiACTive to get help to correct problems as they arise.
++ The involvement of NICTA and their experience with early stage commercialisation provides the *resources* and *networks* for DigiACTive to seek help correcting problems as they arise.
 + The structure of the challenge provides a definite end point where the project can be abandoned if it has become unfeasible.
 
 ## Avoided Risks/Out of scope risks ##
@@ -155,14 +159,14 @@ Risks will need to be reassessed should TAMS wish to proceed to a full system af
     + System malfunctions will not lead to downtime or lost productivity internally as the system will not be used beyond a small group of testers at this stage.
    
 + TAMS is not committed to take the project further - if it is not fit for purpose or is going to be to expensive, TAMS can decide not to proceed with the project after the project agreement lapses on 1 March. TAMS is not obligated to progress the project beyond that point.
-+ The DCC budget is for expense reimbursement only, and is capped at $5000. This money is managed by NICTA.
++ The DCC budget is for expense reimbursement only, and is capped at $5000. This is managed by NICTA.
 
 
 # Related Projects #
 
 The closest related work that DigiACTive is aware of is the existing smart-form system. Apart from that, DigiACTive is unaware of any related projects currently ongoing within PACS.
 
-Looking outside of PACS, the other Digital Canberra Challenge project, for the booking of drivers' license tests, is tangentially related in that it's a booking system, but proceeds from a much simpler model - there is no need for multi-agency involvement, for example.
+Looking outside of PACS the other Digital Canberra Challenge project presently running, regarding the booking of drivers' license tests, is tangentially related in that it's a booking system, but targets a different use case and proceeds from a much simpler model - there is no need for multi-agency involvement, for example.
 
 ## Future extensions ##
 
@@ -181,14 +185,14 @@ While the project is being developed, the project will be built in line with the
 	+ Use of parameterised queries to avoid SQL injection attacks.
 	+ Use of proven frameworks over "in house" or DIY technologies.
 + Correct and valid use of technologies such as HTML and CSS, such that all pages pass W3C validation.
-+ SSICT standards, such that a full solution can be hosted on SSICT infrastructure with a minimum of fuss.
++ SSICT standards, such that a full solution can be hosted on SSICT infrastructure with a minimum of intervention.
 
-Before the POC can be deployed, future work will be required to bring it in line with to following other standards:
+Before the POC can be deployed, future work will be required to bring it in line with the following other standards:
 
 + WCAG 2.0 compliance, so as the system meets legislative/human rights requirements for accessibility.
 + ACT Government branding/visual identity
 
-The POC will be developed in such a way as to make that future work as easy as possible.
+The POC will be developed in such a way as to make that future work as simple as possible.
 
 # Ongoing Quality Control #
 
@@ -232,7 +236,7 @@ The application considers the following "characters":
  
     Within an agency, there are 3 roles:
 
-    * An *administrator*, who sets up the application process in terms of workflows, as detailed bleow.
+    * An *administrator*, who sets up the application process in terms of workflows, as detailed below.
     * An *approver* works with an applicant to progress their application.
     * A *manager* is responsible for balancing the workload amongst approvers.
 
@@ -318,7 +322,7 @@ The system will be implemented in [Django][django]. Django:
 
 + is a well known web framework for the Python programming language.
 + is used on sites that deal with millions of hits, so it is known to be able to scale.
-+ has a large community of users. It will be easy to find Django developers to keep the system running.
++ has a large community of users. It will be easy to find Django developers capable of maintaining and extending the system.
 
 The implementation focuses on scalability, security and portability to SSICT systems. It is being built around:
 
@@ -335,7 +339,7 @@ The implementation focuses on scalability, security and portability to SSICT sys
     * Virus scanning workers will be implemented in [ClamAV][clamav], or possibly stubbed out if we run out of time.
     * Email workers will send mail through Amazon SES, using the SMTP interface for simple transition to SSICT infrastructure.
  * **Database**: [PostgreSQL][postgres].
-     * Transition to an Oracle database to meet SSICT requirements should be straightforward.
+     * Transition to an Oracle database to meet SSICT requirements should be straightforward thanks to Django's database abstraction. 
  * **File storage**: [OpenStack Swift][swift].
  * **Front end**: [Bootstrap][bootstrap] and [HTML5 boilerplate][h5bp]
      * Developed with an eye towards standards compliance, accessibility and extensibility.
