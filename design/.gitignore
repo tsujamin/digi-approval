@@ -1,0 +1,6 @@
+*.aux
+*.log
+*.tex
+*.out
+*.synctex.gz
+!*.template.tex

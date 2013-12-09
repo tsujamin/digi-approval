@@ -85,6 +85,11 @@ The Collaborative Agreement defines the interests and communication strategy for
     + *Stakeholder interest*: SSICT is responsible for the servers that the code would run on if the POC is converted to a full system. At this stage, none of the code runs on SSICT servers.
     + *Communication strategy*: SSICT's requirements are represented by their standards document. The solution is designed to comply with these standards. There is no ongoing communications planned with SSICT at this point.
 
++ **Other Agencies**:
+    + *Stakeholder Interest*: The permit approval process involves several government agencies, including the **Emergency Services Agency**, the **Australian Federal Police**, the **ACT Insurance Authority** and the **Environment Protection Authority**. Each agency is responsible for ensuring that applications meet the relevant requirements within the agency's areas of interest. Each agency has its own policies, procedures and systems for handling applications. 
+    + *Communication Strategy*: These agency's interestes have been accounted for in the system design. Provision has been made for agencies to communicate effectively with TAMS staff and customers, whether they choose to adopt the system or remain with existing processes and systems (see the Technical Brief for more details). There is no ongoing communications planned with these agencies at this point.
+
+
 # Risk Management #
 
 At this stage, the output is a proof of concept leading to an outcome of informed decision making.
@@ -136,6 +141,7 @@ Ultimately, this is an unavoidable risk that all software projects bear. We are 
 The DigiACTive team is new, and therefore has all the usual risks of new groups and new companies.
 
 The risks are largely mitigated by the structure of the Digital Canberra Challenge and the governance arrangements from the Collaborative Agreement.
+
 + The fortnightly meetings provide the *accountability* necessary to detect problems early.
 + The involvement of NICTA and their experience with early stage commercialisation provides the *resources* and *networks* for DigiACTive to get help to correct problems as they arise.
 + The structure of the challenge provides a definite end point where the project can be abandoned if it has become unfeasible.
@@ -161,7 +167,8 @@ Looking outside of PACS, the other Digital Canberra Challenge project, for the b
 ## Future extensions ##
 
 The project scope is explicitly restricted to a proof of concept. Should the project proceed to a full system, there are a couple of related projects:
-+ Plan Your Picnic (<http://planyourpicnic.org.au>) has been identified as the basis for a possible "front end" to the booking system to allow users to discover the most appropriate land for their use case.
+
++ [Plan Your Picnic](http://planyourpicnic.org.au) has been identified as the basis for a possible "front end" to the booking system to allow users to discover the most appropriate land for their use case.
 + More generally, the scoping process identified the desire to build a portal of mostly static information about the available public spaces in the ACT.
 
 # Guidelines & Standards #
@@ -188,6 +195,7 @@ The POC will be developed in such a way as to make that future work as easy as p
 Firstly, the outputs are a proof of concept, so an output is "fit for purpose" if it provides a realistic basis on which TAMS can evaluate the feasibility of converting the POC into a full system.
 
 Given the limited duration of the project, there are two major opportunities to verify that the outputs are fit for purpose:
+
 + In the initial testing of a static workflow.
 + In the final evaluation of the POC for the Digital Canberra Challenge judging process.
 
@@ -280,6 +288,7 @@ Approvers can then pull up an application for which they are responsible, see, i
 The applicant is notified whenever the approver completes a step, and approvers (and possibly applicants) are notified when an involved agency provides feedback.
 
 A very loose concept of what this might look like is below. (This concept sketch doesn't include the multi-agency amendments, but that is in scope for the POC.)
+
 ![Approver wireframe](./imgs/approver-wireframe.png?raw=true)
 
 ### Managers ###

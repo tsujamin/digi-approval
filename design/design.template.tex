@@ -1,0 +1,40 @@
+\documentclass[12pt,a4paper,twosided]{article}
+
+% Compile with "pandoc -S --template=design.template.tex design.md -o design.tex"
+% Then add a:
+% \includepdf[pages=1-6,nup=1x2,frame=true,landscape=true]{attached_work_scope.pdf}
+% point, and remove the ?raw=true from the graphics, and add [width=0.9\textwidth]
+
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage[top=3cm,bottom=3cm,left=2cm,right=2cm]{geometry}
+
+\usepackage{setspace}
+\setlength{\parindent}{0.0in}
+\setlength{\parskip}{0.2in}
+
+\usepackage{fancyhdr}
+\setlength{\headheight}{15.2pt}
+\chead{\sf DCC Project Plan \rm}
+\pagestyle{fancy}
+
+
+
+
+%\usepackage{times}
+\usepackage[T1]{fontenc}
+\usepackage{libertine}
+\usepackage{graphicx}
+\usepackage{pdfpages}
+\usepackage{hyperref}
+\renewcommand*\oldstylenums[1]{{\fontfamily{fxlj}\selectfont #1}}
+\title{$title$}
+\author{$author$}
+\date{$date$}
+\begin{document}
+\maketitle
+$body$
+\end{document}
