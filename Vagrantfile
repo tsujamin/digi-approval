@@ -34,7 +34,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     chef.cookbooks_path = "chef-repo/cookbooks"
     chef.data_bags_path = "chef-repo/data_bags"
     chef.roles_path = "chef-repo/roles"
-    chef.add_recipe "nginx::repo"
-    chef.add_recipe "nginx"
+    chef.add_role("web")
   end
 end

@@ -1,0 +1,19 @@
+{
+  "name": "web",
+  "description": "The web layer of DigiApproval. No application components.",
+  "json_class": "Chef::Role",
+  "default_attributes": {
+  },
+  "override_attributes": {
+  },
+  "chef_type": "role",
+  "run_list": [
+    "recipe[nginx::repo]",
+    "recipe[nginx]",
+    "recipe[web]",
+    "recipe[simple_iptables]"
+  ],
+  "env_run_lists": {
+  }
+}
+
