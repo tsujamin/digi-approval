@@ -35,5 +35,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     chef.data_bags_path = "chef-repo/data_bags"
     chef.roles_path = "chef-repo/roles"
     chef.add_role("web")
+    chef.add_role("database")
   end
 end
