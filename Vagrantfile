@@ -31,7 +31,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Provision the environment to include the required packages
   # config.vm.provision :shell, :path => "vagrant/bootstrap.sh"
   config.vm.provision "chef_solo" do |chef|
-    chef.cookbooks_path = "chef-repo/cookbooks"
+    chef.cookbooks_path = ["chef-repo/cookbooks", "chef-repo/site-cookbooks"]
     chef.data_bags_path = "chef-repo/data_bags"
     chef.roles_path = "chef-repo/roles"
     chef.add_role("web")
