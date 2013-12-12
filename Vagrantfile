@@ -34,6 +34,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     chef.cookbooks_path = ["chef-repo/cookbooks", "chef-repo/site-cookbooks"]
     chef.data_bags_path = "chef-repo/data_bags"
     chef.roles_path = "chef-repo/roles"
+    chef.environments_path = "chef-repo/environments"
+    chef.environment = "development"
     chef.add_role("web")
     chef.add_role("database")
     chef.add_role("app")
