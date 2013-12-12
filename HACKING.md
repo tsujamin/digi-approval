@@ -1,13 +1,17 @@
-# Submodules:
+# Getting started
+
+## Submodules ##
+
 Do this the first time you check out the repository:
 ```shell
 git submodule init
 git submodule update
 ```
 
-# Chef
+## Chef ##
 
-## Setup
+### Setup ###
+
 ```shell
 # recommended but not essential: create a rvm for chef
 rvm use 2.0.0@chef --create 
@@ -16,7 +20,10 @@ gem install chef
 # if using w/o rvm, do sudo gem install
 ```
 
-## Regular use
+# Regular use #
+
+## Hacking on chef ##
+
 ```shell
 rvm use 2.0.0@chef
 
@@ -28,9 +35,21 @@ knife cookbook site install nginx
 
 If you make changes, do ```vagrant provision``` to avoid the whole destroy/up rigmarole.
 
-# Database
+## Database ##
+
 Per ```/var/lib/pgsql/data/pg_hba.conf```, local connections are via ident and therefore must be with the psql user. Circumvernt this by connecting on localhost:
 ```shell
-psql django django_user -h 127.0.0.1```
+psql django django_user -h 127.0.0.1
+```
 
 Password is set in the django_db cookbook in the default recipe, for now.
+
+## App ##
+
+```shell
+vagrant ssh
+
+cd /vagrant/src/digiapproval_project/
+source ../../env/bin/activate
+python manage.py runserver 0.0.0.0:8000
+```

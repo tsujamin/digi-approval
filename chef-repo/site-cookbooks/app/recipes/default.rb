@@ -7,6 +7,14 @@
 # All rights reserved - Do Not Redistribute
 #
 
+# Install Python3
+# this messily hopes the attributes are correctly set elsewhere
+# for now in the role.
+if not ::File.exists?("#{node["python_build"]["install_prefix"]}/bin/python3")
+  import_recipe "python-build"
+end
+
+# Verify that we're a messy dev env only
 if node.chef_environment != "development" 
   abort "No production environment defined yet, only 'development'"
 end
@@ -26,16 +34,12 @@ end
 Chef::Log.info("Installing packages from requirements.txt")
 execute "/vagrant/env/bin/pip install -r requirements.txt" do
       cwd "/vagrant/src"
-      # seems that if we don't set the HOME env var pip tries to log to /root/.pip, which fails due to permissions
-      # setting HOME also enables us to control pip behavior on per-project basis by dropping off a pip.conf file there
-      # GIT_SSH allow us to reuse the deployment key used to clone the main
-      # repository to clone any private requirements
-      #if new_resource.deploy_key
-      #  environment 'HOME' => ::File.join(new_resource.path,'shared'), 'GIT_SSH' => "#{new_resource.path}/deploy-ssh-wrapper"
-      #else
-      #  environment 'HOME' => ::File.join(new_resource.path,'shared')
-      #end
       user "vagrant"
       group "vagrant"
 end
 
+# permit port 8000 for dev traffic
+simple_iptables_rule "http-dev" do
+  rule [ "--proto tcp --dport 8000"]
+  jump "ACCEPT"
+end
