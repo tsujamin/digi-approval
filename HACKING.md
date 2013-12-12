@@ -1,3 +1,10 @@
+# Submodules:
+Do this the first time you check out the repository:
+```shell
+git submodule init
+git submodule update
+```
+
 # Chef
 
 ## Setup
