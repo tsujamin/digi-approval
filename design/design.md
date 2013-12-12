@@ -1,6 +1,6 @@
 % Digital Canberra Challenge -- Project Design
 % DigiACTive Pty Ltd (ABN 62 166 886 871)
-% 9 December 2013
+% 12 December 2013
 
 # Background #
 
@@ -21,7 +21,7 @@ The process of scoping the project also revealed the following pain points that 
 The objective is two-fold:
 
 + To develop a proof of concept system to demonstrate a workflow-based, online system for use in the assessment and approval of open space for events.
-+ To present a case study to the ACT government and NICTA on the experience of the design and development.
++ To present a case study to the ACT Government and the eGov Cluster on the experience of the design and development.
 
 # Outcomes #
 
@@ -50,7 +50,7 @@ Per the project agreement, the project is guided by the Project Board.
 
 The project board consists of:
 
-+ **NICTA**: Michael Phillips
++ **NICTA (eGov Cluster)**: Michael Phillips
 + **TAMS**: Rachel Reid
 + **DigiACTive**: Benjamin Roberts
 
@@ -64,13 +64,13 @@ The project is scheduled by the Gantt chart produced by TAMS and stored on the e
 
 # Budget #
 
-The project budget is $5,000, which is available to DigiACTive for receipted expenses through NICTA.
+The project budget is $5,000, which is available to DigiACTive for receipted expenses through the eGov Cluster.
 
 # Stakeholders & Communication Strategy #
 
 ## Collaborative Agreement Parties ##
 
-The Collaborative Agreement defines the interests and communication strategy for **DigiACTive**, **NICTA** and **TAMS**. 
+The Collaborative Agreement defines the interests and communication strategy for **DigiACTive**, **the eGov Cluster** and **TAMS**. 
 
 
 ## Community Parties ##
@@ -137,7 +137,7 @@ We also have a number of strategies to allow us to manage any issues that as the
 
 + Our regular meetings allow us to raise unexpected challenges, potentially finding novel ways around these problems that satisfy stakeholders' requirements in a way that is easier to implement.
 
-+ Our links with NICTA, the innovation community in Canberra and with the ANU provide us with networks of experts that can help us resolve issues we may encounter.
++ Our links with the eGov Cluster, the innovation community in Canberra and with the ANU provide us with networks of experts that can help us resolve issues we may encounter.
 
 Ultimately, this is an unavoidable risk that all software projects bear. We are confident that our mitigation strategies are sufficient.
 
@@ -147,7 +147,7 @@ The DigiACTive team is new, and therefore has  the usual risks of new groups and
 The risks are largely mitigated by the structure of the Digital Canberra Challenge and the governance arrangements from the Collaborative Agreement.
 
 + The fortnightly meetings provide the *accountability* necessary to detect problems early.
-+ The involvement of NICTA and their experience with early stage commercialisation provides the *resources* and *networks* for DigiACTive to seek help correcting problems as they arise.
++ The involvement of the eGov Cluster and their experience with early stage commercialisation provides the *resources* and *networks* for DigiACTive to seek help correcting problems as they arise.
 + The structure of the challenge provides a definite end point where the project can be abandoned if it has become unfeasible.
 
 ## Avoided Risks/Out of scope risks ##
@@ -159,7 +159,7 @@ Risks will need to be reassessed should TAMS wish to proceed to a full system af
     + System malfunctions will not lead to downtime or lost productivity internally as the system will not be used beyond a small group of testers at this stage.
    
 + TAMS is not committed to take the project further - if it is not fit for purpose or is going to be to expensive, TAMS can decide not to proceed with the project after the project agreement lapses on 1 March. TAMS is not obligated to progress the project beyond that point.
-+ The DCC budget is for expense reimbursement only, and is capped at $5000. This is managed by NICTA.
++ The DCC budget is for expense reimbursement only, and is capped at $5000. This is managed by the eGov Cluster.
 
 
 # Related Projects #
@@ -215,7 +215,7 @@ Prior to the deadline, DigiACTive will develop a case study documenting its expe
 
 Following the deadline, the following steps will be taken to close out the project.
 
-+ NICTA evaluates the Proof of Concept and Case Study document for the purposes of deciding a winner in the Digital Canberra Challenge competition.
++ eGov Cluster3 evaluates the Proof of Concept and Case Study document for the purposes of deciding a winner in the Digital Canberra Challenge competition.
 + TAMS undertakes an internal evaluation of the proof of concept, leading to a go/no-go decision about undertaking the full system.
 + DigiACTive reassesses its ongoing viability and team in light of TAMS' decision.
 
