@@ -11,7 +11,7 @@
 # this messily hopes the attributes are correctly set elsewhere
 # for now in the role.
 if not ::File.exists?("#{node["python_build"]["install_prefix"]}/bin/python3")
-  import_recipe "python-build"
+  include_recipe "python-build"
 end
 
 # Verify that we're a messy dev env only
