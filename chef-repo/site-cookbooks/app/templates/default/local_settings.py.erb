@@ -1,0 +1,13 @@
+DEBUG = <%= @django_debug %>
+
+DATABASES = {
+    'default': {
+        'NAME': '<%= @django_db_name %>',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'USER': '<%= @django_db_user %>',
+        'PASSWORD': '<%= @django_db_password %>',
+        'HOST': '<%= @db_host %>',
+        'PORT': '<%= @db_port  %>',
+    },
+}
+

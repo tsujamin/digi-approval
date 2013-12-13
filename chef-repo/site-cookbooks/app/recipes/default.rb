@@ -30,12 +30,43 @@ python_virtualenv "/vagrant/env" do
   action :create
 end
 
+# install packages
 # it is enough to use the right pip to get a correctly located install
 Chef::Log.info("Installing packages from requirements.txt")
 execute "/vagrant/env/bin/pip install -r requirements.txt" do
       cwd "/vagrant/src"
       user "vagrant"
       group "vagrant"
+end
+
+
+# create local_settings.py
+template "/vagrant/src/digiapproval_project/digiapproval_project/local_settings.py" do
+  source "local_settings.py.erb"
+  owner "vagrant"
+  group "vagrant"
+  mode "644"
+  variables node['digiactive']
+end
+
+# Do all the django setup
+# This has to be done w/i the venv, so we create and run a script for it.
+template "/tmp/init_django.bash" do
+  source "init_django.bash.erb"
+  owner "vagrant"
+  group "vagrant"
+  mode "755"
+  variables node['digiactive']
+end
+
+execute "/tmp/init_django.bash" do
+  cwd "/vagrant/src/digiapproval_project"
+  user "vagrant"
+  group "vagrant"
+end
+
+file "/tmp/init_django.bash" do
+  action :delete
 end
 
 # permit port 8000 for dev traffic

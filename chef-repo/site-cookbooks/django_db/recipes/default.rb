@@ -18,22 +18,22 @@ postgresql_connection_info = {
 }
 
 # create database django
-postgresql_database 'django' do
+postgresql_database node['digiactive']['django_db_name'] do
   connection postgresql_connection_info
   action :create
 end
 
 # create user django, password django
-postgresql_database_user 'django_user' do
+postgresql_database_user node['digiactive']['django_db_user'] do
   connection    postgresql_connection_info
-  password      'django_password'
+  password      node['digiactive']['django_db_password']
   action        :create
 end
 
 # grant rights to db django
-postgresql_database_user 'django_user' do
+postgresql_database_user node['digiactive']['django_db_user'] do
   connection    postgresql_connection_info
-  database_name 'django'
+  database_name node['digiactive']['django_db_name']
   privileges    [:all]
   action        :grant
 end

@@ -1,8 +1,8 @@
 name "database"
 description "Pure Database Server"
 
-default_attributes 'postgresql' => { 'config_pgtune' => {'dbtype' => "web"},
-  'password' => {'postgres' => "Shut up and take my paperwork!"} }
+default_attributes 'postgresql' => { 'config_pgtune' => {'dbtype' => "web"} }
+# Password is set in environment (e.g. development.json)
 
 run_list "recipe[postgresql::server]",
     "recipe[postgresql::config_initdb]",
