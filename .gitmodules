@@ -1,3 +1,6 @@
 [submodule "chef-repo/cookbooks/python-build"]
 	path = chef-repo/cookbooks/python-build
 	url = https://github.com/shimizukawa/chef-python-build
+[submodule "chef-repo/cookbooks/openstack-object-storage"]
+	path = chef-repo/cookbooks/openstack-object-storage
+	url = https://github.com/stackforge/cookbook-openstack-object-storage/
