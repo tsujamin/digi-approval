@@ -1,0 +1,14 @@
+#!/bin/bash
+
+source ../../env/bin/activate
+
+python manage.py syncdb --noinput
+python manage.py createsuperuser --username=<%= @django_superuser %> --email=<%= @django_superuser_email %> --noinput
+
+# massive hack to set password:
+python manage.py shell <<EOF
+from django.contrib.auth.models import User
+user = User.objects.filter(username__exact="<%= @django_superuser %>")[0]
+user.set_password("<%= @django_superuser_password %>")
+user.save()
+EOF

@@ -1,0 +1,2 @@
+# *Don't* check local_settings.py into source control
+local_settings.py

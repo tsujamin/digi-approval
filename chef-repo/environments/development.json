@@ -1,0 +1,25 @@
+{
+  "name": "development",
+  "description": "",
+  "cookbook_versions": {
+  },
+  "json_class": "Chef::Environment",
+  "chef_type": "environment",
+  "default_attributes": {
+      "digiactive": {
+          "db_host": "127.0.0.1",
+          "db_port": "5432",
+          "django_db_name": "django",
+          "django_db_user": "django_user",
+          "django_db_password": "django_password",
+          "django_superuser": "super",
+          "django_superuser_password": "startthecode",
+          "django_superuser_email": "digiactive.canberra@gmail.com",
+          "django_debug": "True"
+      },
+      "postgresql": { "password": {"postgres": "Shut up and take my paperwork!"},
+                      "config": {"port": "5432"} }
+  },
+  "override_attributes": {
+  }
+}
