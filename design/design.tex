@@ -16,10 +16,10 @@
 \setlength{\parindent}{0.0in}
 \setlength{\parskip}{0.2in}
 
-%\usepackage{fancyhdr}
-%\setlength{\headheight}{15.2pt}
-%\chead{\sf DCC Project Plan \rm}
-%\pagestyle{fancy}
+\usepackage{fancyhdr}
+\setlength{\headheight}{15.2pt}
+\chead{\sf DCC Project Plan \rm}
+\pagestyle{fancy}
 
 
 
@@ -33,29 +33,58 @@
 \renewcommand*\oldstylenums[1]{{\fontfamily{fxlj}\selectfont #1}}
 \title{Digital Canberra Challenge -- Project Design}
 \author{DigiACTive Pty Ltd (ABN 62 166 886 871)}
-\date{9 December 2013}
+\date{16 December 2013}
 \begin{document}
 \maketitle
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  clarify ``As part of the application process\ldots{}'' (s16) - include
+  example
+\item
+  clarify `Agencies that are out of the system' (s16) - I've added
+  elsewhere that it's a web-based system. Fleur seems to be thinking
+  that the system will be limited to within TAMS or might require
+  locally installed software or something
+\item
+  change the example wireframe - applications that are part of/separate
+  from application for public land permit. Also say `Assessment underway
+  for liquor licence' (focus on the activity rather than the people
+  involved\ldots{}) (s16.1.1)
+\item
+  `Use public land for an event' rather than `run an event'
+\item
+  ``How long the application has been pending'' - the clock resets when
+  something's sent back for more documentation
+\end{itemize}
+
+More outstanding things + organisational accounts/sub-accounts to keep
+organisational details consistent - associating events together
+e.g.~Festival 2013 with Festival 2014 so that approvers can see past
+event history (is this within scope for POC?) + a `traffic light' system
+for different stages of the application (``How long the application has
+been pending\ldots{}'')
+
 \section{Background}
 
 The ACT Government controls large portions of land within the ACT as
 public unleased land, including many public parks and nature reserves
 that are regularly used for events. Holding an event on public unleased
-land generally requires a permit. Parks and City Services handles
-approximately 2,500 permit applications per year, covering a wide range
-of events. Permit applications for large events can be highly complex,
-involving approval from four or five other government agencies and many
-pages of supporting documentation.
+land generally requires approval. Parks and City Services handles
+approximately 2,500 applications per year, covering a wide range of
+events. Applications for large events can be highly complex, involving
+approval from four or five other government agencies and many pages of
+supporting documentation.
 
-The current software used for handling land use permits is basic and
-provides only rudimentary features for managing the permit approval
-process -- it does not provide an end-to-end system to manage
-applications from initial submission through to final approval. In
-particular, all communication with applicants and with other
-agencies/stakeholders is handled manually via email -- the officer
-handling the application must manually update the database when an
-applicant submits an updated document or another agency approves or
-rejects an application. This process is time-consuming and error-prone.
+The current software used for handling land use approvals is basic and
+provides only rudimentary features for managing the approval process --
+it does not provide an end-to-end system to manage applications from
+initial submission through to final approval. In particular, all
+communication with applicants and with other agencies/stakeholders is
+handled manually via email -- the officer handling the application must
+manually update the database when an applicant submits an updated
+document or another agency approves or rejects an application. This
+process is time-consuming and error-prone.
 
 The process of scoping the project also revealed the following pain
 points that inform this project:
@@ -67,12 +96,12 @@ points that inform this project:
   respond in a timely manner (if at all). The proliferation of contacts
   and lines of communication is difficult to manage.
 \item
-  It is unclear what permits are needed to organise an event, leading to
-  lots of unnecessary back-and-forth between the department and
+  It is unclear what approvals are needed to organise an event, leading
+  to lots of unnecessary back-and-forth between the department and
   applicants.
 \item
   Applicants are often unaware how long the process is likely to take,
-  leading to disappointment when permits are not ready in time.
+  leading to disappointment when approvals are not ready in time.
 \item
   Applicants are often unaware of the requirements of the different
   agencies, leading to lots of lengthy, time consuming and ultimately
@@ -93,29 +122,25 @@ The objective is two-fold:
   online system for use in the assessment and approval of open space for
   events.
 \item
-  To present a case study to the ACT government and NICTA on the
-  experience of the design and development.
+  To present a case study to the ACT Government and the eGov Cluster on
+  the experience of the design and development.
 \end{itemize}
 
 \section{Outcomes}
-
-Initially, the desired outcome of the proof of concept is that TAMS will
-be able to make a fully informed decision whether or not to engage in a
-further project to convert the prototype into a full system.
-
-Should TAMS proceed, the desired outcomes of commissioning, developing
-and deploying a full system are:
 
 \begin{itemize}
 \itemsep1pt\parskip0pt\parsep0pt
 \item
   To increase efficiency of government approval processes, especially
-  multi-agency approvals.
+  multi-agency approvals
 \item
-  To improve the experience of those using the event approval system. In
-  particular, to make it more obvious what is required of applicants and
-  when, what the state of their applications are, and where to go for
-  resources or for help.
+  To improve the experience of those using the event approval system --
+  in particular, to make it more obvious what is required of applicants
+  and when, what the state of their applications are, and where to go
+  for resources or for help
+\item
+  To allow TAMS to make an informed decision on proceeding with further
+  development of a new approvals system
 \end{itemize}
 
 \section{Outputs}
@@ -146,7 +171,7 @@ The project board consists of:
 \begin{itemize}
 \itemsep1pt\parskip0pt\parsep0pt
 \item
-  \textbf{NICTA}: Michael Phillips
+  \textbf{NICTA (eGov Cluster)}: Michael Phillips
 \item
   \textbf{TAMS}: Rachel Reid
 \item
@@ -168,14 +193,15 @@ on the eGovernment Cluster website.
 \section{Budget}
 
 The project budget is \$5,000, which is available to DigiACTive for
-receipted expenses through NICTA.
+receipted expenses through the eGov Cluster.
 
 \section{Stakeholders \& Communication Strategy}
 
 \subsection{Collaborative Agreement Parties}
 
 The Collaborative Agreement defines the interests and communication
-strategy for \textbf{DigiACTive}, \textbf{NICTA} and \textbf{TAMS}.
+strategy for \textbf{DigiACTive}, \textbf{the eGov Cluster} and
+\textbf{TAMS}.
 
 \subsection{Community Parties}
 
@@ -218,7 +244,7 @@ strategy for \textbf{DigiACTive}, \textbf{NICTA} and \textbf{TAMS}.
   \end{itemize}
 \end{itemize}
 
-\subsection{Other affected parties}
+\subsection{Other Affected Parties}
 
 \begin{itemize}
 \itemsep1pt\parskip0pt\parsep0pt
@@ -243,11 +269,13 @@ strategy for \textbf{DigiACTive}, \textbf{NICTA} and \textbf{TAMS}.
   \begin{itemize}
   \itemsep1pt\parskip0pt\parsep0pt
   \item
-    \emph{Stakeholder Interest}: The permit approval process involves
-    several government agencies, including the \textbf{Emergency
-    Services Agency}, the \textbf{Australian Federal Police}, the
-    \textbf{ACT Insurance Authority} and the \textbf{Environment
-    Protection Authority}. Each agency is responsible for ensuring that
+    \emph{Stakeholder Interest}: The approval process involves several
+    government agencies, including the \textbf{National Capital
+    Authority}, the \textbf{Emergency Services Agency}, the
+    \textbf{Australian Federal Police}, the \textbf{ACT Insurance
+    Authority}, \textbf{Roads ACT}, \textbf{ACT Heritage}, \textbf{TAMS
+    Urban Treescapes Branch} and the \textbf{Environment Protection
+    Authority}. Each agency is responsible for ensuring that
     applications meet the relevant requirements within the agency's
     areas of interest. Each agency has its own policies, procedures and
     systems for handling applications.
@@ -363,9 +391,9 @@ that as they come up:
   potentially finding novel ways around these problems that satisfy
   stakeholders' requirements in a way that is easier to implement.
 \item
-  Our links with NICTA, the innovation community in Canberra and with
-  the ANU provide us with networks of experts that can help us resolve
-  issues we may encounter.
+  Our links with the eGov Cluster, the innovation community in Canberra
+  and with the ANU provide us with networks of experts that can help us
+  resolve issues we may encounter.
 \end{itemize}
 
 Ultimately, this is an unavoidable risk that all software projects bear.
@@ -386,15 +414,16 @@ Agreement.
   The fortnightly meetings provide the \emph{accountability} necessary
   to detect problems early.
 \item
-  The involvement of NICTA and their experience with early stage
-  commercialisation provides the \emph{resources} and \emph{networks}
-  for DigiACTive to seek help correcting problems as they arise.
+  The involvement of the eGov Cluster and their experience with early
+  stage commercialisation provides the \emph{resources} and
+  \emph{networks} for DigiACTive to seek help correcting problems as
+  they arise.
 \item
   The structure of the challenge provides a definite end point where the
   project can be abandoned if it has become unfeasible.
 \end{itemize}
 
-\subsection{Avoided Risks/Out of scope risks}
+\subsection{Avoided Risks/Out of Scope risks}
 
 Risks will need to be reassessed should TAMS wish to proceed to a full
 system after the proof of concept. However, as it stands, the project
@@ -427,22 +456,22 @@ poses low risk to TAMS:
   point.
 \item
   The DCC budget is for expense reimbursement only, and is capped at
-  \$5000. This is managed by NICTA.
+  \$5000. This is managed by the eGov Cluster.
 \end{itemize}
 
 \section{Related Projects}
 
 The closest related work that DigiACTive is aware of is the existing
-smart-form system. Apart from that, DigiACTive is unaware of any related
-projects currently ongoing within PACS.
+smart-form system. There is also an ongoing project within PACS to
+develop a booking system for venue bookings.
 
 Looking outside of PACS the other Digital Canberra Challenge project
 presently running, regarding the booking of drivers' license tests, is
 tangentially related in that it's a booking system, but targets a
-different use case and proceeds from a much simpler model - there is no
+different use case and proceeds from a much simpler model -- there is no
 need for multi-agency involvement, for example.
 
-\subsection{Future extensions}
+\subsection{Future Extensions}
 
 The project scope is explicitly restricted to a proof of concept. Should
 the project proceed to a full system, there are a couple of related
@@ -547,9 +576,9 @@ the project.
 \begin{itemize}
 \itemsep1pt\parskip0pt\parsep0pt
 \item
-  NICTA evaluates the Proof of Concept and Case Study document for the
-  purposes of deciding a winner in the Digital Canberra Challenge
-  competition.
+  eGov Cluster3 evaluates the Proof of Concept and Case Study document
+  for the purposes of deciding a winner in the Digital Canberra
+  Challenge competition.
 \item
   TAMS undertakes an internal evaluation of the proof of concept,
   leading to a go/no-go decision about undertaking the full system.
@@ -567,32 +596,39 @@ the project.
 This technical brief updates and extends the original pitch outline
 available on the eGov Cluster shared folder.
 
-The application considers the following ``characters'':
+The DigiApproval system considers the following ``characters'':
 
 \begin{itemize}
 \item
   An \emph{applicant} is someone trying to organise an event or apply
-  for a permit.
+  for an approval.
 \item
   There are one or more \emph{agencies} or \emph{directorates}.
+\item
+  There may be \emph{external stakeholders}.
 
   An \emph{agency} is a body that an applicant must work with to get one
-  or more of the permits they require. In this POC, all applications are
-  initially made to TAMS/PACS, which is an agency.
+  or more of the approvals they require. In this POC, all applications
+  are initially made to TAMS/PACS, which is an agency.
 
-  Within an agency, there are 3 roles:
+  Within each agency, there are 3 roles:
 
   \begin{itemize}
   \itemsep1pt\parskip0pt\parsep0pt
   \item
-    An \emph{administrator}, who sets up the application process in
-    terms of workflows, as detailed below.
+    \emph{Administrators} are responsible for overseeing the system and
+    setting up the application process as \emph{workflows} (detailed
+    below).
   \item
-    An \emph{approver} works with an applicant to progress their
-    application.
+    \emph{Approvers} work with applicants to progress their
+    applications, applying their professional judgment and agency policy
+    to determine when and how applications proceed to the next stage of
+    the workflow.
   \item
-    A \emph{manager} is responsible for balancing the workload amongst
-    approvers.
+    \emph{Managers} are responsible for allocating applications to
+    approvers and ensuring that workload is balanced appropriately among
+    approvers. (Future extensions may automate parts of this role, but
+    are not in scope for the POC.)
   \end{itemize}
 
   As part of the application process, an applicant may also deal with
@@ -601,11 +637,17 @@ The application considers the following ``characters'':
   \begin{itemize}
   \itemsep1pt\parskip0pt\parsep0pt
   \item
-    An applicant may apply directly to the agency for a related permit
-    from within the system.
+    Applicanta may apply directly to other agencies for related types of
+    approval. For example, INSERT EXAMPLE HERE
   \item
-    An approver may send part of the application to another agency for
-    feedback/approval.
+    If an application triggers appropriate predefined rules, the system
+    can automatically send relevant parts (sub-workflows) of the
+    application to other agencies for feedback and approval.
+  \item
+    Approvers may manually send part of the application to other
+    agencies or external stakeholders for feedback and approval. (This
+    is appropriate where automated rules cannot be developed and
+    professional judgement is necessary.)
   \end{itemize}
 
   Agencies may be either \emph{in the system} or \emph{out of the
@@ -615,23 +657,34 @@ The application considers the following ``characters'':
   \itemsep1pt\parskip0pt\parsep0pt
   \item
     Agencies that are \emph{in the system} have their own
-    administrators, approvers and managers: they are set up within the
-    DigiApproval system.
+    administrators, approvers and managers -- they are handled entirely
+    within the DigiApproval system.
   \item
-    Agencies that are \emph{out of the system} have approvals sent to
-    them by email. Emails to and from them are stored with the
-    application in a correspondence register.
+    Agencies that are \emph{out of the system} have applications sent to
+    them by email. Emails are sent through the DigiApproval web
+    interface, and all emails are stored with the relevant application
+    in a correspondence register.
   \end{itemize}
 
   This provides a way for the system to interoperate with agencies
   without them needing to take up the system internally.
+
+  External stakeholders (e.g.~local businesses who may be affected by an
+  event) are treated as if they are \emph{out of the system} agencies.
 \end{itemize}
 
 \subsection{User Interface}
 
+The application will be a Web-based application, with both the applicant
+front-end and the agency back-end accessible using a standard Web
+browser, without any need for installing software on local computers.
+The applicant front-end will be accessible from the wider Internet, with
+the agency back-end accessible from approved ACT/Commonwealth Government
+networks.
+
 Based on our pitch, we see the user interface unfolding as follows.
 
-\subsubsection{Applicant}
+\subsubsection{Applicants}
 
 Before an applicant can begin a workflow, they must register as a user.
 
@@ -655,8 +708,8 @@ presented with a dashboard showing at a glance:
   \textbf{A link to contact the approver assigned to help them progress
   their workflow}.
 \item
-  \textbf{A link to access completed applications}, should they need to
-  re-download any documents/approvals, and to help them avoid
+  \textbf{A link to access previous completed applications}, should they
+  need to re-download any documents/approvals, and to help them avoid
   duplicating effort if they arrange repeated events.
 \end{itemize}
 
@@ -664,7 +717,7 @@ A very loose concept of what this might look like is below:
 
 \begin{figure}[htbp]
 \centering
-\includegraphics [width=0.6\textwidth]{./imgs/user-wireframe.png}
+\includegraphics[width=0.9\textwidth]{./imgs/user-wireframe.png}
 \caption{User wireframe}
 \end{figure}
 
@@ -717,7 +770,7 @@ in scope for the POC.)
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.6\textwidth]{./imgs/approver-wireframe.png}
+\includegraphics[width=0.9\textwidth]{./imgs/approver-wireframe.png}
 \caption{Approver wireframe}
 \end{figure}
 
@@ -738,9 +791,9 @@ that can generate reports on (at a minimum):
 \begin{itemize}
 \itemsep1pt\parskip0pt\parsep0pt
 \item
-  A calendar basis: for a day, what permits have been approved?
+  A calendar basis: for a day, what approvals have been granted?
 \item
-  A location basis: for a location, what permits have been approved?
+  A location basis: for a location, what approvals have been granted?
 \item
   A ``state'' basis: how many approvals are pending? How many have been
   granted/rejected recently? By whom?
@@ -758,7 +811,7 @@ database).
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.6\textwidth]{./imgs/tech-overview.png}
+\includegraphics[width=0.9\textwidth]{./imgs/tech-overview.png}
 \caption{Application architecture}
 \end{figure}
 
@@ -778,7 +831,7 @@ Django:
   has a large community of users. It will be easy to find Django
   developers capable of maintaining and extending the system.
 \end{itemize}
-\newpage
+
 The implementation focuses on scalability, security and portability to
 SSICT systems. It is being built around:
 

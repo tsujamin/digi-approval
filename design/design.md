@@ -1,18 +1,28 @@
 % Digital Canberra Challenge -- Project Design
 % DigiACTive Pty Ltd (ABN 62 166 886 871)
-% 9 December 2013
+% 16 December 2013
+
++ clarify "As part of the application process..." (s16) - include example
++ clarify 'Agencies that are out of the system' (s16) - I've added elsewhere that it's a web-based system. Fleur seems to be thinking that the system will be limited to within TAMS or might require locally installed software or something
++ change the example wireframe - applications that are part of/separate from application for public land permit. Also say 'Assessment underway for liquor licence' (focus on the activity rather than the people involved...) (s16.1.1)
++ 'Use public land for an event' rather than 'run an event'
++ "How long the application has been pending" - the clock resets when something's sent back for more documentation
+
+More outstanding things
++ organisational accounts/sub-accounts to keep organisational details consistent - associating events together e.g. Festival 2013 with Festival 2014 so that approvers can see past event history (is this within scope for POC?)
++ a 'traffic light' system for different stages of the application ("How long the application has been pending...")
 
 # Background #
 
-The ACT Government controls large portions of land within the ACT as public unleased land, including many public parks and nature reserves that are regularly used for events. Holding an event on public unleased land generally requires a permit. Parks and City Services handles approximately 2,500 permit applications per year, covering a wide range of events. Permit applications for large events can be highly complex, involving approval from four or five other government agencies and many pages of supporting documentation.
+The ACT Government controls large portions of land within the ACT as public unleased land, including many public parks and nature reserves that are regularly used for events. Holding an event on public unleased land generally requires approval. Parks and City Services handles approximately 2,500 applications per year, covering a wide range of events. Applications for large events can be highly complex, involving approval from four or five other government agencies and many pages of supporting documentation.
 
-The current software used for handling land use permits is basic and provides only rudimentary features for managing the permit approval process -- it does not provide an end-to-end system to manage applications from initial submission through to final approval. In particular, all communication with applicants and with other agencies/stakeholders is handled manually via email -- the officer handling the application must manually update the database when an applicant submits an updated document or another agency approves or rejects an application. This process is time-consuming and error-prone.
+The current software used for handling land use approvals is basic and provides only rudimentary features for managing the approval process -- it does not provide an end-to-end system to manage applications from initial submission through to final approval. In particular, all communication with applicants and with other agencies/stakeholders is handled manually via email -- the officer handling the application must manually update the database when an applicant submits an updated document or another agency approves or rejects an application. This process is time-consuming and error-prone.
 
 The process of scoping the project also revealed the following pain points that inform this project:
 
 + Approvals have to go through multiple agencies, which often fail to respond in a timely manner (if at all). The proliferation of contacts and lines of communication is difficult to manage.
-+ It is unclear what permits are needed to organise an event, leading to lots of unnecessary back-and-forth between the department and applicants.
-+ Applicants are often unaware how long the process is likely to take, leading to disappointment when permits are not ready in time.
++ It is unclear what approvals are needed to organise an event, leading to lots of unnecessary back-and-forth between the department and applicants.
++ Applicants are often unaware how long the process is likely to take, leading to disappointment when approvals are not ready in time.
 + Applicants are often unaware of the requirements of the different agencies, leading to lots of lengthy, time consuming and ultimately avoidable dialogs between parties.
 + Applicants are frustrated at how much work has to be done "from scratch" each time they organise an event.
 
@@ -21,17 +31,13 @@ The process of scoping the project also revealed the following pain points that 
 The objective is two-fold:
 
 + To develop a proof of concept system to demonstrate a workflow-based, online system for use in the assessment and approval of open space for events.
-+ To present a case study to the ACT government and NICTA on the experience of the design and development.
++ To present a case study to the ACT Government and the eGov Cluster on the experience of the design and development.
 
 # Outcomes #
 
-Initially, the desired outcome of the proof of concept is that TAMS will be able to make a fully informed decision whether or not to engage in a further project to convert the prototype into a full system.
-
-Should TAMS proceed, the desired outcomes of commissioning, developing and deploying a full system are:
-
-+ To increase efficiency of government approval processes, especially multi-agency approvals.
-+ To improve the experience of those using the event approval system. In particular, to make it more obvious what is required of applicants and when, what the state of their applications are, and where to go for resources or for help.
-
++ To increase efficiency of government approval processes, especially multi-agency approvals
++ To improve the experience of those using the event approval system -- in particular, to make it more obvious what is required of applicants and when, what the state of their applications are, and where to go for resources or for help
++ To allow TAMS to make an informed decision on proceeding with further development of a new approvals system
 
 # Outputs #
 
@@ -50,7 +56,7 @@ Per the project agreement, the project is guided by the Project Board.
 
 The project board consists of:
 
-+ **NICTA**: Michael Phillips
++ **NICTA (eGov Cluster)**: Michael Phillips
 + **TAMS**: Rachel Reid
 + **DigiACTive**: Benjamin Roberts
 
@@ -64,13 +70,13 @@ The project is scheduled by the Gantt chart produced by TAMS and stored on the e
 
 # Budget #
 
-The project budget is $5,000, which is available to DigiACTive for receipted expenses through NICTA.
+The project budget is $5,000, which is available to DigiACTive for receipted expenses through the eGov Cluster.
 
 # Stakeholders & Communication Strategy #
 
 ## Collaborative Agreement Parties ##
 
-The Collaborative Agreement defines the interests and communication strategy for **DigiACTive**, **NICTA** and **TAMS**. 
+The Collaborative Agreement defines the interests and communication strategy for **DigiACTive**, **the eGov Cluster** and **TAMS**. 
 
 
 ## Community Parties ##
@@ -83,14 +89,14 @@ The Collaborative Agreement defines the interests and communication strategy for
     + *Stakeholder interest*: As the organisers of a large event in the territory they have an interest in the event organisation process being streamlined. They have highlighted a need for transparency and visibility regarding an applications processing status. They also identified a need for clarification of the relevant stakeholders requirements when issuing approvals.
     + *Communication strategy*: DigiACTive has consulted them in the scoping process and will also work with them in the user testing part of the process.
     
-## Other affected parties ##
+## Other Affected Parties ##
 
 + **SSICT**
     + *Stakeholder interest*: SSICT is responsible for the servers that the project would run on if the POC is converted to a full system. At this stage, none of the code is hosted on SSICT servers.
     + *Communication strategy*: SSICT's requirements are represented by their standards document. The solution is designed to comply with these standards. There is no ongoing communications planned with SSICT at this point.
 
 + **Other Agencies**:
-    + *Stakeholder Interest*: The permit approval process involves several government agencies, including the **Emergency Services Agency**, the **Australian Federal Police**, the **ACT Insurance Authority** and the **Environment Protection Authority**. Each agency is responsible for ensuring that applications meet the relevant requirements within the agency's areas of interest. Each agency has its own policies, procedures and systems for handling applications. 
+    + *Stakeholder Interest*: The approval process involves several government agencies, including the **National Capital Authority**, the **Emergency Services Agency**, the **Australian Federal Police**, the **ACT Insurance Authority**, **Roads ACT**, **ACT Heritage**, **TAMS Urban Treescapes Branch** and the **Environment Protection Authority**. Each agency is responsible for ensuring that applications meet the relevant requirements within the agency's areas of interest. Each agency has its own policies, procedures and systems for handling applications. 
     + *Communication Strategy*: These agency's interests have been accounted for in the system design. Provision has been made for agencies to communicate effectively with TAMS staff and customers, whether they choose to adopt the system or remain with existing processes and systems (see the Technical Brief for more details). There is no ongoing communications planned with these agencies at this point.
 
 
@@ -137,7 +143,7 @@ We also have a number of strategies to allow us to manage any issues that as the
 
 + Our regular meetings allow us to raise unexpected challenges, potentially finding novel ways around these problems that satisfy stakeholders' requirements in a way that is easier to implement.
 
-+ Our links with NICTA, the innovation community in Canberra and with the ANU provide us with networks of experts that can help us resolve issues we may encounter.
++ Our links with the eGov Cluster, the innovation community in Canberra and with the ANU provide us with networks of experts that can help us resolve issues we may encounter.
 
 Ultimately, this is an unavoidable risk that all software projects bear. We are confident that our mitigation strategies are sufficient.
 
@@ -147,10 +153,10 @@ The DigiACTive team is new, and therefore has  the usual risks of new groups and
 The risks are largely mitigated by the structure of the Digital Canberra Challenge and the governance arrangements from the Collaborative Agreement.
 
 + The fortnightly meetings provide the *accountability* necessary to detect problems early.
-+ The involvement of NICTA and their experience with early stage commercialisation provides the *resources* and *networks* for DigiACTive to seek help correcting problems as they arise.
++ The involvement of the eGov Cluster and their experience with early stage commercialisation provides the *resources* and *networks* for DigiACTive to seek help correcting problems as they arise.
 + The structure of the challenge provides a definite end point where the project can be abandoned if it has become unfeasible.
 
-## Avoided Risks/Out of scope risks ##
+## Avoided Risks/Out of Scope risks ##
 Risks will need to be reassessed should TAMS wish to proceed to a full system after the proof of concept. However, as it stands, the project poses low risk to TAMS:
 
 + **The output is a proof of concept that is not publicly accessible.** This closes off a large range of risks:
@@ -159,16 +165,16 @@ Risks will need to be reassessed should TAMS wish to proceed to a full system af
     + System malfunctions will not lead to downtime or lost productivity internally as the system will not be used beyond a small group of testers at this stage.
    
 + TAMS is not committed to take the project further - if it is not fit for purpose or is going to be to expensive, TAMS can decide not to proceed with the project after the project agreement lapses on 1 March. TAMS is not obligated to progress the project beyond that point.
-+ The DCC budget is for expense reimbursement only, and is capped at $5000. This is managed by NICTA.
++ The DCC budget is for expense reimbursement only, and is capped at $5000. This is managed by the eGov Cluster.
 
 
 # Related Projects #
 
-The closest related work that DigiACTive is aware of is the existing smart-form system. Apart from that, DigiACTive is unaware of any related projects currently ongoing within PACS.
+The closest related work that DigiACTive is aware of is the existing smart-form system. There is also an ongoing project within PACS to develop a booking system for venue bookings.
 
-Looking outside of PACS the other Digital Canberra Challenge project presently running, regarding the booking of drivers' license tests, is tangentially related in that it's a booking system, but targets a different use case and proceeds from a much simpler model - there is no need for multi-agency involvement, for example.
+Looking outside of PACS the other Digital Canberra Challenge project presently running, regarding the booking of drivers' license tests, is tangentially related in that it's a booking system, but targets a different use case and proceeds from a much simpler model -- there is no need for multi-agency involvement, for example.
 
-## Future extensions ##
+## Future Extensions ##
 
 The project scope is explicitly restricted to a proof of concept. Should the project proceed to a full system, there are a couple of related projects:
 
@@ -215,48 +221,54 @@ Prior to the deadline, DigiACTive will develop a case study documenting its expe
 
 Following the deadline, the following steps will be taken to close out the project.
 
-+ NICTA evaluates the Proof of Concept and Case Study document for the purposes of deciding a winner in the Digital Canberra Challenge competition.
++ eGov Cluster3 evaluates the Proof of Concept and Case Study document for the purposes of deciding a winner in the Digital Canberra Challenge competition.
 + TAMS undertakes an internal evaluation of the proof of concept, leading to a go/no-go decision about undertaking the full system.
 + DigiACTive reassesses its ongoing viability and team in light of TAMS' decision.
 
 # Attachment: Scope Document #
 
-TODO attach in LaTeX
+\includepdf[pages=1-6,nup=1x2,frame=true,landscape=true]{attached_work_scope.pdf}
 
 # Attachment: Technical Brief #
 
 This technical brief updates and extends the original pitch outline available on the eGov Cluster shared folder.
 
-The application considers the following "characters":
+The DigiApproval system considers the following "characters":
 
- * An *applicant* is someone trying to organise an event or apply for a permit.
+ * An *applicant* is someone trying to organise an event or apply for an approval.
  * There are one or more *agencies* or *directorates*.
+ * There may be *external stakeholders*.
 
-    An *agency* is a body that an applicant must work with to get one or more of the permits they require. In this POC, all applications are initially made to TAMS/PACS, which is an agency.
+    An *agency* is a body that an applicant must work with to get one or more of the approvals they require. In this POC, all applications are initially made to TAMS/PACS, which is an agency.
  
-    Within an agency, there are 3 roles:
+    Within each agency, there are 3 roles:
 
-    * An *administrator*, who sets up the application process in terms of workflows, as detailed below.
-    * An *approver* works with an applicant to progress their application.
-    * A *manager* is responsible for balancing the workload amongst approvers.
+    * *Administrators* are responsible for overseeing the system and setting up the application process as *workflows* (detailed below).
+    * *Approvers* work with applicants to progress their applications, applying their professional judgment and agency policy to determine when and how applications proceed to the next stage of the workflow.
+    * *Managers* are responsible for allocating applications to approvers and ensuring that workload is balanced appropriately among approvers. (Future extensions may automate parts of this role, but are not in scope for the POC.)
 
     As part of the application process, an applicant may also deal with other agencies:
 
-    * An applicant may apply directly to the agency for a related permit from within the system.
-    * An approver may send part of the application to another agency for feedback/approval.
+    * Applicanta may apply directly to other agencies for related types of approval. For example, INSERT EXAMPLE HERE
+    * If an application triggers appropriate predefined rules, the system can automatically send relevant parts (sub-workflows) of the application to other agencies for feedback and approval.
+    * Approvers may manually send part of the application to other agencies or external stakeholders for feedback and approval. (This is appropriate where automated rules cannot be developed and professional judgement is necessary.)
 
     Agencies may be either *in the system* or *out of the system*.
 
-    * Agencies that are *in the system* have their own administrators, approvers and managers: they are set up within the DigiApproval system.
-    * Agencies that are *out of the system* have approvals sent to them by email. Emails to and from them are stored with the application in a correspondence register.
+    * Agencies that are *in the system* have their own administrators, approvers and managers -- they are handled entirely within the DigiApproval system.
+    * Agencies that are *out of the system* have applications sent to them by email. Emails are sent through the DigiApproval web interface, and all emails are stored with the relevant application in a correspondence register.
 
     This provides a way for the system to interoperate with agencies without them needing to take up the system internally.
+    
+    External stakeholders (e.g. local businesses who may be affected by an event) are treated as if they are *out of the system* agencies.
 
 ## User Interface ##
 
+The application will be a Web-based application, with both the applicant front-end and the agency back-end accessible using a standard Web browser, without any need for installing software on local computers. The applicant front-end will be accessible from the wider Internet, with the agency back-end accessible from approved ACT/Commonwealth Government networks.
+
 Based on our pitch, we see the user interface unfolding as follows.
 
-### Applicant
+### Applicants
 
 Before an applicant can begin a workflow, they must register as a user. 
 
@@ -265,11 +277,11 @@ Once they register with their name and contact details, they will be presented w
  * **Workflows that they can commence.** Once a workflow is commenced, the directorate is notified, and the application is assigned to an approver.
  * **Any existing applications that they have begun**, and the stage those applications are at. Applicants can pull up the details of their applications and see the entire history in one place. They can then make sure that they have completed any steps necessary for them to complete. The approver responsible for their application is notified whenever the applicant completes a step.
  * **A link to contact the approver assigned to help them progress their workflow**.
- * **A link to access completed applications**, should they need to re-download any documents/approvals, and to help them avoid duplicating effort if they arrange repeated events.
+ * **A link to access previous completed applications**, should they need to re-download any documents/approvals, and to help them avoid duplicating effort if they arrange repeated events.
 
 A very loose concept of what this might look like is below:
 
-![User wireframe](./imgs/user-wireframe.png?raw=true)
+![User wireframe](./imgs/user-wireframe.png)
 
 
 ### Approvers
@@ -293,7 +305,7 @@ The applicant is notified whenever the approver completes a step, and approvers 
 
 A very loose concept of what this might look like is below. (This concept sketch doesn't include the multi-agency amendments, but that is in scope for the POC.)
 
-![Approver wireframe](./imgs/approver-wireframe.png?raw=true)
+![Approver wireframe](./imgs/approver-wireframe.png)
 
 ### Managers ###
 
@@ -304,8 +316,8 @@ Managers will also be able to generate reports, as follows.
 ### Reporting ###
 Based on stakeholder consultation, a reporting front-end has been added, that can generate reports on (at a minimum):
 
-+ A calendar basis: for a day, what permits have been approved?
-+ A location basis: for a location, what permits have been approved?
++ A calendar basis: for a day, what approvals have been granted?
++ A location basis: for a location, what approvals have been granted?
 + A "state" basis: how many approvals are pending? How many have been granted/rejected recently? By whom?
 
 All reports can be generated by managers and administrators. Some reports (calendar/location) can be generated by approvers so as they do not double-book events.
@@ -314,7 +326,7 @@ All reports can be generated by managers and administrators. Some reports (calen
 
 Our solution can be decomposed into a web layer, an application layer, a set of asynchronous workers and a storage layer (file store and database).
 
-![Application architecture](./imgs/tech-overview.png?raw=true) 
+![Application architecture](./imgs/tech-overview.png) 
 
 Each of these layers is horizontally scalable.
 
