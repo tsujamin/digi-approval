@@ -2,15 +2,24 @@
 % DigiACTive Pty Ltd (ABN 62 166 886 871)
 % 16 December 2013
 
-+ clarify "As part of the application process..." (s16) - include example
-+ clarify 'Agencies that are out of the system' (s16) - I've added elsewhere that it's a web-based system. Fleur seems to be thinking that the system will be limited to within TAMS or might require locally installed software or something
-+ change the example wireframe - applications that are part of/separate from application for public land permit. Also say 'Assessment underway for liquor licence' (focus on the activity rather than the people involved...) (s16.1.1)
-+ 'Use public land for an event' rather than 'run an event'
-+ "How long the application has been pending" - the clock resets when something's sent back for more documentation
+# Change Log
++ v 1 - Initial document
++ v 2 - Expanded Technical Brief in response to feedback from Fleur & Rachel
+    + AJD to insert summary of changes so far
+    + Expand and clarify inter-agency interaction (s16)
+    + Clarify that system is hosted and users require only a web browser to interact with it.
+    + Add organisational account option.
+    + Clarify and provide examples in some cases.
+    + Note requirements for pre-filling applications and traffic-light system for time.
 
-More outstanding things
-+ organisational accounts/sub-accounts to keep organisational details consistent - associating events together e.g. Festival 2013 with Festival 2014 so that approvers can see past event history (is this within scope for POC?)
-+ a 'traffic light' system for different stages of the application ("How long the application has been pending...")
+    Old notes:
+    
+    + clarify "As part of the application process..." (s16) - include example => music festival = public land + liquor lic.
+    + clarify 'Agencies that are out of the system' (s16) - I've added elsewhere that it's a web-based system. Fleur seems to be thinking that the system will be limited to within TAMS or might require locally installed software or something => broke out to section at the top of tech overview.
+    + change the example wireframe - applications that are part of/separate from application for public land permit. Also say 'Assessment underway for liquor licence' (focus on the activity rather than the people involved...) (s16.1.1) => in progress
+    + **'Use public land for an event' rather than 'run an event'** - where?
+    + "How long the application has been pending" - the clock resets when something's sent back for more documentation => additional notes
+    + a 'traffic light' system for different stages of the application ("How long the application has been pending...") => not difficult; added to additional notes.
 
 # Background #
 
@@ -233,38 +242,60 @@ Following the deadline, the following steps will be taken to close out the proje
 
 This technical brief updates and extends the original pitch outline available on the eGov Cluster shared folder.
 
+## System Overview ##
+
+The application will be a Web-based application, with both the applicant front-end and the agency back-end accessible using a standard Web browser, without any need for installing software on local computers. The applicant front-end will be accessible from the wider Internet, with the agency back-end accessible from approved ACT/Commonwealth Government networks.
+
+## Who will use the system? ##
+
 The DigiApproval system considers the following "characters":
 
  * An *applicant* is someone trying to organise an event or apply for an approval.
  * There are one or more *agencies* or *directorates*.
  * There may be *external stakeholders*.
 
-    An *agency* is a body that an applicant must work with to get one or more of the approvals they require. In this POC, all applications are initially made to TAMS/PACS, which is an agency.
+### Applicants
+Applications are lodged by individuals, unincorporated and incorporated associations and companies. In all cases, the application must be signed off on/lodged by a single person who is the point of contact for the application.
+
+In all cases, applicants should have access to information they have previously submitted. In the case of organisations, this previously submitted information should be linked to the organisation, not to any individual within the organisation.
+
+As such, an *applicant* may be either:
+
++ "Jane Citizen" - a Canberran making an application in her own name.
++ "Community Group Inc" - an organisation that runs multiple events. Within the organisation, a person must be nominated as the point of contact. This point of contact can be changed by the organisation as the leadership of the organisation changes.
+
+(For the proof of concept stage, we will start with the private citizen, and extend it to groups if time permits.)
+
+### Agencies
+
+An *agency* is a body that an applicant must work with to get one or more of the approvals they require. In this POC, all applications are initially made to TAMS/PACS, which is an agency.
  
-    Within each agency, there are 3 roles:
+Within each agency, there are 3 roles:
 
-    * *Administrators* are responsible for overseeing the system and setting up the application process as *workflows* (detailed below).
-    * *Approvers* work with applicants to progress their applications, applying their professional judgment and agency policy to determine when and how applications proceed to the next stage of the workflow.
-    * *Managers* are responsible for allocating applications to approvers and ensuring that workload is balanced appropriately among approvers. (Future extensions may automate parts of this role, but are not in scope for the POC.)
+* *Administrators* are responsible for overseeing the system and setting up the application process as *workflows* (detailed below).
+* *Approvers* work with applicants to progress their applications, applying their professional judgment and agency policy to determine when and how applications proceed to the next stage of the workflow.
+* *Managers* are responsible for allocating applications to approvers and ensuring that workload is balanced appropriately among approvers. (Future extensions may automate parts of this role, but are not in scope for the POC.)
 
-    As part of the application process, an applicant may also deal with other agencies:
+#### Dealing with multiple agencies
+As part of a single application process, an applicant may deal with agencies other than the agency which received the original application:
 
-    * Applicanta may apply directly to other agencies for related types of approval. For example, INSERT EXAMPLE HERE
-    * If an application triggers appropriate predefined rules, the system can automatically send relevant parts (sub-workflows) of the application to other agencies for feedback and approval.
-    * Approvers may manually send part of the application to other agencies or external stakeholders for feedback and approval. (This is appropriate where automated rules cannot be developed and professional judgement is necessary.)
+* Applicants may apply directly to other agencies for related types of approval. For example, an applicant applying  to use public land for a music festival may also apply for a liquor license.
+* If an application triggers appropriate predefined rules, the system can automatically send relevant parts (sub-workflows) of the application to other agencies for feedback and approval.
+* Approvers may manually send part of the application to other agencies or external stakeholders for feedback and approval. (This is appropriate where automated rules cannot be developed and professional judgement is necessary.)
 
-    Agencies may be either *in the system* or *out of the system*.
+Agencies may be either *in the system* or *out of the system*.
 
-    * Agencies that are *in the system* have their own administrators, approvers and managers -- they are handled entirely within the DigiApproval system.
-    * Agencies that are *out of the system* have applications sent to them by email. Emails are sent through the DigiApproval web interface, and all emails are stored with the relevant application in a correspondence register.
+ * Agencies that are *in the system* have their own administrators, approvers and managers -- they are handled entirely within the DigiApproval system.
+ * Agencies that are *out of the system* have applications sent to them by email. Emails are sent through the DigiApproval web interface, and all emails are stored with the relevant application in a correspondence register.
 
-    This provides a way for the system to interoperate with agencies without them needing to take up the system internally.
-    
-    External stakeholders (e.g. local businesses who may be affected by an event) are treated as if they are *out of the system* agencies.
+This provides a way for the system to interoperate with agencies without them needing to take up the system internally.
+
+When an applicant applies to another agency, the system should pre-fill appropriate data into their application so as to minimise the amount of work required by applicants.
+
+### External stakeholders
+External stakeholders (e.g. local businesses who may be affected by an event) are treated as if they are *out of the system* agencies.
 
 ## User Interface ##
-
-The application will be a Web-based application, with both the applicant front-end and the agency back-end accessible using a standard Web browser, without any need for installing software on local computers. The applicant front-end will be accessible from the wider Internet, with the agency back-end accessible from approved ACT/Commonwealth Government networks.
 
 Based on our pitch, we see the user interface unfolding as follows.
 
@@ -298,7 +329,7 @@ Approvers can then pull up an application for which they are responsible, see, i
 
 + The entire history of the application
 + All the communications that have been exchanged
-+ How long the application has been pending, both internally, and with any other agencies involved
++ How long the application has been pending, both internally, and with any other agencies involved. A "traffic light" style visualisation will be included.
 + Any steps necessary to progress it.
 
 The applicant is notified whenever the approver completes a step, and approvers (and possibly applicants) are notified when an involved agency provides feedback.
@@ -321,6 +352,12 @@ Based on stakeholder consultation, a reporting front-end has been added, that ca
 + A "state" basis: how many approvals are pending? How many have been granted/rejected recently? By whom?
 
 All reports can be generated by managers and administrators. Some reports (calendar/location) can be generated by approvers so as they do not double-book events.
+
+### Additional notes ###
++ In order for the pre-filling of related data to work, administrators must be able to tag questions in a way the system can understand (i.e. not just by the name of the question).
++ The system requires some way for administrators to define template emails for out of system agency emails, and have them filled in appropriately.
+
++ The system requires rules about what resets a time limit: for example sending documentation back to an applicant for more information.
 
 ## Technology Stack ##
 
