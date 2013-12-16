@@ -39,5 +39,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     chef.add_role("web")
     chef.add_role("database")
     chef.add_role("app")
+    chef.add_recipe("storage")
   end
 end
