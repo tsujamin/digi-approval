@@ -2,7 +2,7 @@ name "app"
 description "Application server"
 
 default_attributes 'python_build' => { "versions" => ["3.3.3"],
-                                       "packages" => ["pip", "virtualenv"] }
+                                       "packages" => [] }
 
 
 run_list         "app"

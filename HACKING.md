@@ -65,6 +65,12 @@ python manage.py runserver 0.0.0.0:8000
 
 The superuser's username is "super" and the password is "startthecode". (It's defined in ```chef-repo/environments/development.json```.)
 
+## Storage ##
+Hack on it with the following credentials:
+```shell
+swift --os-username demo --os-tenant-name demo --os-password password --os-auth-url http://127.0.0.1:5000/v2.0 stat
+```
+
 # Frequently Encountered Problems #
 
 + **I've lost network access in the guest**: have you moved networks? Do a ```vagrant reload``` and try again.
