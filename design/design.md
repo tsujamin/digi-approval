@@ -230,7 +230,7 @@ Prior to the deadline, DigiACTive will develop a case study documenting its expe
 
 Following the deadline, the following steps will be taken to close out the project.
 
-+ eGov Cluster3 evaluates the Proof of Concept and Case Study document for the purposes of deciding a winner in the Digital Canberra Challenge competition.
++ eGov Cluster evaluates the Proof of Concept and Case Study document for the purposes of deciding a winner in the Digital Canberra Challenge competition.
 + TAMS undertakes an internal evaluation of the proof of concept, leading to a go/no-go decision about undertaking the full system.
 + DigiACTive reassesses its ongoing viability and team in light of TAMS' decision.
 
