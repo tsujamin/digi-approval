@@ -1,27 +1,7 @@
 ADMIN_PASSWORD=password
 MYSQL_PASSWORD=password
-RABBIT_PASSWORD=password
 SERVICE_PASSWORD=password
 SERVICE_TOKEN=tokentoken
 SWIFT_HASH=approvem3
-enable_service swift
-disable_service n-api
-disable_service n-crt
-disable_service n-obj
-disable_service n-cpu
-disable_service n-net
-disable_service n-cond
-disable_service cinder
-disable_service c-sch
-disable_service c-api
-disable_service c-vol
-disable_service n-sch
-disable_service n-novnc
-disable_service n-xvnc
-disable_service n-cauth
-disable_service glance
-disable_service tempest
-disable_service g-api
-disable_service g-reg
-disable_service horizon
-disable_service rabbit
+disable_all_services
+enable_service key mysql s-proxy s-object s-container s-account
