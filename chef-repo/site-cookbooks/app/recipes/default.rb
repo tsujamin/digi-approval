@@ -10,7 +10,7 @@
 # Install Python3
 # this messily hopes the attributes are correctly set elsewhere
 # for now in the role.
-if not ::File.exists?("#{node["python_build"]["install_prefix"]}/bin/python3")
+if not ::File.exists?("#{node["python_build"]["install_prefix"]}/bin/python2.7")
   include_recipe "python-build"
 end
 
@@ -24,7 +24,7 @@ end
 
 # create a virtualenv
 python_virtualenv "/vagrant/env" do
-  interpreter "python3"
+  interpreter "python2.7"
   owner "vagrant"
   group "vagrant"
   action :create
