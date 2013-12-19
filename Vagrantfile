@@ -18,8 +18,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine.
+
+  # django dev
   config.vm.network :forwarded_port, guest: 8000, host: 8000
-  config.vm.network :forwarded_port, guest: 80, host: 8080
+  # openstack swift
+  config.vm.network :forwarded_port, guest: 8080, host: 8080
+  # nginx
+  config.vm.network :forwarded_port, guest: 80,   host: 8888
 
   # Provider-specific configuration so you can fine-tune various
   # backing providers for Vagrant. These expose provider-specific options.

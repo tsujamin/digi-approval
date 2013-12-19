@@ -47,3 +47,9 @@ execute "/home/vagrant/devstack/stack.sh" do
   user "vagrant"
   group "vagrant"
 end
+
+# open fw for web interface on 8080
+simple_iptables_rule "swift-frontend" do
+  rule [ "--proto tcp --dport 8080"]
+  jump "ACCEPT"
+end
