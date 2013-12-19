@@ -10,6 +10,9 @@ The process we had was very linear: gather requirements, develop a design docume
 
 **How has this worked out in practise? What was good/bad about doing it the government's way?**
 
+### What's in a name?
+Manager v delgator (even receptionist) -> we're not used to the technical business meanings.
+
 ## Premature Commercialisation is the root of all evil ##
 We spent *a lot* of time doing frankly boring administrative work. We had to start a company, get a shareholder agreement, insurance, and write many, many pages of formal documents.
 
