@@ -15,7 +15,13 @@
           "django_superuser": "super",
           "django_superuser_password": "startthecode",
           "django_superuser_email": "digiactive.canberra@gmail.com",
-          "django_debug": "True"
+          "django_debug": "True",
+          "swift_auth_server": "http://127.0.0.1:5000/v2.0",
+          "django_swift_user": "demo",
+          "django_swift_password": "password",
+          "django_swift_tenant": "demo",
+          "django_swift_container": "digiapproval_files",
+          "swift_base_url": "http://127.0.0.1:8080/"
       },
       "postgresql": { "password": {"postgres": "Shut up and take my paperwork!"},
                       "config": {"port": "5432"} }

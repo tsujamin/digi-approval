@@ -1,2 +1,13 @@
 Django==1.6
+South==0.8.4
+django-storage-swift==0.9
+iso8601==0.1.8
+oslo.config==1.2.1
+prettytable==0.7.2
 psycopg2==2.5.1
+python-keystoneclient==0.2.3
+python-swiftclient==1.4.0
+requests==2.1.0
+simplejson==3.3.1
+six==1.4.1
+wsgiref==0.1.2

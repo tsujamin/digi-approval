@@ -3,6 +3,7 @@
 source ../../env/bin/activate
 
 python manage.py syncdb --noinput
+python manage.py migrate digiapproval
 python manage.py createsuperuser --username=<%= @django_superuser %> --email=<%= @django_superuser_email %> --noinput
 
 # massive hack to set password:

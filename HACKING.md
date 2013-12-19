@@ -71,6 +71,10 @@ Hack on it with the following credentials:
 swift --os-username demo --os-tenant-name demo --os-password password --os-auth-url http://127.0.0.1:5000/v2.0 stat
 ```
 
+There are some settings in the chef development environment. Don't change these becaues localrc for devstack doesn't actually honour them at all. (And several are fixed in devstack anyway.)
+
+**The django module doesn't implement exists() correctly, so if we get overwriting issues, suspect that!**
+
 # Frequently Encountered Problems #
 
 + **I've lost network access in the guest**: have you moved networks? Do a ```vagrant reload``` and try again.

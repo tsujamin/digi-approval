@@ -11,3 +11,11 @@ DATABASES = {
     },
 }
 
+SWIFT_AUTH_URL = '<%= @swift_auth_server %>'
+SWIFT_USERNAME = '<%= @django_swift_user %>'
+SWIFT_KEY = '<%= @django_swift_password %>'
+SWIFT_AUTH_VERSION = 2
+SWIFT_TENANT_NAME = '<%= @django_swift_tenant %>'
+SWIFT_CONTAINER_NAME = '<%= @django_swift_container %>'
+SWIFT_AUTO_CREATE_CONTAINER = True
+SWIFT_BASE_URL = '<%= @swift_base_url %>'
