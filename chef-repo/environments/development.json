@@ -21,7 +21,8 @@
           "django_swift_password": "password",
           "django_swift_tenant": "demo",
           "django_swift_container": "digiapproval_files",
-          "swift_base_url": "http://127.0.0.1:8080/"
+          "swift_base_url": "http://127.0.0.1:8080",
+          "swift_temp_url_key": "super sekrit key"
       },
       "postgresql": { "password": {"postgres": "Shut up and take my paperwork!"},
                       "config": {"port": "5432"} }

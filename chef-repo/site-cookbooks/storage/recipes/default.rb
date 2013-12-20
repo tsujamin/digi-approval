@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # Cookbook Name:: storage
 # Recipe:: default
@@ -28,6 +29,7 @@ git "/home/vagrant/devstack" do
   action :sync
 end
 
+# fixme: ignores environment
 template "/home/vagrant/devstack/localrc" do
   source "localrc.erb"
   user "vagrant"
@@ -43,6 +45,18 @@ end
 
 Chef::Log.info("Installing OpenStack devstack")
 execute "/home/vagrant/devstack/stack.sh" do
+  cwd "/home/vagrant/devstack"
+  user "vagrant"
+  group "vagrant"
+end
+
+# Set the Temp URL key
+# fixme: ignores environment
+execute "set temp url key" do
+  command "swift --os-username admin --os-tenant-name demo " + 
+          "--os-password password --os-auth-url http://127.0.0.1:5000/v2.0 " +
+          "post -m 'Temp-URL-Key:" + node['digiactive']['swift_temp_url_key'] +
+          "'"
   cwd "/home/vagrant/devstack"
   user "vagrant"
   group "vagrant"

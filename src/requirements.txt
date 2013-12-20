@@ -1,6 +1,7 @@
 Django==1.6
 South==0.8.4
-django-storage-swift==0.9
+# we use our own version of django-storage-swift for now
+git+git://github.com/DigiACTive/django-storage-swift.git@digiactive#egg=django-storage-swift
 iso8601==0.1.8
 oslo.config==1.2.1
 prettytable==0.7.2
