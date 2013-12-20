@@ -25,6 +25,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.network :forwarded_port, guest: 8080, host: 8080
   # nginx
   config.vm.network :forwarded_port, guest: 80,   host: 8888
+  # rabbitmq - managment
+  config.vm.network :forwarded_port, guest: 15672, host: 15672
 
   # Provider-specific configuration so you can fine-tune various
   # backing providers for Vagrant. These expose provider-specific options.
@@ -45,5 +47,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     chef.add_role("database")
     chef.add_role("app")
     chef.add_recipe("storage")
+    chef.add_recipe("broker")
   end
 end

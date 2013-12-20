@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 DEBUG = <%= @django_debug %>
 
 DATABASES = {
@@ -11,6 +13,7 @@ DATABASES = {
     },
 }
 
+# Storage layer: Swift
 SWIFT_AUTH_URL = '<%= @swift_auth_server %>'
 SWIFT_USERNAME = '<%= @django_swift_user %>'
 SWIFT_KEY = '<%= @django_swift_password %>'
@@ -21,3 +24,10 @@ SWIFT_AUTO_CREATE_CONTAINER = True
 SWIFT_BASE_URL = '<%= @swift_base_url %>'
 SWIFT_USE_TEMP_URLS = True
 SWIFT_TEMP_URL_KEY = '<%= @swift_temp_url_key %>'
+
+# Message Broker: Celery
+BROKER_URL = '<%= @django_celery_broker_url %>'
+CELERY_RESULT_BACKEND = 'aqmp'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'

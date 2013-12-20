@@ -73,7 +73,20 @@ swift --os-username demo --os-tenant-name demo --os-password password --os-auth-
 
 There are some settings in the chef development environment. Don't change these becaues localrc for devstack doesn't actually honour them at all. (And several are fixed in devstack anyway.)
 
-**The django module doesn't implement exists() correctly, so if we get overwriting issues, suspect that!**
+## Message Broker/Queue (RabbitMQ) ##
+Credentials are guest:guest.
+
+Web interface is at http://localhost:15672/
+
+Start workers with ```celery -A digiapproval_project worker -l info```.
+
+Here's code to simply exercise:
+```python
+from digiapproval_project.celery import debug_task
+a = debug_task.delay()
+print(a.status)
+print(a.result)
+```
 
 # Frequently Encountered Problems #
 
