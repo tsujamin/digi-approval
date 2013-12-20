@@ -4,22 +4,19 @@
 
 # Change Log
 + v 1 - Initial document
-+ v 2 - Expanded Technical Brief in response to feedback from Fleur & Rachel
-    + AJD to insert summary of changes so far
++ v 2 - Expanded document in response to feedback
+    + References to NICTA changed to eGov Cluster
+    + Changed all references to 'permits' to the more generic term 'approvals'
+    + Rearranged and reworded project objectives
+    + Added reference to PACS booking system project
+    + Reworded and clarified description of user roles
+    + Added section dealing with external stakeholders
     + Expand and clarify inter-agency interaction (s16)
-    + Clarify that system is hosted and users require only a web browser to interact with it.
-    + Add organisational account option.
-    + Clarify and provide examples in some cases.
-    + Note requirements for pre-filling applications and traffic-light system for time.
-
-    Old notes:
-    
-    + clarify "As part of the application process..." (s16) - include example => music festival = public land + liquor lic.
-    + clarify 'Agencies that are out of the system' (s16) - I've added elsewhere that it's a web-based system. Fleur seems to be thinking that the system will be limited to within TAMS or might require locally installed software or something => broke out to section at the top of tech overview.
-    + change the example wireframe - applications that are part of/separate from application for public land permit. Also say 'Assessment underway for liquor licence' (focus on the activity rather than the people involved...) (s16.1.1) => in progress
-    + **'Use public land for an event' rather than 'run an event'** - where?
-    + "How long the application has been pending" - the clock resets when something's sent back for more documentation => additional notes
-    + a 'traffic light' system for different stages of the application ("How long the application has been pending...") => not difficult; added to additional notes.
+    + Clarify that system is hosted and users require only a web browser to interact with it
+    + Add organisational account option
+    + Clarify and provide examples in some cases
+    + Note requirements for pre-filling applications and traffic-light system for time
+    + Minor typographical and grammatical changes
 
 # Background #
 
@@ -230,7 +227,7 @@ Prior to the deadline, DigiACTive will develop a case study documenting its expe
 
 Following the deadline, the following steps will be taken to close out the project.
 
-+ eGov Cluster3 evaluates the Proof of Concept and Case Study document for the purposes of deciding a winner in the Digital Canberra Challenge competition.
++ eGov Cluster evaluates the Proof of Concept and Case Study document for the purposes of deciding a winner in the Digital Canberra Challenge competition.
 + TAMS undertakes an internal evaluation of the proof of concept, leading to a go/no-go decision about undertaking the full system.
 + DigiACTive reassesses its ongoing viability and team in light of TAMS' decision.
 
