@@ -1,7 +1,7 @@
 # Encoding: utf-8
 #
 # Cookbook Name:: yum
-# Recipe:: default
+# Resource:: key
 #
 # Copyright 2011, Opscode, Inc.
 #
@@ -17,3 +17,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+actions :add, :remove
+default_action :add
+
+attribute :key, kind_of: String, name_attribute: true
+attribute :url, kind_of: String, default: nil
+
+def initialize(*args)
+  super
+  @action = :add
+end
