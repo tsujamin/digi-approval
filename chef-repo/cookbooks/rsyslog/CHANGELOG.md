@@ -3,6 +3,23 @@ rsyslog Cookbook CHANGELOG
 This file is used to list changes made in each version of the rsyslog cookbook.
 
 
+
+
+
+v1.10.2
+-------
+No change. Version bump for toolchain.
+
+
+v1.10.0
+-------
+### New Feature
+- **[COOK-4021](https://tickets.opscode.com/browse/COOK-4021)** - Allow specifying default templates for local and remote
+
+### Improvement
+- **[COOK-3876](https://tickets.opscode.com/browse/COOK-3876)** - Cater for setting rate limits
+
+
 v1.9.0
 ------
 ### New Feature
