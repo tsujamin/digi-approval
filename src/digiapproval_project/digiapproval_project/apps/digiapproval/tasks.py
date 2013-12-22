@@ -15,7 +15,7 @@ def virus_scan(userfile_pk):
     result = conn.scan_stream(stream)
 
     if result is not None:
-        userfile.virus_status = "FOUND"
+        userfile.virus_status = "THREATFOUND"
     else:
         userfile.virus_status = "CLEAN"
 

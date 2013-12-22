@@ -21,18 +21,17 @@ class UserFile(models.Model):
         """Save the user file, queueing up the virus scan if the file
         is UNSCANNED."""
 
-        # first save, to get a primary key to pass to the task
-        super(UserFile, self).save(*args, **kwargs)
-
-        # then if necessary, scan and save PENDING status.
+        # if necessary, scan and save PENDING status.
         if self.virus_status == 'UNSCANNED':
             from .tasks import virus_scan
-            self.virus_status == 'PENDING'
+            self.virus_status = 'PENDING'
             super(UserFile, self).save(*args, **kwargs)
             # scan *after* we set the PENDING state to avoid a race
             # condition were an actual status could be overwritten
             virus_scan.delay(self.pk)
-
+        else:
+            # otherwise just save
+            super(UserFile, self).save(*args, **kwargs)
         
 
     @property
