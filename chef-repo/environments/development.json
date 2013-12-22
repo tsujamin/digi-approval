@@ -26,7 +26,8 @@
           "django_celery_broker_url": "amqp://guest:guest@localhost//"
       },
       "postgresql": { "password": {"postgres": "Shut up and take my paperwork!"},
-                      "config": {"port": "5432"} }
+                      "config": {"port": "5432"} },
+      "clamav": { "clamd": {"enabled": true} }
   },
   "override_attributes": {
   }

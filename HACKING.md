@@ -78,7 +78,7 @@ Credentials are guest:guest.
 
 Web interface is at http://localhost:15672/
 
-Start workers with ```celery -A digiapproval_project worker -l info```.
+Start workers from within ```/vagrant/src/digiapproval_project``` with ```celery -A digiapproval_project worker -l info```.
 
 Here's code to simply exercise:
 ```python

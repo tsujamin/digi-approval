@@ -48,5 +48,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     chef.add_role("app")
     chef.add_recipe("storage")
     chef.add_recipe("broker")
+    chef.add_recipe("clamav")
   end
 end
