@@ -23,7 +23,7 @@
           "django_swift_container": "digiapproval_files",
           "swift_base_url": "http://127.0.0.1:8080",
           "swift_temp_url_key": "super sekrit key",
-          "django_celery_broker_url": "aqmp://guest:guest@localhost//"
+          "django_celery_broker_url": "amqp://guest:guest@localhost//"
       },
       "postgresql": { "password": {"postgres": "Shut up and take my paperwork!"},
                       "config": {"port": "5432"} }

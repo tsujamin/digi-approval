@@ -27,7 +27,7 @@ SWIFT_TEMP_URL_KEY = '<%= @swift_temp_url_key %>'
 
 # Message Broker: Celery
 BROKER_URL = '<%= @django_celery_broker_url %>'
-CELERY_RESULT_BACKEND = 'aqmp'
+CELERY_RESULT_BACKEND = 'amqp'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
