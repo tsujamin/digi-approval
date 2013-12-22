@@ -31,12 +31,15 @@ python_virtualenv "/vagrant/env" do
 end
 
 # install packages
+# (make sure git is around for our own versions of packages)
+include_recipe 'git'
 # it is enough to use the right pip to get a correctly located install
 Chef::Log.info("Installing packages from requirements.txt")
 execute "/vagrant/env/bin/pip install -r requirements.txt" do
-      cwd "/vagrant/src"
-      user "vagrant"
-      group "vagrant"
+  cwd "/vagrant/src"
+  user "vagrant"
+  group "vagrant"
+  environment 'HOME' => '/home/vagrant/'
 end
 
 

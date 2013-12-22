@@ -10,3 +10,5 @@ depends 'python'
 depends 'python-build'
 # for development firewall hole-poking
 depends 'simple_iptables'
+# while we still have our own git version of packages
+depends 'git'
