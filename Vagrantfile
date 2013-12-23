@@ -43,7 +43,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     chef.roles_path = "chef-repo/roles"
     chef.environments_path = "chef-repo/environments"
     chef.environment = "development"
-    chef.add_role("web")
+    # web role is useless atm
+    #chef.add_role("web")
     chef.add_role("database")
     chef.add_role("app")
     chef.add_recipe("storage")
