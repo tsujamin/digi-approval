@@ -58,6 +58,8 @@ Password is set in the django_db cookbook in the default recipe, for now.
 ```shell
 vagrant ssh
 
+scl enable python27 bash
+
 cd /vagrant/src/digiapproval_project/
 source ../../env/bin/activate
 python manage.py runserver 0.0.0.0:8000
@@ -91,3 +93,5 @@ print(a.result)
 # Frequently Encountered Problems #
 
 + **I've lost network access in the guest**: have you moved networks? Do a ```vagrant reload``` and try again.
+
++ **I've lost my storage layer**: it doesn't start on boot. Do a ```vagrant provision``` to get it back.
