@@ -20,6 +20,12 @@
 
 include_recipe "python::pip"
 
-python_pip "virtualenv" do
-  action :install
+# We want to use the system package!
+major_version = node['platform_version'].split('.').first.to_i
+if platform_family?('rhel') && major_version >= 6
+  package "python-virtualenv"
+else
+  python_pip "virtualenv" do
+    action :install
+  end
 end
