@@ -203,7 +203,7 @@ when 'debian'
   default['postgresql']['pgdg']['release_apt_codename'] = node['lsb']['codename']
 end
 
-default['postgresql']['enable_pgdg_yum'] = false
+default['postgresql']['enable_pgdg_yum'] = true
 
 default['postgresql']['initdb_locale'] = nil
 
