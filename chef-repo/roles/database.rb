@@ -2,7 +2,8 @@ name "database"
 description "Pure Database Server"
 
 default_attributes 'postgresql' => { 'config_pgtune' => {'dbtype' => "web"},
-                                     'version' => "9.3"
+                                     'version' => '9.3',
+                                     'enable_pgdg_yum' => true
                                    }
 # Password is set in environment (e.g. development.json)
 
