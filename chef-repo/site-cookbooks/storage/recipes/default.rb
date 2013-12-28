@@ -36,15 +36,9 @@ template "/home/vagrant/devstack/localrc" do
   group "vagrant"
 end
 
-# check if there is an existing one running
-execute "/home/vagrant/devstack/unstack.sh" do
-cwd "/home/vagrant/devstack"
-  user "vagrant"
-  group "vagrant"
-end
-
+# check if there is an existing one running - stolen from stack.sh
 Chef::Log.info("Installing OpenStack devstack")
-execute "/home/vagrant/devstack/stack.sh" do
+execute 'type -p screen >/dev/null && screen -ls | egrep -q "[0-9].stack" || /home/vagrant/devstack/stack.sh' do
   cwd "/home/vagrant/devstack"
   user "vagrant"
   group "vagrant"
