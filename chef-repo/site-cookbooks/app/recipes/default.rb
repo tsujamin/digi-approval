@@ -15,7 +15,6 @@ end
 # Install Python
 # install the software collections, then install the python 2.7
 # package
-include_recipe "python::virtualenv"
 yum_package "centos-release-SCL"
 yum_package "python27"
 # Allow it to find postgres
@@ -25,17 +24,12 @@ ENV["PATH"] = ENV["PATH"] + ":/usr/pgsql-9.3/bin"
 # heavily based on https://github.com/poise/application_python/blob/master/providers/django.rb
 
 # create a virtualenv
-#old_ld_library_path = ENV["LD_LIBRARY_PATH"]
-#ENV["LD_LIBRARY_PATH"] = "/opt/rh/python27/root/usr/lib64/"
-#give up entirely on python_virtualenv for now
-#python_virtualenv "/vagrant/env" do
+#give up entirely on python_virtualenv for now - it doesn't support environment vars
 execute "scl enable python27 'virtualenv /vagrant/env'" do
-#  interpreter "/opt/rh/python27/root/usr/bin/python"
   user "vagrant"
   group "vagrant"
-#  action :create
+  not_if do ::File.exists?('/vagrant/env/bin/python') end
 end
-#ENV["LD_LIBRARY_PATH"] = old_ld_library_path
 
 # install packages
 # (make sure git is around for our own versions of packages)
