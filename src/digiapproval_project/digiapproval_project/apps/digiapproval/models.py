@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 from django.db import models
+from .fields import WorkflowField, WorkflowSpecField
 
 class UserFile(models.Model):
     VIRUS_STATUS_CHOICES = (
@@ -43,3 +44,28 @@ class UserFile(models.Model):
             return None
 
         return self._file
+
+class WorkflowSpec(models.Model):
+    from django.contrib.auth.models import Group
+    
+    name = models.CharField(max_length = "64")
+    owner = models.ForeignKey(Group)
+    public = models.BooleanField(default=False)
+    spec = WorkflowSpecField()
+    
+class Workflow(models.Model):
+    from django.contrib.auth.models import User
+    
+    customer = models.ForeignKey(User, related_name='workflow_customer')
+    approver = models.ForeignKey(User, related_name='workflow_approver')
+    workflow = WorkflowField()
+    completed = models.BooleanField(default=False)
+    spec = models.ForeignKey(WorkflowSpec)
+    
+    
+    
+    
+    
+    
+    
+    
