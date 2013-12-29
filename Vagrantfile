@@ -27,8 +27,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.network :forwarded_port, guest: 80,   host: 8888
   # rabbitmq - managment
   config.vm.network :forwarded_port, guest: 15672, host: 15672
-  # dja: keystone, required for proxy to work
-  config.vm.network :forwarded_port, guest: 35357, host: 35357
 
   # Provider-specific configuration so you can fine-tune various
   # backing providers for Vagrant. These expose provider-specific options.
