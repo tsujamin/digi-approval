@@ -81,3 +81,6 @@ simple_iptables_rule "http-dev" do
   rule [ "--proto tcp --dport 8000"]
   jump "ACCEPT"
 end
+
+# to debug lamson, install mutt
+yum_package "mutt"

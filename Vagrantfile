@@ -16,6 +16,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # doesn't already exist on the user's system.
   config.vm.box_url = "http://developer.nrel.gov/downloads/vagrant-boxes/CentOS-6.4-x86_64-v20130731.box"
 
+  # Network setup
+  config.vm.network "private_network", ip: "192.168.2.15"
+  
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine.
 
@@ -27,6 +30,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.network :forwarded_port, guest: 80,   host: 8888
   # rabbitmq - managment
   config.vm.network :forwarded_port, guest: 15672, host: 15672
+
+  # NFS mount the /vagrant directory. Very helpful for lamson as it
+  # allows for hard links.
+  config.vm.synced_folder ".", "/vagrant", type: "nfs"
 
   # Provider-specific configuration so you can fine-tune various
   # backing providers for Vagrant. These expose provider-specific options.
