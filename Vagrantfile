@@ -32,8 +32,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.network :forwarded_port, guest: 15672, host: 15672
 
   # NFS mount the /vagrant directory. Very helpful for lamson as it
-  # allows for hard links.
-  config.vm.synced_folder ".", "/vagrant", type: "nfs"
+  # allows for hard links. Forcing tcp + defaults for Fedora host
+  config.vm.synced_folder ".", "/vagrant", type: "nfs", :mount_options => ['rw', 'vers=3', 'tcp']
 
   # Provider-specific configuration so you can fine-tune various
   # backing providers for Vagrant. These expose provider-specific options.
