@@ -62,6 +62,48 @@ class Workflow(models.Model):
     completed = models.BooleanField(default=False)
     spec = models.ForeignKey(WorkflowSpec)
     
+
+    def assign_approver(self):
+        """Finds the least busy approver (in the owner group of the Workflows spec), 
+        returns and assigns it to the workflow"""
+        
+        from django.contrib.auth.models import User
+        if self.spec is None:
+            raise UnboundLocalError("Workflow has no assigned WorkflowSpec")
+        active_approvers = User.objects.filter(groups=self.spec.owner, 
+                                                is_active=True)
+        #Generates a dict of {Approver: no. current workflows}                                        
+        approver_wf_count = dict(map(   lambda x: (x['approver'], x['approver__count']),
+                                        Workflow.objects.filter(completed=False, spec__owner=self.spec.owner)
+                                            .values('approver')
+                                            .annotate(models.Count('approver'))))
+        #Find unassigned approver                                    
+        for approver in active_approvers:
+            if approver.id not in approver_wf_count.keys():
+                self.approver = approver
+                return approver
+        
+        #Find least busy approver
+        least_wf_approver = min(approver_wf_count, key=approver_wf_count.get)
+        approver = User.objects.get(id=least_wf_approver)
+        self.approver = approver
+        return approver
+    
+ 
+    def save(self, *args, **kargs):
+        """Auto assigns approver if none provided"""
+        
+        from django.core.exceptions import ObjectDoesNotExist
+        try:
+            self.approver
+        except ObjectDoesNotExist:
+            self.assign_approver()
+        super(Workflow, self).save(*args, **kargs)    
+        
+    
+        
+        
+    
     
     
     
