@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 from django.db import models
 from .fields import WorkflowField, WorkflowSpecField
+from jsonfield import JSONField
 
 class UserFile(models.Model):
     VIRUS_STATUS_CHOICES = (
@@ -98,7 +99,12 @@ class Workflow(models.Model):
             self.approver
         except ObjectDoesNotExist:
             self.assign_approver()
-        super(Workflow, self).save(*args, **kargs)    
+        super(Workflow, self).save(*args, **kargs)
+
+class Task(models.Model):
+    workflow = models.ForeignKey(Workflow)
+    task = JSONField()
+      
         
     
         
