@@ -37,8 +37,9 @@ class WorkflowField(with_metaclass(models.SubfieldBase, models.Field)):
             return value
         elif isinstance(value, dict):
             return _dserializer.deserialize_workflow(value)
-        else:
+        elif len(value) is not 0:
             return _jserializer.deserialize_workflow(value)
+
             
     def get_prep_value(self, value):
             return _jserializer.serialize_workflow(value)
@@ -66,9 +67,9 @@ class WorkflowSpecField(with_metaclass(models.SubfieldBase, models.Field)):
             return value
         elif isinstance(value, dict):
             return _dserializer.deserialize_workflow_spec(value)
-        else:
+        elif len(value) is not 0:
             return _jserializer.deserialize_workflow_spec(value)
-            
+       
     def get_prep_value(self, value):
             return _jserializer.serialize_workflow_spec(value)
             
