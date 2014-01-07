@@ -93,11 +93,11 @@ print(a.result)
 ## Proposed structure for task data dict
 **Required**, _arbitrary key name_
 {
-  **view**:                                   #the template to be applied to this task
+  **form**:                                   #the form template to be applied to this task
   **actor**: (approver/customer)              #the user who performs the task
   fields: {                                   #fields present in task, its contents depend on the view
     _simplename_: {                           #field
-      **name**:                               #Presentable name of field
+      **label**:                               #Presentable name of field
       **type**: (int/str)                     #input type of field
       **required**: (True/False)              #mandatory status of field
       value:                                  #actual value of the field
