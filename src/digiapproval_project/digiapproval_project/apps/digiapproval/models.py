@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 from django.db import models
 from .fields import WorkflowField, WorkflowSpecField
+from django.contrib.auth.models import User, Group
 
 class UserFile(models.Model):
     VIRUS_STATUS_CHOICES = (
@@ -45,18 +46,46 @@ class UserFile(models.Model):
 
         return self._file
 
-class WorkflowSpec(models.Model):
-    from django.contrib.auth.models import Group
+class CustomerAccount(models.Model):
+    """ End user model. Can either be Customer (single user) or Organisation (User with sub accounts)
+        Related accounts of Organisation must be a list of users. Organisations can add users to this list
+        Related accounts of User are the organisations it is a part of and whose workflows it can use."""
     
+    ACCOUNT_TYPE_CHOICES = (
+        ('CUSTOMER', 'Customer account'),
+        ('ORGANISATION', 'Organisation account (Customer)'),
+    )
+    
+    user = models.OneToOneField(User) 
+    account_type = models.CharField(max_length=16,
+                                    choices=ACCOUNT_TYPE_CHOICES, 
+                                    default='CUSTOMER')
+    related_accounts = models.ManyToManyField(  'self',
+                                                symmetrical = False)
+    
+    def get_member_organisations(self, *args, **kargs):
+        """Gets a the organisations a customer is a member of. Throws if self isnt a customer."""
+        
+    def get_organisation_members(self, *args, **kargs):
+        """Gets the members of an organistaion, Throws if self isnt an organisation"""
+        
+    def get_workflows(self, *args, **kargs):
+        """Get workflows owned by this user, takes **karg of ['completed'] as filter"""
+        
+    def save(self, *args, **kargs):
+        """Saves related auth.User object. Checks types of related accounts for legality"""
+
+
+class WorkflowSpec(models.Model):  
+      
     name = models.CharField(max_length = "64")
     owner = models.ForeignKey(Group)
     public = models.BooleanField(default=False)
     spec = WorkflowSpecField()
     
 class Workflow(models.Model):
-    from django.contrib.auth.models import User
     
-    customer = models.ForeignKey(User, related_name='workflow_customer')
+    customer = models.ForeignKey(CustomerAccount, related_name='workflow_customer')
     approver = models.ForeignKey(User, related_name='workflow_approver')
     workflow = WorkflowField()
     completed = models.BooleanField(default=False)
@@ -99,15 +128,3 @@ class Workflow(models.Model):
         except ObjectDoesNotExist:
             self.assign_approver()
         super(Workflow, self).save(*args, **kargs)    
-        
-    
-        
-        
-    
-    
-    
-    
-    
-    
-    
-    
