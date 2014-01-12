@@ -16,8 +16,8 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal(u'digiapproval', ['CustomerAccount'])
 
-        # Adding M2M table for field related_accounts on 'CustomerAccount'
-        m2m_table_name = db.shorten_name(u'digiapproval_customeraccount_related_accounts')
+        # Adding M2M table for field parent_accounts on 'CustomerAccount'
+        m2m_table_name = db.shorten_name(u'digiapproval_customeraccount_parent_accounts')
         db.create_table(m2m_table_name, (
             ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
             ('from_customeraccount', models.ForeignKey(orm[u'digiapproval.customeraccount'], null=False)),
@@ -33,8 +33,8 @@ class Migration(SchemaMigration):
         # Deleting model 'CustomerAccount'
         db.delete_table(u'digiapproval_customeraccount')
 
-        # Removing M2M table for field related_accounts on 'CustomerAccount'
-        db.delete_table(db.shorten_name(u'digiapproval_customeraccount_related_accounts'))
+        # Removing M2M table for field parent_accounts on 'CustomerAccount'
+        db.delete_table(db.shorten_name(u'digiapproval_customeraccount_parent_accounts'))
 
 
         # Changing field 'Workflow.customer'
@@ -81,7 +81,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'CustomerAccount'},
             'account_type': ('django.db.models.fields.CharField', [], {'default': "'CUSTOMER'", 'max_length': '16'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'related_accounts': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['digiapproval.CustomerAccount']", 'symmetrical': 'False'}),
+            'parent_accounts': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'sub_accounts'", 'symmetrical': 'False', 'to': u"orm['digiapproval.CustomerAccount']"}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['auth.User']", 'unique': 'True'})
         },
         u'digiapproval.userfile': {

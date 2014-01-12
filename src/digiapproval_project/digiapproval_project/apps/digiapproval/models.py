@@ -60,20 +60,49 @@ class CustomerAccount(models.Model):
     account_type = models.CharField(max_length=16,
                                     choices=ACCOUNT_TYPE_CHOICES, 
                                     default='CUSTOMER')
-    related_accounts = models.ManyToManyField(  'self',
-                                                symmetrical = False)
+    parent_accounts = models.ManyToManyField(  'self',
+                                                symmetrical=False,
+                                                related_name='sub_accounts',
+                                                blank = True, null = True)
+        
+    def get_own_workflows(self, *args, **kwargs): #UNTESTED
+        """Get workflows owned by this user, takes **kwarg of ['completed'] as filter, otherwise returns all"""
+        if 'completed' in kwargs:
+            return workflow_customer.get(completed=bool(kwargs['completed']))
+        else:
+            return workflow_customer.all()
     
-    def get_member_organisations(self, *args, **kargs):
-        """Gets a the organisations a customer is a member of. Throws if self isnt a customer."""
+    def get_all_workflows(self, *args, **kwargs): #UNTESTED
+        """Gets workflows of self and parent accounts, takes **kwarg of ['completed'] as filter, otherwise returns all"""
+        workflow_list = self.get_own_workflows(*args, **kwargs)
+        for parent in self.parent_accounts:
+            workflow_list.extend(parent.get_own_workflows(*args, **kwargs))
+        return workflow_list
+            
         
-    def get_organisation_members(self, *args, **kargs):
-        """Gets the members of an organistaion, Throws if self isnt an organisation"""
+    def save(self, *args, **kwargs): ##DOESNT VALIDATE PROPERLY ON THE FIRST DJANGO-ADMIN SAVE, DOES AFTER THAT. MANY TO MANY NOT SAVING?
+        """Saves related auth.User object. Checks types of related accounts for legality (ie customer doesnt have sub accounts)"""
+        from exceptions import ValueError
+        if self.id: #already saved
+            if self.account_type == 'CUSTOMER':
+                if self.sub_accounts.count() != 0:
+                    raise ValueError("Customers cannot have sub accounts")
+                if self.parent_accounts.filter(account_type='CUSTOMER').count() != 0:
+                    raise ValueError("Parent Accounts must be Organisations")
+            elif self.account_type  == 'ORGANISATION':
+                if self.parent_accounts.count() != 0:
+                    raise ValueError("Organisations cannot have parent accounts")
+                if self.sub_accounts.filter(account_type='ORGANISATION').count != 0:
+                    raise ValueError("Sub accounts must be customers")
+        try: #Save related user, exceptions will be emitted in CustomerAccount.save()
+            self.user.save()
+        finally:
+            super(CustomerAccount, self).save(*args, **kwargs)
+            
+    def __unicode__(self):
+        return self.account_type + ": " + self.user.username
         
-    def get_workflows(self, *args, **kargs):
-        """Get workflows owned by this user, takes **karg of ['completed'] as filter"""
-        
-    def save(self, *args, **kargs):
-        """Saves related auth.User object. Checks types of related accounts for legality"""
+                
 
 
 class WorkflowSpec(models.Model):  
@@ -119,7 +148,7 @@ class Workflow(models.Model):
         return approver
     
  
-    def save(self, *args, **kargs):
+    def save(self, *args, **kwargs):
         """Auto assigns approver if none provided"""
         
         from django.core.exceptions import ObjectDoesNotExist
@@ -127,4 +156,4 @@ class Workflow(models.Model):
             self.approver
         except ObjectDoesNotExist:
             self.assign_approver()
-        super(Workflow, self).save(*args, **kargs)    
+        super(Workflow, self).save(*args, **kwargs)    
