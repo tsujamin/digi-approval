@@ -59,8 +59,8 @@ class RegisterCustomerForm(forms.Form):
         account.save()
         return account
         
-class LoginCustomerForm(forms.Form):
-    """Simple login form for customer accounts"""
+class LoginForm(forms.Form):
+    """Simple login form for accounts"""
     username = forms.CharField(
         label = 'Username',
         max_length = 30,
@@ -75,7 +75,7 @@ class LoginCustomerForm(forms.Form):
     
     def is_valid(self): #doesnt render errors
         """Checks for valid user and returns it if authentication is successful"""
-        if super(LoginCustomerForm, self).is_valid():
+        if super(LoginForm, self).is_valid():
             user = authenticate(username=self.cleaned_data['username'], password=self.cleaned_data['password'])
             if user is not None and user.is_active:
                 return user

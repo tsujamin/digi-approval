@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.models import User
-from django.contrib.auth import login
 from .forms import *
 import models
 
@@ -22,17 +21,18 @@ def register_customer(request):
         'form' : form,
     })
     
-def login_customer(request):
+def login(request):
+    from django.contrib.auth import login as auth_login
     """login controler for customer accounts"""
     if request.method == 'POST':
-        login_form = LoginCustomerForm(request.POST)
+        login_form = LoginForm(request.POST)
         user = login_form.is_valid()
         if user is not None:
-            login(request, user)
+            auth_login(request, user)
             return index(request)
     else:
-        login_form = LoginCustomerForm()
-    return render(request, 'digiapproval/login_customer.html', {
+        login_form = LoginForm()
+    return render(request, 'digiapproval/login.html', {
         'form' : login_form,
     })
     
