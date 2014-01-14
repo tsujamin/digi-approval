@@ -53,7 +53,7 @@ class CustomerAccount(models.Model):
     
     ACCOUNT_TYPE_CHOICES = (
         ('CUSTOMER', 'Customer account'),
-        ('ORGANISATION', 'Organisation account (Customer)'),
+        ('ORGANISATION', 'Organisation account'),
     )
     
     user = models.OneToOneField(User) 
