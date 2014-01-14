@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
 import models
 
 class RegisterCustomerForm(forms.Form):
@@ -47,9 +48,9 @@ class RegisterCustomerForm(forms.Form):
     
     def create_customer(self):
         """returns CustomerAccount created from self form"""
-        user = User(username = self.cleaned_data['username'],
-            email = self.cleaned_data['email'],
-            password = self.cleaned_data['password'],
+        user = User.objects.create_user(self.cleaned_data['username'], 
+                    self.cleaned_data['email'], 
+                    self.cleaned_data['password'],
         )
         user.save()
         account = models.CustomerAccount(user=user,
@@ -57,6 +58,33 @@ class RegisterCustomerForm(forms.Form):
         )
         account.save()
         return account
+        
+class LoginCustomerForm(forms.Form):
+    """Simple login form for customer accounts"""
+    username = forms.CharField(
+        label = 'Username',
+        max_length = 30,
+        min_length = 5,
+    )
+    password = forms.CharField(
+        label = 'Password',
+        max_length = 20,
+        min_length = 5,
+        widget = forms.PasswordInput(),
+    )
+    
+    def is_valid(self): #doesnt render errors
+        """Checks for valid user and returns it if authentication is successful"""
+        if super(LoginCustomerForm, self).is_valid():
+            user = authenticate(username=self.cleaned_data['username'], password=self.cleaned_data['password'])
+            if user is not None and user.is_active:
+                return user
+            else:
+                self._errors['bad_combination'] = "Invalid username/password combination"
+        return None
+            
+            
+        
         
         
         
