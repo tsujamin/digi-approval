@@ -1,0 +1,19 @@
+<h1>Edit your Sub Accounts:</h1>
+<h2> Add a Sub Account </h2>
+<form action="{% url 'modify_subaccounts' %}" method="post">
+    {% csrf_token %}
+    Username: <input type="text" name="add_account" />
+    <input type="submit" value="Add Account"/>
+</form>
+
+
+<h2>Remove A Sub Account</h2>
+<form action="{% url 'modify_subaccounts' %}" method="post">
+    {% csrf_token %}
+    {% for account in subaccounts %}
+        <input type="radio" name="remove_account" id="rem_account{{forloop.counter}}" value="{{account.id}}" />
+        <label for="rem_account{{forloop.counter}}">{{account.user.username}}({{account.user.email}})</label><br>
+    {% endfor %}
+    <input type="submit" value="Remove Account"/>
+</form>
+    

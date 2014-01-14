@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 from .forms import *
 import models
 
@@ -37,8 +38,59 @@ def login(request):
     })
     
 def logout(request):
+    """Logs out any currently logged in user"""
     from django.contrib.auth import logout as auth_logout
     if request.user.is_authenticated():
         auth_logout(request)
     return index(request)
+
+@login_required()
+def modify_subaccounts(request):
+    try:
+        customer = request.user.customeraccount
+    except: #Not a customeraccount
+        return index(request)
+    if customer.account_type != 'ORGANISATION':
+        return index(request)
+        
+    if request.method == 'POST':
+        if request.POST.get('remove_account', False):
+            customer.sub_accounts.remove(
+                models.CustomerAccount.objects.get(id=request.POST['remove_account']))
+        elif request.POST.get('add_account', False):
+            try:
+                customer.sub_accounts.add(
+                    models.CustomerAccount.objects
+                        .filter(user__username=request.POST['add_account'], account_type='CUSTOMER')[0])
+            except:
+                pass
+        customer.save()    
+    return render(request, 'digiapproval/modify_subaccounts.html', {
+        'subaccounts' : customer.sub_accounts.all()
+    })
+    
+@login_required()
+def remove_parentaccounts(request):
+    try:
+        customer = request.user.customeraccount
+    except: #Not a customeraccount
+        return index(request)
+    if customer.account_type != 'CUSTOMER':
+        return index(request)
+    
+    if request.method == 'POST' and request.POST.get('remove_account', False):
+        customer.parent_accounts.remove(
+            models.CustomerAccount.objects.get(id=request.POST['remove_account']))
+        customer.save()
+                
+    return render(request, 'digiapproval/remove_parentaccounts.html', {
+        'parentaccounts' : customer.parent_accounts.all()
+    })
+        
+    
+
+    
+    
+    
+    
             

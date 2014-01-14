@@ -86,5 +86,7 @@ STATIC_URL = '/static/'
 # Files
 DEFAULT_FILE_STORAGE='swift.storage.SwiftStorage'
 
+LOGIN_URL='/digiapproval/login'
+
 # Patch in our local settings
 from .local_settings import *

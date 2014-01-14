@@ -92,7 +92,7 @@ class CustomerAccount(models.Model):
             elif self.account_type  == 'ORGANISATION':
                 if self.parent_accounts.count() != 0:
                     raise ValueError("Organisations cannot have parent accounts")
-                if self.sub_accounts.filter(account_type='ORGANISATION').count != 0:
+                if self.sub_accounts.filter(account_type='ORGANISATION').count() != 0:
                     raise ValueError("Sub accounts must be customers")
         try: #Save related user, exceptions will be emitted in CustomerAccount.save()
             self.user.save()
