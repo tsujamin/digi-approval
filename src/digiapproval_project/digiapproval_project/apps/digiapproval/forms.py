@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 import models
 
-class RegisterUserForm(forms.Form):
+class RegisterCustomerForm(forms.Form):
     """User registration for for use by DigiApproval customers"""
     type = forms.ChoiceField(
         label = 'Account Type',
@@ -29,10 +29,10 @@ class RegisterUserForm(forms.Form):
         widget = forms.PasswordInput(),
     )
     
-    def is_valid(self):
+    def is_valid(self): #errors not displayed
         """Check form for valid passwords and available usernames"""
         valid = True
-        if not super(RegisterUserForm, self).is_valid():
+        if not super(RegisterCustomerForm, self).is_valid():
             return False
         if User.objects.filter(username=self.cleaned_data['username'].lower()).count() is not 0:
             self._errors['user_taken'] = "User name already exists"
@@ -57,7 +57,6 @@ class RegisterUserForm(forms.Form):
         )
         account.save()
         return account
-
         
         
         
