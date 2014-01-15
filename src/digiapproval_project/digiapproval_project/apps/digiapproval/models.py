@@ -47,6 +47,64 @@ class UserFile(models.Model):
 
         return self._file
 
+
+class CustomerAccount(models.Model):
+    """ End user model. Can either be Customer (single user) or Organisation (User with sub accounts)
+        Related accounts of Organisation must be a list of users. Organisations can add users to this list
+        Related accounts of User are the organisations it is a part of and whose workflows it can use."""
+    
+    ACCOUNT_TYPE_CHOICES = (
+        ('CUSTOMER', 'Customer account'),
+        ('ORGANISATION', 'Organisation account'),
+    )
+    
+    user = models.OneToOneField(User) 
+    account_type = models.CharField(max_length=16,
+                                    choices=ACCOUNT_TYPE_CHOICES, 
+                                    default='CUSTOMER')
+    parent_accounts = models.ManyToManyField(  'self',
+                                                symmetrical=False,
+                                                related_name='sub_accounts',
+                                                blank = True, null = True)
+        
+    def get_own_workflows(self, *args, **kwargs): #UNTESTED
+        """Get workflows owned by this user, takes **kwarg of ['completed'] as filter, otherwise returns all"""
+        if 'completed' in kwargs:
+            return workflow_customer.get(completed=bool(kwargs['completed']))
+        else:
+            return workflow_customer.all()
+    
+    def get_all_workflows(self, *args, **kwargs): #UNTESTED
+        """Gets workflows of self and parent accounts, takes **kwarg of ['completed'] as filter, otherwise returns all"""
+        workflow_list = self.get_own_workflows(*args, **kwargs)
+        for parent in self.parent_accounts:
+            workflow_list.extend(parent.get_own_workflows(*args, **kwargs))
+        return workflow_list
+            
+        
+    def save(self, *args, **kwargs): ##DOESNT VALIDATE PROPERLY ON THE FIRST DJANGO-ADMIN SAVE, DOES AFTER THAT. MANY TO MANY NOT SAVING?
+        """Saves related auth.User object. Checks types of related accounts for legality (ie customer doesnt have sub accounts)"""
+        from exceptions import ValueError
+        if self.id: #already saved
+            if self.account_type == 'CUSTOMER':
+                if self.sub_accounts.count() != 0:
+                    raise ValueError("Customers cannot have sub accounts")
+                if self.parent_accounts.filter(account_type='CUSTOMER').count() != 0:
+                    raise ValueError("Parent Accounts must be Organisations")
+            elif self.account_type  == 'ORGANISATION':
+                if self.parent_accounts.count() != 0:
+                    raise ValueError("Organisations cannot have parent accounts")
+                if self.sub_accounts.filter(account_type='ORGANISATION').count() != 0:
+                    raise ValueError("Sub accounts must be customers")
+        try: #Save related user, exceptions will be emitted in CustomerAccount.save()
+            self.user.save()
+        finally:
+            super(CustomerAccount, self).save(*args, **kwargs)
+            
+    def __unicode__(self):
+        return self.account_type + ": " + self.user.username
+
+
 class WorkflowSpec(models.Model):
     name = models.CharField(max_length = "64")
     owner = models.ForeignKey(Group)
@@ -59,10 +117,11 @@ class WorkflowSpec(models.Model):
         return Workflow(customer = customer,
                         spec = self,
                         workflow = SWorkflow(self.spec))
-        
+
+
+class Workflow(models.Model):
     
-class Workflow(models.Model):    
-    customer = models.ForeignKey(User, related_name='workflow_customer')
+    customer = models.ForeignKey(CustomerAccount, related_name='workflow_customer')
     approver = models.ForeignKey(User, related_name='workflow_approver')
     workflow = WorkflowField()
     completed = models.BooleanField(default=False)
@@ -90,8 +149,8 @@ class Workflow(models.Model):
         approver = User.objects.get(id=least_wf_approver)
         self.approver = approver
         return approver
-    
-    def save(self, *args, **kargs):
+ 
+    def save(self, *args, **kwargs):
         """Auto assigns approver if none provided"""
         from django.core.exceptions import ObjectDoesNotExist
         try:
@@ -120,16 +179,3 @@ class Workflow(models.Model):
 class Task(models.Model):
     workflow = models.ForeignKey(Workflow)
     task = JSONField()
-      
-        
-    
-        
-        
-    
-    
-    
-    
-    
-    
-    
-    

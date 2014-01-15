@@ -33,7 +33,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # NFS mount the /vagrant directory. Very helpful for lamson as it
   # allows for hard links.
-  config.vm.synced_folder ".", "/vagrant", type: "nfs"
+  
+  # We use bindfs to circumvent issues with NFS permissions. bindfs is unfortunately slow,
+  # and using it with CentOS 6 requires our specially modified version of vagrant-bindfs.
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+  config.vm.synced_folder ".", "/mnt/vagrant_nfs", type: "nfs"
+  config.bindfs.bind_folder "/mnt/vagrant_nfs", "/vagrant"
+  
 
   # Provider-specific configuration so you can fine-tune various
   # backing providers for Vagrant. These expose provider-specific options.
