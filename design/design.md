@@ -1,6 +1,6 @@
 % Digital Canberra Challenge -- Project Design
 % DigiACTive Pty Ltd (ABN 62 166 886 871)
-% 16 December 2013
+% 15 January 2014
 
 # Change Log
 + v 1 - Initial document
@@ -17,6 +17,10 @@
     + Clarify and provide examples in some cases
     + Note requirements for pre-filling applications and traffic-light system for time
     + Minor typographical and grammatical changes
++ v 3 - Expanded and modified document in response to feedback
+    + Changed all references to 'managers' to the more descriptive term 'delegators'
+    + Added additional description of the workflow system
+    + Added diagrams to explain 'in-the-system' and 'out-of-the-system' approval stages when dealing with multiple agencies
 
 # Background #
 
@@ -271,9 +275,11 @@ Within each agency, there are 3 roles:
 
 * *Administrators* are responsible for overseeing the system and setting up the application process as *workflows* (detailed below).
 * *Approvers* work with applicants to progress their applications, applying their professional judgment and agency policy to determine when and how applications proceed to the next stage of the workflow.
-* *Managers* are responsible for allocating applications to approvers and ensuring that workload is balanced appropriately among approvers. (Future extensions may automate parts of this role, but are not in scope for the POC.)
+* *Delegators* are responsible for allocating applications to approvers and ensuring that workload is balanced appropriately among approvers. (Future extensions may automate parts of this role, but are not in scope for the POC.) It is expected, though not required, that a delegator would be a manager or experienced senior team member. An agency employee can be both an approver and a delegator at the same time.
+
 
 #### Dealing with multiple agencies
+
 As part of a single application process, an applicant may deal with agencies other than the agency which received the original application:
 
 * Applicants may apply directly to other agencies for related types of approval. For example, an applicant applying  to use public land for a music festival may also apply for a liquor license.
@@ -282,8 +288,14 @@ As part of a single application process, an applicant may deal with agencies oth
 
 Agencies may be either *in the system* or *out of the system*.
 
- * Agencies that are *in the system* have their own administrators, approvers and managers -- they are handled entirely within the DigiApproval system.
+ * Agencies that are *in the system* have their own administrators, approvers and delegators -- they are handled entirely within the DigiApproval system.
  * Agencies that are *out of the system* have applications sent to them by email. Emails are sent through the DigiApproval web interface, and all emails are stored with the relevant application in a correspondence register.
+
+The following diagrams outline the handling of multi-agency approvals.
+
+![In the system multi-agency approval process](./imgs/workflow-example.png)
+
+![Out of the system multi-agency approval process](./imgs/workflow-example-external.png)
 
 This provides a way for the system to interoperate with agencies without them needing to take up the system internally.
 
@@ -291,6 +303,20 @@ When an applicant applies to another agency, the system should pre-fill appropri
 
 ### External stakeholders
 External stakeholders (e.g. local businesses who may be affected by an event) are treated as if they are *out of the system* agencies.
+
+## Workflows
+Approval processes are represented as *workflows*. For each type of approval handled by the system, an administrator must define a *workflow specification*, detailing each *stage* of the process and the business rules which determine automatic *transitions* between stages. The transition rules ensure that the appropriate information is collected from the applicant, and the application is submitted for approval to the appropriate approving agencies.
+
+### Stages
+
+There are two main types of stage -- *data collection stages* and *approval stages*. Data collection stages appear to the applicant as a web form, asking questions similar to those found on existing application forms. Approval stages cause the application to appear in the agency delegator's worklist, which can then be assigned to an approver. Upon reviewing the previous data collection stages, the approver will mark the approval stage as "completed" when they are satisfied that the requirements are met, causing the workflow to transition to the next stage.
+
+Stages can be executed in parallel, allowing agencies to begin assessing applications before the full application is submitted. For example, an organisation applies to hold an event requiring assessment by the ACT Insurance Authority (risk assessment plan and insurance paperwork) and Roads ACT (temporary traffic management plans), among other agencies. The applicant has completed the risk assessment and obtained their insurance paperwork, but has not yet completed their traffic management plan. The applicant can complete the "Risk Assessment/Insurance" data collection stage and proceed to the ACTIA approval stage immediately, then complete the "Traffic Management" data collection stage when they are ready. The workflow will be completed when there are no more outstanding stages remaining.
+
+To facilitate parallel execution of stages, when multiple data collection stages are available to complete, the applicant will be given a menu allowing them to choose the next stage. When multiple approval stages are executing in parallel, the applicant will see the status of each approval stage.
+
+### Transition Rules
+Transition rules between stages define what happens after a stage is completed. Generally, the completion of one stage will trigger one or more subsequent stages. A simple transition rule may trigger the designated "next" stage in all circumstances, while a more complex transition rule may determine the appropriate stages to trigger based on the application of business rules (e.g. a large event with more than 100 attendees will trigger the "Risk Assessment/Insurance" stage to trigger, while small events will trigger a different stage).
 
 ## User Interface ##
 
@@ -335,11 +361,11 @@ A very loose concept of what this might look like is below. (This concept sketch
 
 ![Approver wireframe](./imgs/approver-wireframe.png)
 
-### Managers ###
+### Delegators ###
 
-A manager will have a simple user interface to assign a workflow that has just commenced to an approver, and is able to re-allocate in-progress workflows if needed. (For example, if an approver is ill or leaves the directorate.)
+A delegator will have a simple user interface to assign a workflow that has just commenced to an approver, and is able to re-allocate in-progress workflows if needed. (For example, if an approver is ill or leaves the directorate.)
 
-Managers will also be able to generate reports, as follows.
+Delegators will also be able to generate reports, as follows.
 
 ### Reporting ###
 Based on stakeholder consultation, a reporting front-end has been added, that can generate reports on (at a minimum):
@@ -348,7 +374,7 @@ Based on stakeholder consultation, a reporting front-end has been added, that ca
 + A location basis: for a location, what approvals have been granted?
 + A "state" basis: how many approvals are pending? How many have been granted/rejected recently? By whom?
 
-All reports can be generated by managers and administrators. Some reports (calendar/location) can be generated by approvers so as they do not double-book events.
+All reports can be generated by delegators and administrators. Some reports (calendar/location) can be generated by approvers so as they do not double-book events.
 
 ### Additional notes ###
 + In order for the pre-filling of related data to work, administrators must be able to tag questions in a way the system can understand (i.e. not just by the name of the question).
