@@ -8,6 +8,13 @@ git submodule init
 git submodule update
 ```
 
+## vagrant-bindfs ##
+Install our modified vagrant-bindfs plugin with CentOS 6 bindfs installation support:
+```shell
+wget http://digiactive.com.au/digiactive-repo/gems/vagrant-bindfs-0.2.4.digiactive2.gem
+vagrant plugin install vagrant-bindfs-0.2.4.digiactive2.gem
+```
+
 ## Chef ##
 
 ### Setup ###
@@ -89,6 +96,27 @@ a = debug_task.delay()
 print(a.status)
 print(a.result)
 ```
+
+## Proposed structure for task data dict
+**Required**, _arbitrary key name_
+{
+  **form**:                                   #the form template to be applied to this task
+  **actor**: (approver/customer)              #the user who performs the task
+  fields: {                                   #fields present in task, its contents depend on the view
+    _simplename_: {                           #field
+      **label**:                               #Presentable name of field
+      **type**: (int/str)                     #input type of field
+      **required**: (True/False)              #mandatory status of field
+      value:                                  #actual value of the field
+    }
+  }
+  data: {                                     #arbitrary static pieces of data 
+    _simplename_: value
+  }
+  options: {                                  #options specific to the view
+    _simplename_: value
+  }
+}
 
 # Frequently Encountered Problems #
 

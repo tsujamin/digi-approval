@@ -1,7 +1,8 @@
 from __future__ import absolute_import
 from django.db import models
+from django.contrib.auth.models import Group, User
 from .fields import WorkflowField, WorkflowSpecField
-from django.contrib.auth.models import User, Group
+from jsonfield import JSONField
 
 class UserFile(models.Model):
     VIRUS_STATUS_CHOICES = (
@@ -50,7 +51,7 @@ class CustomerAccount(models.Model):
     """ End user model. Can either be Customer (single user) or Organisation (User with sub accounts)
         Related accounts of Organisation must be a list of users. Organisations can add users to this list
         Related accounts of User are the organisations it is a part of and whose workflows it can use."""
-    
+
     ACCOUNT_TYPE_CHOICES = (
         ('CUSTOMER', 'Customer account'),
         ('ORGANISATION', 'Organisation account'),
@@ -101,17 +102,21 @@ class CustomerAccount(models.Model):
             
     def __unicode__(self):
         return self.account_type + ": " + self.user.username
-        
-                
 
-
-class WorkflowSpec(models.Model):  
-      
+class WorkflowSpec(models.Model):
     name = models.CharField(max_length = "64")
     owner = models.ForeignKey(Group)
     public = models.BooleanField(default=False)
     spec = WorkflowSpecField()
     
+    def start_workflow(self, customer):
+        """Returns a workflow object derived from self's spec"""
+        from SpiffWorkflow import Workflow as SWorkflow
+        return Workflow(customer = customer,
+                        spec = self,
+                        workflow = SWorkflow(self.spec))
+
+
 class Workflow(models.Model):
     
     customer = models.ForeignKey(CustomerAccount, related_name='workflow_customer')
@@ -120,12 +125,9 @@ class Workflow(models.Model):
     completed = models.BooleanField(default=False)
     spec = models.ForeignKey(WorkflowSpec)
     
-
     def assign_approver(self):
         """Finds the least busy approver (in the owner group of the Workflows spec), 
         returns and assigns it to the workflow"""
-        
-        from django.contrib.auth.models import User
         if self.spec is None:
             raise UnboundLocalError("Workflow has no assigned WorkflowSpec")
         active_approvers = User.objects.filter(groups=self.spec.owner, 
@@ -140,20 +142,38 @@ class Workflow(models.Model):
             if approver.id not in approver_wf_count.keys():
                 self.approver = approver
                 return approver
-        
         #Find least busy approver
         least_wf_approver = min(approver_wf_count, key=approver_wf_count.get)
         approver = User.objects.get(id=least_wf_approver)
         self.approver = approver
         return approver
-    
  
     def save(self, *args, **kwargs):
         """Auto assigns approver if none provided"""
-        
         from django.core.exceptions import ObjectDoesNotExist
         try:
             self.approver
         except ObjectDoesNotExist:
             self.assign_approver()
-        super(Workflow, self).save(*args, **kwargs)    
+        if self.workflow.is_completed() and self.completed is False:
+            self.completed = True
+        super(Workflow, self).save(*args, **kargs)
+    
+    def get_ready_task_forms(self):
+        """Iterates to find ready tasks and returns them as a list of task_forms"""
+        from .taskforms import AbstractForm as Form
+        READY = 16  #From SpiffWorkflow.Task
+        from SpiffWorkflow import Workflow
+        ready_forms = [] 
+        for task in self.workflow.get_tasks():
+            form = None
+            if task.state is READY:
+                form = Form.get_task_form(task, self.workflow)
+            if form is not None: #Check that task had form before adding to list
+                ready_forms.append(form)
+        return ready_forms
+                
+
+class Task(models.Model):
+    workflow = models.ForeignKey(Workflow)
+    task = JSONField()
