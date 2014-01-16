@@ -1,0 +1,10 @@
+<h1>{{task}}</h1>
+<div style="overflow:scroll">{{agreement}}</div>
+{% if error != ""}{{error}}{% endif %}
+<form action="" method="POST">
+    {% crsf_token %}
+    <input type="checkbox" name="checkbox_value" value={{checkbox_value}}/>
+    <label for="checkbox_value">{{checkbox_label}}</label>
+    <input type="submit" name="submit" value="Continue"/>
+</form>
+    

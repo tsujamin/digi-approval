@@ -23,8 +23,8 @@ def register_customer(request):
     })
     
 def login(request):
+    """Login controller for customer accounts, Currently doesnt display error on bad credentials"""
     from django.contrib.auth import login as auth_login
-    """login controler for customer accounts"""
     if request.method == 'POST':
         login_form = LoginForm(request.POST)
         user = login_form.is_valid()
@@ -46,11 +46,13 @@ def logout(request):
 
 @login_required()
 def modify_subaccounts(request):
+    """ Controller for modify_subaccounts template. Requires an authenticated CustomerAccount of type ORGINISATION
+        Currently doesnt return useful error messages """
     try:
         customer = request.user.customeraccount
     except: #Not a customeraccount
         return index(request)
-    if customer.account_type != 'ORGANISATION':
+    if customer.account_type != 'ORGANISATION' or not request.user.is_authenticated():
         return index(request)
         
     if request.method == 'POST':
@@ -71,11 +73,13 @@ def modify_subaccounts(request):
     
 @login_required()
 def remove_parentaccounts(request):
+    """ Controller for remove_parentaccounts template. Requires authenticated CustomerAccount of type CUSTOMER
+        Currently doesnt return useful error messages"""
     try:
         customer = request.user.customeraccount
     except: #Not a customeraccount
         return index(request)
-    if customer.account_type != 'CUSTOMER':
+    if customer.account_type != 'CUSTOMER' or not request.user.is_authenticated():
         return index(request)
     
     if request.method == 'POST' and request.POST.get('remove_account', False):

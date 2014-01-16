@@ -157,7 +157,7 @@ class Workflow(models.Model):
             self.assign_approver()
         if self.workflow.is_completed() and self.completed is False:
             self.completed = True
-        super(Workflow, self).save(*args, **kargs)
+        super(Workflow, self).save(*args, **kwargs)
     
     def get_ready_task_forms(self):
         """Iterates to find ready tasks and returns them as a list of task_forms"""
@@ -168,7 +168,7 @@ class Workflow(models.Model):
         for task in self.workflow.get_tasks():
             form = None
             if task.state is READY:
-                form = Form.get_task_form(task, self.workflow)
+                form = Form.get_task_form(task, self)
             if form is not None: #Check that task had form before adding to list
                 ready_forms.append(form)
         return ready_forms
