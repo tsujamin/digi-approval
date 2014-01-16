@@ -8,6 +8,13 @@ git submodule init
 git submodule update
 ```
 
+## vagrant-bindfs ##
+Install our modified vagrant-bindfs plugin with CentOS 6 bindfs installation support:
+```shell
+wget http://digiactive.com.au/digiactive-repo/gems/vagrant-bindfs-0.2.4.digiactive2.gem
+vagrant plugin install vagrant-bindfs-0.2.4.digiactive2.gem
+```
+
 ## Chef ##
 
 ### Setup ###
