@@ -118,6 +118,19 @@ print(a.result)
   }
 }
 
+## Demo DB Data
+If you would like to fill the database with some test user accounts/orginisations call:
+```shell
+vagrant ssh
+
+scl enable python27 bash
+
+cd /vagrant/src/digiapproval_project/
+source ../../env/bin/activate
+python manage.py init\_demo\_db
+```
+**Waring** The only model instance that survives this command is the super account
+
 # Frequently Encountered Problems #
 
 + **I've lost network access in the guest**: have you moved networks? Do a ```vagrant reload``` and try again.
