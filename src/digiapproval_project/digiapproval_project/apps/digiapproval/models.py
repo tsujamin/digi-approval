@@ -70,19 +70,15 @@ class CustomerAccount(models.Model):
         
     def get_own_workflows(self, *args, **kwargs):
         """Get workflows owned by this user, takes **kwarg of ['completed'] as filter, otherwise returns all"""
-
-        if 'completed' in kwargs:
-            try:
+        try:
+            if 'completed' in kwargs:
                 result = list(self.workflow_customer.filter(completed=bool(kwargs['completed'])))
-            except ObjectDoesNotExist:
-                result = []
-            return result
-        else:
-            try:
+            else:
                 result = list(self.workflow_customer.all())
-            except ObjectDoesNotExist:
-                result = []
-            return result
+        except ObjectDoesNotExist:
+            result = []
+        return result
+    
     
     def get_all_workflows(self, *args, **kwargs):
         """Gets workflows of self and parent accounts, takes **kwarg of ['completed'] as filter, otherwise returns all"""
