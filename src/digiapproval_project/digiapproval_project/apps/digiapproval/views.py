@@ -148,7 +148,7 @@ def view_workflow(request, workflow_id):
 
 
 @login_required_customer()
-def new_workflow(request):
+def new_workflow(request, workflowspec_id):
     """Controller for creating new workflows. TODO finish description
     """
     pass

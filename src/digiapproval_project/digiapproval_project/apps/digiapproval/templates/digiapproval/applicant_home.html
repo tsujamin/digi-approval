@@ -3,7 +3,7 @@
 <table>
 <tr><th>Application Type</th></tr>
 {% for application in applicant_workflows %}
-<tr><td><a href="{% url 'view_workflow' application.id %}">{{ application.spec.name }}</a></td></tr>
+<tr><td><a href="{% url 'view_workflow' workflow_id=application.id %}">{{ application.spec.name }}</a></td></tr>
 {% endfor %}
 </table>
 
@@ -11,6 +11,6 @@
 <table>
 <tr><th>Application Type</th></tr>
 {% for spec in workflow_specs %}
-<tr><td><a href="{% url 'new_workflow' spec.id %}">{{ spec.name }}</a></td></tr>
+<tr><td><a href="{% url 'new_workflow' workflowspec_id=spec.id %}">{{ spec.name }}</a></td></tr>
 {% endfor %}
 </table>
