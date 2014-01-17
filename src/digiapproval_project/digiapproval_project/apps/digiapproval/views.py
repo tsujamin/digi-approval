@@ -2,10 +2,12 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
 from .forms import *
 import models
 
 def index(request):
+    
     return HttpResponse("DigiApproval 2014, welcome " + request.user.username.title())
 
 def register_customer(request):
@@ -30,7 +32,7 @@ def login(request):
         user = login_form.is_valid()
         if user is not None:
             auth_login(request, user)
-            return index(request)
+            return HttpResponseRedirect(reverse('index'))
     else:
         login_form = LoginForm()
     return render(request, 'digiapproval/login.html', {
@@ -42,7 +44,7 @@ def logout(request):
     from django.contrib.auth import logout as auth_logout
     if request.user.is_authenticated():
         auth_logout(request)
-    return index(request)
+    return HttpResponseRedirect(reverse('index'))
 
 @login_required()
 def modify_subaccounts(request):
@@ -51,9 +53,9 @@ def modify_subaccounts(request):
     try:
         customer = request.user.customeraccount
     except: #Not a customeraccount
-        return index(request)
+        return HttpResponseRedirect(reverse('index'))
     if customer.account_type != 'ORGANISATION' or not request.user.is_authenticated():
-        return index(request)
+        return HttpResponseRedirect(reverse('index'))
         
     if request.method == 'POST':
         if request.POST.get('remove_account', False):
@@ -78,9 +80,9 @@ def remove_parentaccounts(request):
     try:
         customer = request.user.customeraccount
     except: #Not a customeraccount
-        return index(request)
+        return HttpResponseRedirect(reverse('index'))
     if customer.account_type != 'CUSTOMER' or not request.user.is_authenticated():
-        return index(request)
+        return HttpResponseRedirect(reverse('index'))
     
     if request.method == 'POST' and request.POST.get('remove_account', False):
         customer.parent_accounts.remove(
