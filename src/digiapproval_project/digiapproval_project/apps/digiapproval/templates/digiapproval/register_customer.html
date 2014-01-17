@@ -1,6 +1,10 @@
-<h1>Register a New User</h1>
+{% extends "digiapproval/page.tpl.html" %}
+{% block title %}Register New User{% endblock title %}
+
+{% block content %}
 <form action="{% url 'register' %}", method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <input type="submit", value="Submit"/>
 </form>
+{% endblock content %}

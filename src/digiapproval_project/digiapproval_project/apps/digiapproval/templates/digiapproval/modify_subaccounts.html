@@ -1,5 +1,8 @@
-<h1>Edit your Sub Accounts:</h1>
-<h2> Add a Sub Account </h2>
+{% extends "digiapproval/page.tpl.html" %}
+{% block title %}Edit Subaccounts{% endblock title %}
+
+{% block content %}
+<h2>Add a Sub Account</h2>
 <form action="{% url 'modify_subaccounts' %}" method="post">
     {% csrf_token %}
     Username: <input type="text" name="add_account" />
@@ -16,4 +19,4 @@
     {% endfor %}
     <input type="submit" value="Remove Account"/>
 </form>
-    
+{% endblock content %}
