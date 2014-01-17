@@ -1,0 +1,25 @@
+{% load macros %}
+{% macro title %}
+    {% block title %}{% endblock %}
+{% endmacro %}
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+<head>
+<title>DigiApproval - {% usemacro title %}</title>
+</head>
+
+<body>
+<h1>{% usemacro title %}</h1>
+
+<p>
+{% if user.is_authenticated %}
+Logged in as: {{ user.username.title }} | <a href="{% url 'logout' %}">Log out</a>
+{% else %}
+<a href="{% url 'login' %}">Log in</a>
+{% endif %}
+</p>
+
+{% block content %}{% endblock %}
+
+</body>
+</html>

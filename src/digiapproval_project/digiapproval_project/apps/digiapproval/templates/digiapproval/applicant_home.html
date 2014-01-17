@@ -1,16 +1,35 @@
-<h1>Applicant Home</h1>
-<h2>Your Current Applications</h2>
-<table>
-<tr><th>Application Type</th></tr>
-{% for application in applicant_workflows %}
-<tr><td><a href="{% url 'view_workflow' workflow_id=application.id %}">{{ application.spec.name }}</a></td></tr>
-{% endfor %}
-</table>
+{% extends "digiapproval/page.tpl.html" %}
+{% block title %}Applicant Portal{% endblock %}
 
-<h2>Start A New Application</h2>
-<table>
-<tr><th>Application Type</th></tr>
-{% for spec in workflow_specs %}
-<tr><td><a href="{% url 'new_workflow' workflowspec_id=spec.id %}">{{ spec.name }}</a></td></tr>
-{% endfor %}
-</table>
+{% block content %}
+<h2>My current applications</h2>
+{% if running_workflows %}
+<ul>
+  {% for workflow in running_workflows %}
+  <li><a href="{% url 'view_workflow' workflow_id=workflow.id %}">{{workflow.spec.name}} - ({{ workflow.customer.user.username }})</a></li>
+  {% endfor %}
+</ul>
+{% else %}
+<p>No current applications.</p>
+{% endif %}
+
+
+<h2>My completed applications</h2>
+{% if completed_workflows %}
+<ul>
+  {% for workflow in completed_workflows %}
+  <li><a href="{% url 'view_workflow' workflow_id=workflow.id %}">{{workflow.spec.name}} - ({{ workflow.customer.user.username }})</a></li>
+  {% endfor %}
+</ul>
+{% else %}
+<p>No completed applications.</p>
+{% endif %}
+
+<h2>Start a new application</h2>
+<ul>
+  {% for spec in workflow_specs %}
+  <li><a href="{% url 'new_workflow' workflowspec_id=spec.id %}">{{ spec.name }}</a></li>
+  {% endfor %}
+</ul>
+
+{% endblock content %}
