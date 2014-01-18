@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from .forms import *
+from .auth_decorators import *
 import models
 
 def index(request):
@@ -46,17 +47,11 @@ def logout(request):
         auth_logout(request)
     return HttpResponseRedirect(reverse('index'))
 
-@login_required()
+@login_required_organisation()
 def modify_subaccounts(request):
     """ Controller for modify_subaccounts template. Requires an authenticated CustomerAccount of type ORGINISATION
         Currently doesnt return useful error messages """
-    try:
-        customer = request.user.customeraccount
-    except: #Not a customeraccount
-        return HttpResponseRedirect(reverse('index'))
-    if customer.account_type != 'ORGANISATION' or not request.user.is_authenticated():
-        return HttpResponseRedirect(reverse('index'))
-        
+    customer = request.user.customeraccount
     if request.method == 'POST':
         if request.POST.get('remove_account', False):
             customer.sub_accounts.remove(
@@ -73,17 +68,11 @@ def modify_subaccounts(request):
         'subaccounts' : customer.sub_accounts.all()
     })
     
-@login_required()
+@login_required_customer()
 def remove_parentaccounts(request):
     """ Controller for remove_parentaccounts template. Requires authenticated CustomerAccount of type CUSTOMER
         Currently doesnt return useful error messages"""
-    try:
-        customer = request.user.customeraccount
-    except: #Not a customeraccount
-        return HttpResponseRedirect(reverse('index'))
-    if customer.account_type != 'CUSTOMER' or not request.user.is_authenticated():
-        return HttpResponseRedirect(reverse('index'))
-    
+    customer = request.user.customeraccount
     if request.method == 'POST' and request.POST.get('remove_account', False):
         customer.parent_accounts.remove(
             models.CustomerAccount.objects.get(id=request.POST['remove_account']))
@@ -94,9 +83,3 @@ def remove_parentaccounts(request):
     })
         
     
-
-    
-    
-    
-    
-            
