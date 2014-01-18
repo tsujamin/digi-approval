@@ -3,6 +3,8 @@ from django.db import models
 from django.contrib.auth.models import Group, User
 from .fields import WorkflowField, WorkflowSpecField
 from jsonfield import JSONField
+from django.core.exceptions import ObjectDoesNotExist
+import itertools
 
 class UserFile(models.Model):
     VIRUS_STATUS_CHOICES = (
@@ -66,17 +68,26 @@ class CustomerAccount(models.Model):
                                                 related_name='sub_accounts',
                                                 blank = True, null = True)
         
-    def get_own_workflows(self, *args, **kwargs): #UNTESTED
+    def get_own_workflows(self, *args, **kwargs):
         """Get workflows owned by this user, takes **kwarg of ['completed'] as filter, otherwise returns all"""
+
         if 'completed' in kwargs:
-            return workflow_customer.get(completed=bool(kwargs['completed']))
+            try:
+                result = list(self.workflow_customer.filter(completed=bool(kwargs['completed'])))
+            except ObjectDoesNotExist:
+                result = []
+            return result
         else:
-            return workflow_customer.all()
+            try:
+                result = list(self.workflow_customer.all())
+            except ObjectDoesNotExist:
+                result = []
+            return result
     
-    def get_all_workflows(self, *args, **kwargs): #UNTESTED
+    def get_all_workflows(self, *args, **kwargs):
         """Gets workflows of self and parent accounts, takes **kwarg of ['completed'] as filter, otherwise returns all"""
         workflow_list = self.get_own_workflows(*args, **kwargs)
-        for parent in self.parent_accounts:
+        for parent in self.parent_accounts.all():
             workflow_list.extend(parent.get_own_workflows(*args, **kwargs))
         return workflow_list
             

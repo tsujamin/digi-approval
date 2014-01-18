@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title>DigiApproval</title>
+</head>
+
+<body>
+<h1>Welcome to DigiApproval</h1>
+
+<p>
+{% if logged_in %}
+Logged in as: {{ name }} | <a href="{% url 'logout' %}">Log out</a>
+{% else %}
+<a href="{% url 'login' %}">Log in</a>
+{% endif %}
+</p>
+
+{% if logged_in %}
+<h2>My current applications</h2>
+{% if running_workflows %}
+<ul>
+  {% for workflow in running_workflows %}
+  <li>{{workflow.spec.name}} - ({{ workflow.customer.user.username }})</li>
+  {% endfor %}
+</ul>
+{% else %}
+<p>No current applications.</p>
+{% endif %}
+
+
+<h2>My completed applications</h2>
+{% if completed_workflows %}
+<ul>
+  {% for workflow in completed_workflows %}
+  <li>{{workflow.spec.name}} - ({{ workflow.customer.user.username }})</li>
+  {% endfor %}
+</ul>
+{% else %}
+<p>No completed applications.</p>
+{% endif %}
+{% endif %}
+
+</body> </html>

@@ -8,8 +8,34 @@ from .auth_decorators import *
 from .models import *
 
 def index(request):
-    
-    return HttpResponse("DigiApproval 2014, welcome " + request.user.username.title())
+    params = {'logged_in': False}
+    if request.user.is_authenticated():
+        params['logged_in'] = True
+        params['name'] = request.user.username.title()
+
+        #try:
+        customer = request.user.customeraccount
+
+        # this catches empty iterators, which I freely admit are
+        # behaving in ways I do not understand - DJA
+        #try:
+        params['running_workflows'] = customer.get_all_workflows(completed=False)
+        #except:
+        #    params['running_workflows'] = []
+        
+        #try:
+        params['completed_workflows'] = customer.get_all_workflows(completed=True)
+        #except:
+        #    params['completed_workflows'] = []
+                
+        #except:
+        #    # this catches non-customer accounts 
+        #    pass
+
+    print(params)
+        
+    return render(request, 'digiapproval/index.html', params)
+
 
 def register_customer(request):
     """Creates CustomerUser and corresponding User if RegisterUserForm is valid"""
