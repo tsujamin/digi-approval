@@ -166,8 +166,8 @@ class Workflow(models.Model):
             self.completed = True
         super(Workflow, self).save(*args, **kwargs)
     
-    def get_ready_task_forms(self):
-        """Iterates to find ready tasks and returns them as a list of task_forms"""
+    def get_ready_task_forms(self, **kwargs):
+        """ Iterates to find ready tasks and returns them as a list of task_forms, results can be filtered by optional argument 'actor'"""
         from .taskforms import AbstractForm as Form
         READY = 16  #From SpiffWorkflow.Task
         from SpiffWorkflow import Workflow
@@ -178,8 +178,10 @@ class Workflow(models.Model):
                 form = Form.get_task_form(task, self)
             if form is not None: #Check that task had form before adding to list
                 ready_forms.append(form)
+        if 'actor' in kwargs: #filter for requested actor
+            ready_forms = [form for form in ready_forms if form.actor == kwargs['actor']]
         return ready_forms
-                
+                        
 
 class Task(models.Model):
     workflow = models.ForeignKey(Workflow)

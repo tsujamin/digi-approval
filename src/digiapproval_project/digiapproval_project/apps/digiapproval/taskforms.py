@@ -13,6 +13,7 @@ class AbstractForm(object):
         self.task_model: the model storing the tasks data
         self.form: an instance of the form required by the task_model
         self.task_dict: equivalent to self.task_model.task
+        self.actor: account which acts on this task (CUSTOMER/APPROVER)
     """
     
     @staticmethod
@@ -43,6 +44,7 @@ class AbstractForm(object):
             spiff_task.set_data(model_id = self.task_model.id) 
             workflow_model.save()
         self.task_dict = self.task_model.task
+        self.actor = self.task_dict['actor']
         self.validate_task_data(self.task_dict)
     
     @staticmethod        
