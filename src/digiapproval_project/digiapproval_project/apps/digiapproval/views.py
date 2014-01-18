@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from .forms import *
 from .auth_decorators import *
-import models
+from .models import *
 
 def index(request):
     
@@ -55,11 +55,11 @@ def modify_subaccounts(request):
     if request.method == 'POST':
         if request.POST.get('remove_account', False):
             customer.sub_accounts.remove(
-                models.CustomerAccount.objects.get(id=request.POST['remove_account']))
+                CustomerAccount.objects.get(id=request.POST['remove_account']))
         elif request.POST.get('add_account', False):
             try:
                 customer.sub_accounts.add(
-                    models.CustomerAccount.objects
+                    CustomerAccount.objects
                         .filter(user__username=request.POST['add_account'], account_type='CUSTOMER')[0])
             except:
                 pass
@@ -75,11 +75,54 @@ def remove_parentaccounts(request):
     customer = request.user.customeraccount
     if request.method == 'POST' and request.POST.get('remove_account', False):
         customer.parent_accounts.remove(
-            models.CustomerAccount.objects.get(id=request.POST['remove_account']))
+            CustomerAccount.objects.get(id=request.POST['remove_account']))
         customer.save()
                 
     return render(request, 'digiapproval/remove_parentaccounts.html', {
         'parentaccounts' : customer.parent_accounts.all()
     })
         
+
+
+@login_required_customer()
+def applicant_home(request):
+    """Controller for applicant home page. Displays the applicant's current applications, as well as a list of workflow specs to start new applications.
     
+    Requires authenticated CustomerAccount of type CUSTOMER.
+    """
+    customer = request.user.customeraccount
+    return render(request, 'digiapproval/applicant_home.html', {
+        'applicant_workflows' : customer.get_own_workflows(),
+        'workflow_specs' : WorkflowSpec.objects.filter(public=True)
+    })
+    
+
+@login_required()
+def approver_worklist(request):
+    """Controller for approver worklist. Displays the approver's worklist ... TODO Finish description
+    
+    Requires authenticated User with approver privileges on approval stages."""
+    pass
+
+
+@login_required()
+def delegator_worklist(request):
+    """Controller for delegator worklist. Displays... TODO Finish description
+    
+    Requires authenticated User with delegator privileges on approval stages.
+    """
+    pass
+
+
+@login_required_customer()
+def view_workflow(request, workflow_id):
+    """Controller for viewing workflows. TODO finish description
+    """
+    pass
+
+
+@login_required_customer()
+def new_workflow(request):
+    """Controller for creating new workflows. TODO finish description
+    """
+    pass

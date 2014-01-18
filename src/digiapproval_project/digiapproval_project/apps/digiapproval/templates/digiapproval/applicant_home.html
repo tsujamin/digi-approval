@@ -1,0 +1,16 @@
+<h1>Applicant Home</h1>
+<h2>Your Current Applications</h2>
+<table>
+<tr><th>Application Type</th></tr>
+{% for application in applicant_workflows %}
+<tr><td><a href="{% url 'view_workflow' application.id %}">{{ application.spec.name }}</a></td></tr>
+{% endfor %}
+</table>
+
+<h2>Start A New Application</h2>
+<table>
+<tr><th>Application Type</th></tr>
+{% for spec in workflow_specs %}
+<tr><td><a href="{% url 'new_workflow' spec.id %}">{{ spec.name }}</a></td></tr>
+{% endfor %}
+</table>
