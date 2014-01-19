@@ -37,7 +37,8 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'digiapproval_project.apps.digiapproval',
-    'south'
+    'south',
+    'bootstrap3'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -81,12 +82,33 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
+import os
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+STATIC_ROOT = 'staticfiles'
 STATIC_URL = '/static/'
+
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
+# List of finder classes that know how to find static files in
+# various locations.
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+)
+
+
 
 # Files
 DEFAULT_FILE_STORAGE='swift.storage.SwiftStorage'
 
 LOGIN_URL='/digiapproval/login'
+
+# Bootstrap
+BOOTSTRAP3 = {
+    'base_url': '/static/bootstrap/dist/'
+}
 
 # Patch in our local settings
 from .local_settings import *
