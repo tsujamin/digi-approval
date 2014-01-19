@@ -114,7 +114,7 @@ class WorkflowSpec(models.Model):
     name = models.CharField(max_length = "64")
     owner = models.ForeignKey(Group)
     public = models.BooleanField(default=False)
-    spec = WorkflowSpecField()
+    spec = WorkflowSpecField(editable=False) # it doesn't render properly in Django admin, and besides we have no need to modify it in the admin interface anyway -- AJD
     
     def start_workflow(self, customer):
         """Returns a workflow object derived from self's spec"""
@@ -128,7 +128,7 @@ class Workflow(models.Model):
     
     customer = models.ForeignKey(CustomerAccount, related_name='workflow_customer')
     approver = models.ForeignKey(User, related_name='workflow_approver')
-    workflow = WorkflowField()
+    workflow = WorkflowField(editable=False) # it doesn't render properly in Django admin, and besides we have no need to modify it in the admin interface anyway -- AJD
     completed = models.BooleanField(default=False)
     spec = models.ForeignKey(WorkflowSpec)
     
