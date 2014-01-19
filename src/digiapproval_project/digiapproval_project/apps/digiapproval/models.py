@@ -186,3 +186,4 @@ class Workflow(models.Model):
 class Task(models.Model):
     workflow = models.ForeignKey(Workflow)
     task = JSONField()
+    uuid = models.CharField(max_length = "36")

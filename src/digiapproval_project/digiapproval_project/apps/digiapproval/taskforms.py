@@ -4,6 +4,7 @@ from . import models
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from exceptions import TypeError
+import uuid
 
 class AbstractForm(object):
     """
@@ -35,14 +36,17 @@ class AbstractForm(object):
         otherwise it saves a new one from the template in spiff_task.taskspec['task_data]"""
         self.spiff_task = spiff_task
         self.workflow_model = workflow_model
+        if isinstance(spiff_task.id, dict):
+            self.uuid = uuid.UUID(spiff_task.id['__uuid__'])
+        else:
+            self.uuid=spiff_task.id
+              
         try: #task already has an associated task_model
-            model_id = spiff_task.get_data('model_id')
-            self.task_model = models.Task.objects.get(id=model_id)
+            self.task_model = models.Task.objects.get(uuid=self.uuid)
         except: #need to make a new task_model object
             data_template = spiff_task.task_spec.get_data('task_data') #handles missing task data in get_task_form
-            self.task_model = models.Task(workflow = workflow_model, task = data_template) 
+            self.task_model = models.Task(workflow = workflow_model, task = data_template, uuid = self.uuid)
             self.task_model.save()
-            spiff_task.set_data(model_id = self.task_model.id) 
             workflow_model.save()
         self.task_dict = self.task_model.task
         self.actor = self.task_dict['actor']
@@ -61,9 +65,9 @@ class AbstractForm(object):
                 if  'label' not in field or \
                     'type' not in field or \
                     'mandatory' not in field or \
-                    type(field['mandatory']) is not bool:
-                        print field['type']
-                        raise AttributeError("field must have label, type and mandatory")
+                    type(field['mandatory']) is not bool or \
+                    field['type'] not in field_types:
+                        raise AttributeError("field must have label, legal type and boolean mandatory")
                         
     @staticmethod
     def make_task_dict(form, actor, *args, **kwargs):
@@ -106,7 +110,7 @@ class AcceptAgreement(AbstractForm):
     
     def __init__(self, spiff_task, workflow_model,  *args, **kwargs):
         super(AcceptAgreement, self).__init__(spiff_task, workflow_model,  *args, **kwargs)
-    
+
     @staticmethod
     def validate_task_data(task_data):
         """Checks that the dictionary has acceptance field and agreement"""
@@ -115,10 +119,10 @@ class AcceptAgreement(AbstractForm):
         if task_data['data']['agreement'] is None:
             raise AttributeError("data->agreement must exist")
         bool_field = task_data['fields']['acceptance']
-        
+
     @staticmethod    
     def make_task_dict(mandatory, agreement, actor, *args, **kwargs):
-        """Builds a task dictionary, accepts karg of 'label'"""
+        """Builds a valid taskdict. Fields given as *args parameter in form ()"""
         if 'label' in kwargs:
             label = kwargs['label']
         else:
@@ -153,13 +157,72 @@ class AcceptAgreement(AbstractForm):
     def complete_task(self, request):
         """Perform post completion tasks"""
         return super(AcceptAgreement, self).complete_task(request)
+    
+class FieldEntry(AbstractForm):
+    """Form for string field data entry. Could be modified to support other field types by changing the 
+    'type' of the field (in dict)
+    """
+    def __init__(self, spiff_task, workflow_model,  *args, **kwargs):
+        super(FieldEntry, self).__init__(spiff_task, workflow_model,  *args, **kwargs)
+
+    @staticmethod
+    def validate_task_data(task_data):
+        """Checks validity of provided task dictionary. Just a passthrough as basic field 
+        validation already performed by superclass"""
+        AbstractForm.validate_task_data(task_data)
         
-   
+    @staticmethod    
+    def make_task_dict(actor, *args, **kwargs):
+        """Builds a task dictionary, accepts *args of (name, label, ftype, required). 
+        Only text currently supported for ftype
+        """
+        task_dict = AbstractForm.make_task_dict("field_entry", actor)
+        for (field_name, label, ftype, mandatory) in args:
+            task_dict['fields'][field_name] = {   
+                'label': label, 'mandatory': mandatory, 
+                'type': ftype, 'value': False
+            } 
+        FieldEntry.validate_task_data(task_dict)
+        return task_dict
+        
+    def form_request(self, request):
+        response = super(FieldEntry, self).form_request(request)
+        error = None
+        render_dict = {}
+        form_fields = self.task_dict['fields']
+        
+        if response is not None: return response #invalid access
+        
+        if request.method == "POST":
+            for field in form_fields:
+                value = request.POST.get(field, None)
+                if value == '' and form_fields[field]['mandatory'] is True: #Failed to enter mandatory field
+                    error = "\"" + str(form_fields[field]['label']) + "\" is a mandatory field."
+                    break
+                else: form_fields[field]['value'] = value
+            if error is None: #Correctly filled out
+                return self.complete_task(request)
+        return render(request, 'digiapproval/taskforms/FieldEntry.html', { #default response
+            'error': error,
+            'task': self.spiff_task.get_name(),
+            'form_fields': form_fields
+        })
+            
+    def complete_task(self, request):
+        """Perform post completion tasks"""
+        return super(FieldEntry, self).complete_task(request)
+                    
+                
         
     
 form_classes = {
-    "accept_agreement": AcceptAgreement  
+    "accept_agreement": AcceptAgreement,
+    "field_entry": FieldEntry  
 }
+field_types = [
+    'checkbox',
+    'text'
+]
         
         
         

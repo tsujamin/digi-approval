@@ -11,7 +11,7 @@
   <ul>
     {% for task in tasks %}
     <li>
-      <a href="{% url 'view_task' workflow_id=workflow.id task_model_id=task.task_model.id %}">{{task.spiff_task.get_name}}</a>
+      <a href="{% url 'view_task' workflow_id=workflow.id task_uuid=task.uuid %}">{{task.spiff_task.get_name}}</a>
     </li>
     {% endfor %}
   </ul>

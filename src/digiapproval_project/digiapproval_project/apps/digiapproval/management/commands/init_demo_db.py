@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from digiapproval_project.apps.digiapproval import models
-from digiapproval_project.apps.digiapproval.taskforms import AcceptAgreement
+from digiapproval_project.apps.digiapproval.taskforms import AcceptAgreement, FieldEntry
 from django.contrib.auth.models import User, Group
 from SpiffWorkflow import specs
 
@@ -45,7 +45,8 @@ class Command(BaseCommand):
         self.stdout.write("creating workflow specifications")
         WORKFLOW_SPECS = map(to_workflow_spec, [
             ("Veterinary Visit Permit", DIRECTORATES[0], True, workflowspec_one()),
-            ("Police Checkup Request", DIRECTORATES[1], False, workflowspec_one()),
+            ("Police Checkup Request", DIRECTORATES[1], True, workflowspec_two()),
+            ("Request to Ban Persons from Private Businesses", DIRECTORATES[0], False, workflowspec_two())
         ])
         
         self.stdout.write("creating workflows")
@@ -55,6 +56,11 @@ class Command(BaseCommand):
             (CUSTOMERS[2], WORKFLOW_SPECS[0], None),
             (ORGANISATIONS[0], WORKFLOW_SPECS[0], APPROVERS[1]),
             (ORGANISATIONS[1], WORKFLOW_SPECS[0], None),
+            (CUSTOMERS[0], WORKFLOW_SPECS[1], APPROVERS[0]),
+            (CUSTOMERS[1], WORKFLOW_SPECS[1], APPROVERS[2]),            
+            (CUSTOMERS[2], WORKFLOW_SPECS[1], None),
+            (ORGANISATIONS[0], WORKFLOW_SPECS[1], APPROVERS[1]),
+            (ORGANISATIONS[1], WORKFLOW_SPECS[1], None),
         ])
         
         self.stdout.write("processing workflows")
@@ -63,6 +69,10 @@ class Command(BaseCommand):
             (WORKFLOWS[2], 1),
             (WORKFLOWS[3], 1),
             (WORKFLOWS[4], 10),
+            (WORKFLOWS[5], 0),
+            (WORKFLOWS[6], 1),
+            (WORKFLOWS[7], 1),
+            (WORKFLOWS[8], 10),
         ])
         
 
@@ -141,6 +151,28 @@ def workflowspec_one():
     
     cust_agreement.set_data(task_data = AcceptAgreement.make_task_dict(True, lorum_ipsum, 'CUSTOMER'))
     approver_agreement.set_data(task_data = AcceptAgreement.make_task_dict(True, lorum_ipsum, 'APPROVER') )
+    return wf_spec
+    
+def workflowspec_two():
+    wf_spec = specs.WorkflowSpec()
+    cust_agreement = specs.Simple(wf_spec, "Customer Agreement")
+    cust_fieldentry = specs.Simple(wf_spec, "Permit Details")
+    approver_agreement = specs.Simple(wf_spec, "Approver Agreement")
+    task_join1 = specs.Join(wf_spec, "Parties In Agreement")
+    
+    wf_spec.start.connect(cust_fieldentry)
+    wf_spec.start.connect(approver_agreement)
+    cust_fieldentry.connect(cust_agreement)
+    cust_agreement.connect(task_join1)
+    approver_agreement.connect(task_join1)
+    
+    cust_agreement.set_data(task_data = AcceptAgreement.make_task_dict(True, lorum_ipsum, 'CUSTOMER'))
+    cust_fieldentry.set_data(task_data = FieldEntry.make_task_dict('CUSTOMER', 
+        ('event_name', 'What is the name of your event:  ', 'text', True),
+        ('event_purpose', 'What is the purpose of your event: ', 'text', True),
+        ('event_love', 'In 50 words or less, why do you love applying for events: ', 'text', True),)
+    )
+    approver_agreement.set_data(task_data = AcceptAgreement.make_task_dict(True, lorum_ipsum,'APPROVER'))
     return wf_spec
     
     
