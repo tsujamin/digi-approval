@@ -140,7 +140,6 @@ def view_task(request, workflow_id, task_model_id):
     if len(task_form_list) is 1:
         return task_form_list[0].form_request(request)
     else: #either invalid data or hash collision
-        print task_form_list
         return HttpResponseRedirect(reverse('applicant_home'))
         
         
