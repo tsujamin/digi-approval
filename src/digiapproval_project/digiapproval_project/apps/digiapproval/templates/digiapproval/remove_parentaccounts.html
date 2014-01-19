@@ -1,8 +1,7 @@
 {% extends "digiapproval/page.tpl.html" %}
-{% block title %}Edit Parent Accounts{% endblock title %}
-
+{% block title %}Remove a Parent Account{% endblock %}
 {% block content %}
-<h2>Remove a Parent Account</h2>
+
 <form action="{% url 'remove_parentaccounts' %}" method="post">
     {% csrf_token %}
     {% for account in parentaccounts %}
