@@ -94,7 +94,7 @@ class AbstractForm(object):
         self.spiff_task.complete()
         self.task_model.save()
         self.workflow_model.save()
-        children = self.workflow_model.get_ready_task_forms()
+        waiting_tasks = self.workflow_model.get_ready_task_forms()
         if len(waiting_tasks) is 1:
             return waiting_tasks[0].form_request(request)
         else:
@@ -130,7 +130,7 @@ class AcceptAgreement(AbstractForm):
         return task_dict
         
     def form_request(self, request):
-        response = super(AcceptAgreement, self).form_request()
+        response = super(AcceptAgreement, self).form_request(request)
         error = ""
         if response is not None: #invalid access
             index(request)
@@ -141,9 +141,9 @@ class AcceptAgreement(AbstractForm):
                 self.task_dict['fields']['acceptance']['value'] = checkbox_value
                 return self.complete_task(request)
             error = "You must accept the agreement to continue"
-        response = render(request, 'digiapproval/taskforms/AcceptAgreement.html', { #default response
+        return render(request, 'digiapproval/taskforms/AcceptAgreement.html', { #default response
             'error': error,
-            'task': self.spiff_task.name,
+            'task': self.spiff_task.get_name(),
             'agreement': self.task_dict['data']['agreement'],
             'checkbox_label': self.task_dict['fields']['acceptance']['label'],
             'checkbox_value': self.task_dict['fields']['acceptance']['value'],

@@ -3,6 +3,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
+from django.core.exceptions import ObjectDoesNotExist
 from .forms import *
 from .auth_decorators import *
 from .models import *
@@ -92,7 +93,8 @@ def applicant_home(request):
     """
     customer = request.user.customeraccount
     return render(request, 'digiapproval/applicant_home.html', {
-        'running_workflows' : customer.get_all_workflows(completed=False),
+        'running_workflows_and_tasks' : map(lambda wf: (wf, wf.get_ready_task_forms(actor = 'CUSTOMER')), 
+            customer.get_all_workflows(completed=False)),
         'completed_workflows' : customer.get_all_workflows(completed=True),
         'workflow_specs' : WorkflowSpec.objects.filter(public=True)
     })
@@ -127,3 +129,24 @@ def new_workflow(request, workflowspec_id):
     """Controller for creating new workflows. TODO finish description
     """
     pass
+    
+def view_task(request, workflow_id, task_model_id):
+    """Transient controller for returning appropriate taskform controller, authentication is handled by taskform
+    """
+    try: workflow = Workflow.objects.get(id = workflow_id)
+    except ObjectDoesNotExist: 
+        return HttpResponseRedirect(reverse('applicant_home'))
+    task_form_list = [task for task in workflow.get_ready_task_forms() if task.task_model.id == int(task_model_id)]
+    if len(task_form_list) is 1:
+        return task_form_list[0].form_request(request)
+    else: #either invalid data or hash collision
+        print task_form_list
+        return HttpResponseRedirect(reverse('applicant_home'))
+        
+        
+    
+        
+        
+        
+
+  
