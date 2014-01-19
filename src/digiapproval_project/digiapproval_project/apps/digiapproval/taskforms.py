@@ -1,7 +1,8 @@
 from django import forms
 from django.shortcuts import render
 from . import models
-from .views import index
+from django.http import HttpResponse, HttpResponseRedirect
+from django.core.urlresolvers import reverse
 from exceptions import TypeError
 
 class AbstractForm(object):
@@ -84,9 +85,9 @@ class AbstractForm(object):
             Doesn't currently return useful error messages on auth fail"""
         is_authenticated = request.user.is_authenticated()
         is_approver = request.user.id is self.workflow_model.approver.id
-        is_customer_and_actor = (request.user.customeraccount.id is self.workflow_model.customer.id) and  (self.task_dict['actor'] is 'CUSTOMER')
+        is_customer_and_actor = (request.user.customeraccount.id is self.workflow_model.customer.id) and  (self.actor == 'CUSTOMER')
         if not (is_authenticated and (is_approver or is_customer_and_actor)):
-            return index(request)
+            return HttpResponseRedirect(reverse('applicant_home'))
     
     def complete_task(self, request):
         """ Sets current task as complete, saves the models and redirects to ndex or next task (if there is only one)
@@ -94,11 +95,11 @@ class AbstractForm(object):
         self.spiff_task.complete()
         self.task_model.save()
         self.workflow_model.save()
-        children = self.workflow_model.get_ready_task_forms()
+        waiting_tasks = self.workflow_model.get_ready_task_forms(actor=self.actor)
         if len(waiting_tasks) is 1:
             return waiting_tasks[0].form_request(request)
         else:
-            return index(request)
+            return HttpResponseRedirect(reverse('applicant_home'))
         
 class AcceptAgreement(AbstractForm):
     """Simple form which shows an agreement and has a boolean 'acceptance' field"""
@@ -130,10 +131,10 @@ class AcceptAgreement(AbstractForm):
         return task_dict
         
     def form_request(self, request):
-        response = super(AcceptAgreement, self).form_request()
+        response = super(AcceptAgreement, self).form_request(request)
         error = ""
         if response is not None: #invalid access
-            index(request)
+            return response
         if request.method == "POST":
             mandatory = self.task_dict['fields']['acceptance']['mandatory']
             checkbox_value = request.POST.get('checkbox_value', False) 
@@ -141,9 +142,9 @@ class AcceptAgreement(AbstractForm):
                 self.task_dict['fields']['acceptance']['value'] = checkbox_value
                 return self.complete_task(request)
             error = "You must accept the agreement to continue"
-        response = render(request, 'digiapproval/taskforms/AcceptAgreement.html', { #default response
+        return render(request, 'digiapproval/taskforms/AcceptAgreement.html', { #default response
             'error': error,
-            'task': self.spiff_task.name,
+            'task': self.spiff_task.get_name(),
             'agreement': self.task_dict['data']['agreement'],
             'checkbox_label': self.task_dict['fields']['acceptance']['label'],
             'checkbox_value': self.task_dict['fields']['acceptance']['value'],
@@ -151,7 +152,7 @@ class AcceptAgreement(AbstractForm):
         
     def complete_task(self, request):
         """Perform post completion tasks"""
-        super(AcceptAgreement, self).complete_task(request)
+        return super(AcceptAgreement, self).complete_task(request)
         
    
         
