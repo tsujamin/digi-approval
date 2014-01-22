@@ -1,0 +1,16 @@
+{% extends "digiapproval/page.tpl.html" %}
+{% block title %}{{ task }}{% endblock %}
+{% load taskform_tags %}
+
+{% block content %}
+{% if error %}{{error}}{% endif %}
+<form action="" method="POST">
+    {% csrf_token %}
+    {% for field, items in form_fields.items %}
+    <label for="{{field}}">{{items.label}}</label>
+    <input type="checkbox" name="{{ field }}" value="{{ items.value }}"/><br>
+    {% endfor %}
+    <input type="submit" name="submit" value="Continue"/>
+</form>
+{% endblock content %}
+    
