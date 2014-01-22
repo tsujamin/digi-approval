@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
+from django.shortcuts import get_object_or_404
 from .forms import *
 from .auth_decorators import *
 from .models import *
@@ -134,9 +135,7 @@ def new_workflow(request, workflowspec_id):
 def view_task(request, workflow_id, task_uuid):
     """Transient controller for returning appropriate taskform controller, authentication is handled by taskform
     """
-    try: workflow = Workflow.objects.get(id = workflow_id)
-    except ObjectDoesNotExist: 
-        return HttpResponseRedirect(reverse('applicant_home'))
+    workflow = get_object_or_404(Workflow, pk=workflow_id)
     task_form_list = [task for task in workflow.get_ready_task_forms() if task.uuid == uuid.UUID(task_uuid)]
     if len(task_form_list) is 1:
         return task_form_list[0].form_request(request)
