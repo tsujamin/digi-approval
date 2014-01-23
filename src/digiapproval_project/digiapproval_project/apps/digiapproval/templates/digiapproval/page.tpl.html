@@ -35,23 +35,26 @@
                 <li><a href="/pages/help">Help</a></li>
                 <li><a href="/pages/contact">Contact</a></li>
                 {% endblock %}
-                <li>
+              </ul>
+              <ul class="nav navbar-nav navbar-right">
                 {% if user.is_authenticated %}
-                <a href="{% url 'applicant_home' %}">Logged in as: {{ user.username.title }}</a>
-                </li>
-                <li>
+                  <li>
+                    <a href="{% url 'applicant_home' %}">Logged in as: {{ user.username.title }}</a>
+                  </li>
+                  <li>
                   {% if user.customeraccount.account_type == 'CUSTOMER' %}
-                  <a href="{% url 'remove_parentaccounts' %}">Modify your Parent Accounts</a>
+                    <a href="{% url 'remove_parentaccounts' %}">Modify your Parent Accounts</a>
                   {% elif user.customeraccount.account_type == 'ORGANISATION' %}
-                  <a href="{% url 'modify_subaccounts' %}">Modify your Substituent Accounts</a>
+                    <a href="{% url 'modify_subaccounts' %}">Modify your Substituent Accounts</a>
                   {% endif %}
-                <li>
-                <a href="{% url 'logout' %}">Log out</a>
+                  <li>
+                    <a href="{% url 'logout' %}">Log out</a>
+                  </li>
                 {% else %}
-                <a href="{% url 'login' %}">Log in</a>
+                  <li>
+                    <a href="{% url 'login' %}">Log in</a>
+                  </li>
                 {% endif %}
-                </li>
-
               </ul>
             </div><!--/.nav-collapse -->
           </div>
