@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
@@ -135,10 +135,8 @@ def new_workflow(request, workflowspec_id):
     """
     # TODO: creating organisational workflows
     # TODO: what's the best way to handle non-public workflows? And non-top-level workflows?
-    try:
-        workflowspec = WorkflowSpec.objects.get(id=workflowspec_id, public=True)
-    except ObjectDoesNotExist:
-        raise Http404
+    
+    workflowspec = get_object_or_404(WorkflowSpec, id=workflowspec_id, public=True)
     
     customer = request.user.customeraccount
     if request.method == 'POST' and request.POST.get('create_workflow', False):
