@@ -3,8 +3,19 @@
 
 {% block content %}
 
-<p>Welcome to DigiApproval! You can do things on this website!</p>
+<p>Welcome to DigiApproval!</p>
 
-<ul><a href="{% url 'applicant_home' %}">Applicant Portal</a></ul>
+<ul>
+  {% if user.is_authenticated %}
+    {% if user.customeraccount.account_type %}
+    <li><a href="{% url 'applicant_home' %}">Applicant Portal</a></li>
+    {% else %}
+    <li><a href="{% url 'approver_worklist' %}">Approver Worklist</a></li>
+    {% endif %}
+  {% else %}
+    <li><a href="{% url 'login' %}">Log in</a></li>
+    <li><a href="{% url 'register' %}">Register</a></li>
+  {% endif %}
+</ul>
 
 {% endblock content %}
