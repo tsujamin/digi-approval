@@ -1,0 +1,14 @@
+{% extends "digiapproval/page.tpl.html" %}
+{% block title %}Start new application - {{ workflowspec.name }}{% endblock %}
+
+{% block content %}
+<h2>Application information</h2>
+<ul><li><strong>Application Name:</strong> {{ workflowspec.name }}</li>
+<li><strong>Approving Agency:</strong> {{ workflowspec.owner.name }}</li>
+<li><strong>Description:</strong> TODO add more details here</li>
+</ul>
+<form action="{% url 'new_workflow' workflowspec.id %}" method="POST">
+    {% csrf_token %}
+    <input name="create_workflow" type="submit" value="Start Application" />
+</form>
+{% endblock content %}

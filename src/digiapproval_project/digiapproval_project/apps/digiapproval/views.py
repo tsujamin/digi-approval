@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
@@ -127,9 +127,27 @@ def view_workflow(request, workflow_id):
 
 @login_required_customer()
 def new_workflow(request, workflowspec_id):
-    """Controller for creating new workflows. TODO finish description
+    """Controller for creating new workflows. Displays information page about
+    the requested WorkflowSpec, then creates new workflow when requested by user.
+    
+    Requires authenticated CustomerAccount of type CUSTOMER.
     """
-    pass
+    # TODO: creating organisational workflows
+    # TODO: what's the best way to handle non-public workflows? And non-top-level workflows?
+    try:
+        workflowspec = WorkflowSpec.objects.get(id=workflowspec_id, public=True)
+    except ObjectDoesNotExist:
+        raise Http404
+    
+    customer = request.user.customeraccount
+    if request.method == 'POST' and request.POST.get('create_workflow', False):
+        workflow = workflowspec.start_workflow(customer)
+        workflow.save()
+        return HttpResponseRedirect(reverse('view_workflow', args=(workflow.id,)))
+    else:
+        return render(request, 'digiapproval/new_workflow.html', {
+            'workflowspec': workflowspec
+        })
     
 def view_task(request, workflow_id, task_uuid):
     """Transient controller for returning appropriate taskform controller, authentication is handled by taskform
