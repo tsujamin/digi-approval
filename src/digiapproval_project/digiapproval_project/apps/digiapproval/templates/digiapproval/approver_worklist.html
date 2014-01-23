@@ -1,0 +1,23 @@
+{% extends "digiapproval/page.tpl.html" %}
+{% block title %}Approver Worklist{% endblock %}
+
+{% block content %}
+<h2>My current applications and pending tasks</h2>
+{% if workflows %}
+<ul>
+  {% for workflow in workflows %}
+  <li>
+  <a href="{% url 'view_workflow' workflow_id=workflow.id %}">{{workflow.spec.name}} - ({{ workflow.customer.user.username }})</a>
+  <!--<ul>
+    {% for task in tasks %}
+    <li>
+      <a href="{% url 'view_task' workflow_id=workflow.id task_uuid=task.uuid %}">{{task.spiff_task.get_name}}</a>
+    </li>
+    {% endfor %}
+  </ul>-->
+  {% endfor %}
+</ul>
+{% else %}
+<p>No current applications.</p>
+{% endif %}
+{% endblock content %}

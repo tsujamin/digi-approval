@@ -108,7 +108,14 @@ def approver_worklist(request):
     """Controller for approver worklist. Displays the approver's worklist ... TODO Finish description
     
     Requires authenticated User with approver privileges on approval stages."""
-    pass
+    
+    # TODO: check staff status and redirect normal users
+    workflows = request.user.workflow_approver.all()
+    
+    # TODO: more advanced logic here!
+    return render(request, 'digiapproval/approver_worklist.html', {
+        'workflows': workflows,
+    })
 
 
 @login_required()
@@ -167,9 +174,25 @@ def view_workflow(request, workflow_id):
 
 @login_required_customer()
 def new_workflow(request, workflowspec_id):
-    """Controller for creating new workflows. TODO finish description
+    """Controller for creating new workflows. Displays information page about
+    the requested WorkflowSpec, then creates new workflow when requested by user.
+    
+    Requires authenticated CustomerAccount of type CUSTOMER.
     """
-    pass
+    # TODO: creating organisational workflows
+    # TODO: what's the best way to handle non-public workflows? And non-top-level workflows?
+    
+    workflowspec = get_object_or_404(WorkflowSpec, id=workflowspec_id, public=True)
+    
+    customer = request.user.customeraccount
+    if request.method == 'POST' and request.POST.get('create_workflow', False):
+        workflow = workflowspec.start_workflow(customer)
+        workflow.save()
+        return HttpResponseRedirect(reverse('view_workflow', args=(workflow.id,)))
+    else:
+        return render(request, 'digiapproval/new_workflow.html', {
+            'workflowspec': workflowspec
+        })
     
 def view_task(request, workflow_id, task_uuid):
     """Transient controller for returning appropriate taskform controller, authentication is handled by taskform
