@@ -34,12 +34,15 @@
                 {% block nav %}
                 <li><a href="/pages/help">Help</a></li>
                 <li><a href="/pages/contact">Contact</a></li>
+                <!-- TODO: Filter these appropriately -->
+                <li><a href="{% url 'applicant_home' %}">Applicant Home</a></li>
+                <li><a href="{% url 'approver_worklist' %}">Approver Worklist</a></li>
                 {% endblock %}
               </ul>
               <ul class="nav navbar-nav navbar-right">
                 {% if user.is_authenticated %}
                   <li>
-                    <a href="{% url 'applicant_home' %}">Logged in as: {{ user.username.title }}</a>
+                    <a href="{% url 'settings' %}">Logged in as: {{ user.username.title }}</a>
                   </li>
                   <li>
                   {% if user.customeraccount.account_type == 'CUSTOMER' %}
