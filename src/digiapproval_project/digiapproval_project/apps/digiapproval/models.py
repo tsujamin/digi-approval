@@ -145,15 +145,15 @@ class Workflow(models.Model):
     spec = models.ForeignKey(WorkflowSpec)
     
     def assign_approver(self):
-        """Finds the least busy approver (in the owner group of the Workflows spec), 
+        """Finds the least busy approver (in the approvers group of the Workflows spec), 
         returns and assigns it to the workflow"""
         if self.spec is None:
             raise UnboundLocalError("Workflow has no assigned WorkflowSpec")
-        active_approvers = User.objects.filter(groups=self.spec.owner, 
+        active_approvers = User.objects.filter(groups=self.spec.approvers, 
                                                 is_active=True)
         #Generates a dict of {Approver: no. current workflows}                                        
         approver_wf_count = dict(map(   lambda x: (x['approver'], x['approver__count']),
-                                        Workflow.objects.filter(completed=False, spec__owner=self.spec.owner)
+                                        Workflow.objects.filter(completed=False, spec__owner=self.spec.approvers)
                                             .values('approver')
                                             .annotate(models.Count('approver'))))
         #Find unassigned approver                                    
