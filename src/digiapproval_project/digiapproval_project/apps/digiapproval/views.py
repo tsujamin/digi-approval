@@ -171,7 +171,7 @@ def view_workflow(request, workflow_id):
             'name': task.get_name(),
             'state_name': task.state_names[task.state],
             'actor': (task.task_spec.get_data('task_data')['actor'] if task.task_spec.get_data('task_data') else ''),
-            'uuid': task.id['__uuid__']
+            'uuid': task.id
             }
 
         # should various links be shown?
