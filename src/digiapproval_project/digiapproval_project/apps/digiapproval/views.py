@@ -107,7 +107,14 @@ def approver_worklist(request):
     """Controller for approver worklist. Displays the approver's worklist ... TODO Finish description
     
     Requires authenticated User with approver privileges on approval stages."""
-    pass
+    
+    # TODO: check staff status and redirect normal users
+    workflows = request.user.workflow_approver.all()
+    
+    # TODO: more advanced logic here!
+    return render(request, 'digiapproval/approver_worklist.html', {
+        'workflows': workflows,
+    })
 
 
 @login_required()
