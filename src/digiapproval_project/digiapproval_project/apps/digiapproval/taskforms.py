@@ -89,7 +89,7 @@ class AbstractForm(object):
             Doesn't currently return useful error messages on auth fail"""
         is_authenticated = request.user.is_authenticated()
         is_approver = request.user.id is self.workflow_model.approver.id
-        is_customer_and_actor = (request.user.customeraccount.id is self.workflow_model.customer.id) and  (self.actor == 'CUSTOMER')
+        is_customer_and_actor = (self.actor == 'CUSTOMER') and (request.user.customeraccount.id is self.workflow_model.customer.id)
         if not (is_authenticated and (is_approver or is_customer_and_actor)):
             return HttpResponseRedirect(reverse('applicant_home'))
     
@@ -103,7 +103,7 @@ class AbstractForm(object):
         if len(waiting_tasks) is 1:
             return waiting_tasks[0].form_request(request)
         else:
-            return HttpResponseRedirect(reverse('applicant_home'))
+            return HttpResponseRedirect(reverse('view_workflow', args=(self.workflow_model.id,)))
         
 class AcceptAgreement(AbstractForm):
     """Simple form which shows an agreement and has a boolean 'acceptance' field"""
