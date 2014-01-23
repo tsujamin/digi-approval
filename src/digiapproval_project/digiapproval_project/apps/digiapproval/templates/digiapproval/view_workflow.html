@@ -1,0 +1,26 @@
+{% extends "digiapproval/page.tpl.html" %}
+{% block title %}{{workflow.spec.name}}{% endblock %}
+
+{% block content %}
+<p class="muted">Customer: {{workflow.customer.user.username}}.</p>
+<p class="muted">Approver: {{workflow.approver.get_full_name}}.</p>
+
+<ul>
+  {% for task in tasks %}
+  <li><b>{{task.name}}</b> - {{task.state_name|title}}
+  {% if task.actor %}
+  - {{task.actor|title}}
+  {% if task.show_link %}
+  - <a href="{% url 'view_task' workflow.id task.uuid %}">View</a>
+  {% endif %}
+  {% endif %}
+  </li>
+  {% endfor %}
+</ul>
+
+<h2>Debug Info</h2>
+<pre>
+{{workflow.workflow.spec.get_dump}}
+</pre>
+
+{% endblock content %}

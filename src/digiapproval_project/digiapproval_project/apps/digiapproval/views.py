@@ -3,12 +3,13 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.shortcuts import get_object_or_404
 from .forms import *
 from .auth_decorators import *
 from .models import *
 import uuid
+from SpiffWorkflow import Task
 
 def index(request):
     return render(request, 'digiapproval/index.html')
@@ -119,11 +120,49 @@ def delegator_worklist(request):
     pass
 
 
-@login_required_customer()
+@login_required()
 def view_workflow(request, workflow_id):
     """Controller for viewing workflows. TODO finish description
+    TODO verify that this user is allowed to view.
     """
-    pass
+    # figure out what and who we are
+    workflow = get_object_or_404(Workflow, pk=workflow_id)
+    if request.user != workflow.customer.user and \
+      request.user != workflow.approver:
+        raise PermissionDenied
+
+    try:
+        customer = request.user.customeraccount
+        actor = 'CUSTOMER'
+    except:
+        actor = 'APPROVER'
+
+    
+    
+    # iterate through the tasks, making a list of actually useful information
+    tasks_it = Task.Iterator(workflow.workflow.task_tree)
+    # ... skip the root
+    tasks_it.next()
+
+    tasks = []
+    for task in tasks_it:
+        result = {
+            'name': task.get_name(),
+            'state_name': task.state_names[task.state],
+            'actor': (task.task_spec.get_data('task_data')['actor'] if task.task_spec.get_data('task_data') else ''),
+            'uuid': task.id['__uuid__']
+            }
+
+        # show a link if the task is ready and I can complete it.
+        # TODO: extend to view past work (see todo in view_task)
+        result['show_link'] = (task.state == task.READY and result['actor'] == actor)
+
+        tasks.append(result)
+    
+    return render(request, 'digiapproval/view_workflow.html', {
+        'workflow': workflow,
+        'tasks': tasks
+        })
 
 
 @login_required_customer()
@@ -140,6 +179,7 @@ def view_task(request, workflow_id, task_uuid):
     if len(task_form_list) is 1:
         return task_form_list[0].form_request(request)
     else: #either invalid data or hash collision
+        # TODO: display completed data if available.
         return HttpResponseRedirect(reverse('applicant_home'))
         
         
