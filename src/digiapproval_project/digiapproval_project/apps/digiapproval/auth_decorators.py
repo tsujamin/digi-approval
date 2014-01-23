@@ -48,3 +48,31 @@ def login_required_organisation(function=None, redirect_field_name=REDIRECT_FIEL
     if function:
         return actual_decorator(function)
     return actual_decorator
+
+def login_required_approver(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login_url=None):
+    """
+    Decorator for views that checks that the user is logged in, and that
+    the user is an approver for at least one WorkflowSpec. Redirects to login page if necessary.
+    """
+    actual_decorator = user_passes_test(
+        lambda u: u.is_authenticated and any([hasattr(g, 'workflowspecs_approvers') for g in u.groups.all()]),
+        login_url=login_url,
+        redirect_field_name=redirect_field_name
+    )
+    if function:
+        return actual_decorator(function)
+    return actual_decorator
+
+def login_required_delegator(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login_url=None):
+    """
+    Decorator for views that checks that the user is logged in, and that
+    the user is a delegator for at least one WorkflowSpec. Redirects to login page if necessary.
+    """
+    actual_decorator = user_passes_test(
+        lambda u: u.is_authenticated and any([hasattr(g, 'workflowspecs_delegators') for g in u.groups.all()]),
+        login_url=login_url,
+        redirect_field_name=redirect_field_name
+    )
+    if function:
+        return actual_decorator(function)
+    return actual_decorator

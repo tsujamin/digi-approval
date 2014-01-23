@@ -56,11 +56,11 @@ def logout(request):
         auth_logout(request)
     return HttpResponseRedirect(reverse('index'))
 
-@login_required()
+@login_required
 def settings(request):
     raise NotImplementedError
 
-@login_required_organisation()
+@login_required_organisation
 def modify_subaccounts(request):
     """ Controller for modify_subaccounts template. Requires an authenticated CustomerAccount of type ORGINISATION
         Currently doesnt return useful error messages """
@@ -81,7 +81,7 @@ def modify_subaccounts(request):
         'subaccounts' : customer.sub_accounts.all()
     })
     
-@login_required_customer()
+@login_required_customer
 def remove_parentaccounts(request):
     """ Controller for remove_parentaccounts template. Requires authenticated CustomerAccount of type CUSTOMER
         Currently doesnt return useful error messages"""
@@ -98,7 +98,7 @@ def remove_parentaccounts(request):
 
 ## APPLICANT-ONLY PAGES
 
-@login_required_customer()
+@login_required_customer
 def applicant_home(request):
     """Controller for applicant home page. Displays the applicant's current applications, as well as a list of workflow specs to start new applications.
     
@@ -115,7 +115,7 @@ def applicant_home(request):
 
 ## STAFF-ONLY PAGES
 
-@login_required()
+@login_required_approver
 def approver_worklist(request):
     """Controller for approver worklist. Displays the approver's worklist ... TODO Finish description
     
@@ -130,7 +130,7 @@ def approver_worklist(request):
     })
 
 
-@login_required()
+@login_required_delegator
 def delegator_worklist(request):
     """Controller for delegator worklist. Displays... TODO Finish description
     
@@ -141,7 +141,7 @@ def delegator_worklist(request):
 
 ## WORKFLOWS / TASKS
 
-@login_required()
+@login_required
 def view_workflow(request, workflow_id):
     """Controller for viewing workflows. TODO finish description
     """
@@ -186,7 +186,7 @@ def view_workflow(request, workflow_id):
         })
 
 
-@login_required_customer()
+@login_required_customer
 def new_workflow(request, workflowspec_id):
     """Controller for creating new workflows. Displays information page about
     the requested WorkflowSpec, then creates new workflow when requested by user.
@@ -207,7 +207,8 @@ def new_workflow(request, workflowspec_id):
         return render(request, 'digiapproval/new_workflow.html', {
             'workflowspec': workflowspec
         })
-    
+
+@login_required
 def view_task(request, workflow_id, task_uuid):
     """Transient controller for returning appropriate taskform controller, authentication is handled by taskform
     """
