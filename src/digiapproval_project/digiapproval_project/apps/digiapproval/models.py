@@ -134,6 +134,9 @@ class WorkflowSpec(models.Model):
         # complete the empty start task
         workflow.workflow.complete_next()
         return workflow
+    
+    def __unicode__(self):
+        return u'%s (%s)' % (self.name, self.owner.name)
 
 
 class Workflow(models.Model):
@@ -193,6 +196,9 @@ class Workflow(models.Model):
         if 'actor' in kwargs: #filter for requested actor
             ready_forms = [form for form in ready_forms if form.actor == kwargs['actor']]
         return ready_forms
+    
+    def __unicode__(self):
+        return u'%s (%s)' % (self.customer.user.username, self.spec.name)
                         
 
 class Task(models.Model):
