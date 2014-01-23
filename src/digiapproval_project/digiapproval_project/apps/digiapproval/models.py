@@ -119,9 +119,12 @@ class WorkflowSpec(models.Model):
     def start_workflow(self, customer):
         """Returns a workflow object derived from self's spec"""
         from SpiffWorkflow import Workflow as SWorkflow
-        return Workflow(customer = customer,
-                        spec = self,
-                        workflow = SWorkflow(self.spec))
+        workflow = Workflow(customer = customer,
+                            spec = self,
+                            workflow = SWorkflow(self.spec))
+        # complete the empty start task
+        workflow.workflow.complete_next()
+        return workflow
 
 
 class Workflow(models.Model):
