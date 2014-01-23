@@ -113,7 +113,14 @@ class CustomerAccount(models.Model):
 
 class WorkflowSpec(models.Model):
     name = models.CharField(max_length = "64")
-    owner = models.ForeignKey(Group)
+    description = models.TextField(blank=True)
+    
+    # A WorkflowSpec must have an owner group, but it may not have a delegators or
+    # approvers group - this is to help with initial development/setup of the WfS
+    owner = models.ForeignKey(Group, related_name='workflowspecs_owner')
+    delegators = models.ForeignKey(Group, related_name='workflowspecs_delegators', null=True, blank=True, default=None)
+    approvers = models.ForeignKey(Group, related_name='workflowspecs_approvers', null=True, blank=True, default=None)
+    
     public = models.BooleanField(default=False)
     toplevel = models.BooleanField(default=True)
     spec = WorkflowSpecField(editable=False) # it doesn't render properly in Django admin, and besides we have no need to modify it in the admin interface anyway -- AJD
