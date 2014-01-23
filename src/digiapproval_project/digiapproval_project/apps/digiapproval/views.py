@@ -109,7 +109,7 @@ def applicant_home(request):
         'running_workflows_and_tasks' : map(lambda wf: (wf, wf.get_ready_task_forms(actor = 'CUSTOMER')), 
             customer.get_all_workflows(completed=False)),
         'completed_workflows' : customer.get_all_workflows(completed=True),
-        'workflow_specs' : WorkflowSpec.objects.filter(public=True)
+        'workflow_specs' : WorkflowSpec.objects.filter(public=True, toplevel=True)
     })
     
 
@@ -196,7 +196,7 @@ def new_workflow(request, workflowspec_id):
     # TODO: creating organisational workflows
     # TODO: what's the best way to handle non-public workflows? And non-top-level workflows?
     
-    workflowspec = get_object_or_404(WorkflowSpec, id=workflowspec_id, public=True)
+    workflowspec = get_object_or_404(WorkflowSpec, id=workflowspec_id, public=True, toplevel=True)
     
     customer = request.user.customeraccount
     if request.method == 'POST' and request.POST.get('create_workflow', False):
