@@ -147,17 +147,18 @@ def view_workflow(request, workflow_id):
     """
     # figure out what and who we are
     workflow = get_object_or_404(Workflow, pk=workflow_id)
-    if request.user != workflow.customer.user and \
-      request.user != workflow.approver:
-        raise PermissionDenied
-
+    
     try:
         customer = request.user.customeraccount
         actor = 'CUSTOMER'
+        # FIXME: this doesn't cope with multiple layers of parent account - but we should probably remove those multiple layers
+        if customer != workflow.customer and \
+            workflow.customer not in customer.parent_accounts.all():
+                raise PermissionDenied
     except:
         actor = 'APPROVER'
-
-    
+        if request.user != workflow.approver:
+            raise PermissionDenied
     
     # iterate through the tasks, making a list of actually useful information
     tasks_it = SpiffTask.Iterator(workflow.workflow.task_tree)

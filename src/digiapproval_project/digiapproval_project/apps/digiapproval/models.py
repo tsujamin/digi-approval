@@ -63,6 +63,7 @@ class CustomerAccount(models.Model):
     account_type = models.CharField(max_length=16,
                                     choices=ACCOUNT_TYPE_CHOICES, 
                                     default='CUSTOMER')
+    # FIXME: does this allow for multiple levels of parent accounts?
     parent_accounts = models.ManyToManyField(  'self',
                                                 symmetrical=False,
                                                 related_name='sub_accounts',
