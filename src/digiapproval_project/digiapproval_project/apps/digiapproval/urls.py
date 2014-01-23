@@ -14,5 +14,6 @@ urlpatterns = patterns('',
     url(r'^delegator_worklist', views.delegator_worklist, name='delegator_worklist'),
     url(r'^view_workflow/(?P<workflow_id>\d+)$', views.view_workflow, name='view_workflow'),
     url(r'^new_workflow/(?P<workflowspec_id>\d+)$', views.new_workflow, name='new_workflow'),
-    url(r'^view_task/(?P<workflow_id>\d+)/(?P<task_uuid>.+)$', views.view_task, name='view_task')
+    url(r'^view_task/(?P<workflow_id>\d+)/(?P<task_uuid>.+)$', views.view_task, name='view_task'),
+    url(r'^view_task_data/(?P<task_uuid>.+)$', views.view_task_data, name='view_task_data')
 )

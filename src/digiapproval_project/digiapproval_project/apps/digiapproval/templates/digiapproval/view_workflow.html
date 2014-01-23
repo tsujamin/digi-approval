@@ -10,9 +10,13 @@
   <li><b>{{task.name}}</b> - {{task.state_name|title}}
   {% if task.actor %}
   - {{task.actor|title}}
-  {% if task.show_link %}
+  {% if task.show_task_link %}
   - <a href="{% url 'view_task' workflow.id task.uuid %}">View</a>
   {% endif %}
+  {% if task.show_data_link %}
+  - <a href="{% url 'view_task_data' task.uuid %}">View</a>
+  {% endif %}
+  
   {% endif %}
   </li>
   {% endfor %}

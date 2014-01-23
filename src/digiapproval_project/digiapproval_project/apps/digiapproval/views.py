@@ -9,7 +9,7 @@ from .forms import *
 from .auth_decorators import *
 from .models import *
 import uuid
-from SpiffWorkflow import Task
+from SpiffWorkflow import Task as SpiffTask
 
 def index(request):
     return render(request, 'digiapproval/index.html')
@@ -130,7 +130,6 @@ def delegator_worklist(request):
 @login_required()
 def view_workflow(request, workflow_id):
     """Controller for viewing workflows. TODO finish description
-    TODO verify that this user is allowed to view.
     """
     # figure out what and who we are
     workflow = get_object_or_404(Workflow, pk=workflow_id)
@@ -147,7 +146,7 @@ def view_workflow(request, workflow_id):
     
     
     # iterate through the tasks, making a list of actually useful information
-    tasks_it = Task.Iterator(workflow.workflow.task_tree)
+    tasks_it = SpiffTask.Iterator(workflow.workflow.task_tree)
     # ... skip the root
     tasks_it.next()
 
@@ -160,10 +159,10 @@ def view_workflow(request, workflow_id):
             'uuid': task.id['__uuid__']
             }
 
-        # show a link if the task is ready and I can complete it.
-        # TODO: extend to view past work (see todo in view_task)
-        result['show_link'] = (task.state == task.READY and result['actor'] == actor)
-
+        # should various links be shown?
+        result['show_task_link'] = (task.state == task.READY and result['actor'] == actor)
+        result['show_data_link'] = (task.state == task.COMPLETED and result['actor'])
+        
         tasks.append(result)
     
     return render(request, 'digiapproval/view_workflow.html', {
@@ -202,13 +201,28 @@ def view_task(request, workflow_id, task_uuid):
     if len(task_form_list) is 1:
         return task_form_list[0].form_request(request)
     else: #either invalid data or hash collision
-        # TODO: display completed data if available.
+        # TODO: display completed data if available: redirect to view_task_data
         return HttpResponseRedirect(reverse('applicant_home'))
-        
-        
-    
-        
-        
-        
 
-  
+
+@login_required
+def view_task_data(request, task_uuid):
+    """ View the entered data of a completed task. """
+
+    # figure out what and who we are
+    task = get_object_or_404(Task, uuid=uuid.UUID(task_uuid))
+    if request.user != task.workflow.customer.user and \
+      request.user != task.workflow.approver:
+        raise PermissionDenied
+
+    spiff_task = task.workflow.workflow.get_task({'__uuid__': uuid.UUID(task.uuid).hex})
+    if spiff_task.state != spiff_task.COMPLETED:
+        # TODO: throw some sort of error
+        return HttpResponse("You can't view the data of a task that hasn't been completed.")
+
+    
+    return render(request, 'digiapproval/view_task_data.html',
+                  {'task': task,
+                   'spiff_task': spiff_task})
+
+    
