@@ -179,7 +179,7 @@ def view_workflow(request, workflow_id):
         result['show_data_link'] = (task.state == task.COMPLETED and result['actor'])
         
         tasks.append(result)
-    print tasks
+
     return render(request, 'digiapproval/view_workflow.html', {
         'workflow': workflow,
         'tasks': tasks
