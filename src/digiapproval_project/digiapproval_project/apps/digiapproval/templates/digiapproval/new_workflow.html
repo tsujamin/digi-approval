@@ -5,7 +5,7 @@
 <h2>Application information</h2>
 <ul><li><strong>Application Name:</strong> {{ workflowspec.name }}</li>
 <li><strong>Approving Agency:</strong> {{ workflowspec.owner.name }}</li>
-<li><strong>Description:</strong> TODO add more details here</li>
+<li><strong>Description:</strong> {{ workflowspec.description }}</li>
 </ul>
 <form action="{% url 'new_workflow' workflowspec.id %}" method="POST">
     {% csrf_token %}
