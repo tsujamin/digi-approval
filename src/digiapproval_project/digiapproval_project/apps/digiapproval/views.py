@@ -11,9 +11,14 @@ from .models import *
 import uuid
 from SpiffWorkflow import Task as SpiffTask
 
+
+## MAIN PAGES
+
 def index(request):
     return render(request, 'digiapproval/index.html')
 
+
+## AUTHENTICATION / USER SETTINGS
 
 def register_customer(request):
     """Creates CustomerUser and corresponding User if RegisterUserForm is valid"""
@@ -51,6 +56,10 @@ def logout(request):
         auth_logout(request)
     return HttpResponseRedirect(reverse('index'))
 
+@login_required()
+def settings(request):
+    raise NotImplementedError
+
 @login_required_organisation()
 def modify_subaccounts(request):
     """ Controller for modify_subaccounts template. Requires an authenticated CustomerAccount of type ORGINISATION
@@ -87,6 +96,7 @@ def remove_parentaccounts(request):
     })
         
 
+## APPLICANT-ONLY PAGES
 
 @login_required_customer()
 def applicant_home(request):
@@ -102,6 +112,8 @@ def applicant_home(request):
         'workflow_specs' : WorkflowSpec.objects.filter(public=True)
     })
     
+
+## STAFF-ONLY PAGES
 
 @login_required()
 def approver_worklist(request):
@@ -124,8 +136,10 @@ def delegator_worklist(request):
     
     Requires authenticated User with delegator privileges on approval stages.
     """
-    pass
+    raise NotImplementedError
 
+
+## WORKFLOWS / TASKS
 
 @login_required()
 def view_workflow(request, workflow_id):
