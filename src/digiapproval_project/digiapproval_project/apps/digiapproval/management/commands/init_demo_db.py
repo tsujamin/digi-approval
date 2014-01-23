@@ -10,31 +10,49 @@ class Command(BaseCommand):
     args = '<>'
     help = 'Initialises the database and fills it with the test fixtures'
     
-    def handle(self, *args, **kargs):
+    def handle(self, *args, **kwargs):
         """Clears current models from tables, creates demo directorates, approvers, orginisations and customers"""
-        self.stdout.write("clearing current models")   
+        self.stdout.write("Clearing current models")   
         clear_data()
         
-        self.stdout.write("creating directorate groups(django.contrub.auth)")   
+        self.stdout.write("Creating directorate groups (django.contrib.auth)")   
         DIRECTORATES = map(directorate_to_group, [ 
-            'TAMS', 
-            'NCA',
+            'Territory and Municipal Services Directorate',
+            'Justice and Community Safety Directorate',
+            'National Capital Authority',
+            'Australian Federal Police',
+            'Commerce and Works Directorate'
         ])
         
-        self.stdout.write("creating approver accounts(django.contrub.auth)")   
+        self.stdout.write("Creating directorate approver groups (django.contrib.auth)")   
+        DIRECTORATES_APPROVER_GROUPS = map(directorate_to_group, [
+            'TAMS - Parks and City Services - City Services - Licensing and Compliance',
+            'JACS - Emergency Services Agency - Emergency Management, Risk & Spatial Services',
+            'NCA - National Capital Estate Unit - Estate Management',
+            'AFP - ACT Policing - Emergency Management and Planning',
+            'CWD - ACT Insurance Authority'
+        ])
+        
+        self.stdout.write("Creating directorate delegator groups (django.contrib.auth)")   
+        DIRECTORATES_DELEGATOR_GROUPS = map(directorate_to_group, [g.name[:67] + " (Delegators)" for g in DIRECTORATES_APPROVER_GROUPS])
+        
+        
+        self.stdout.write("creating approver accounts (django.contrib.auth)")   
         APPROVERS = map(approver_to_user, [
-            ('David Potter', 'harrysorrydavid', 'David.Potter@act.gov.au', [DIRECTORATES[0]]),
-            ('Cal McGregor', 'alwaystheminister', 'Cal.McGregor@act.gov.au', [DIRECTORATES[0]]),
-            ('Claudia Marshall', 'neverthetwotermer', 'Claudia.Marshall@nca.gov.au', [DIRECTORATES[0], DIRECTORATES[1]]),
+            ('David Potter', 'harrysorrydavid', 'David.Potter@act.gov.au', [DIRECTORATES[0], DIRECTORATES_APPROVER_GROUPS[0], DIRECTORATES_DELEGATOR_GROUPS[0]]),
+            ('Cal McGregor', 'alwaystheminister', 'Cal.McGregor@act.gov.au', [DIRECTORATES[0], DIRECTORATES_APPROVER_GROUPS[0]]),
+            ('Claudia Marshall', 'neverthetwotermer', 'Claudia.Marshall@nationalcapital.gov.au', [DIRECTORATES[2], DIRECTORATES_APPROVER_GROUPS[2], DIRECTORATES_DELEGATOR_GROUPS[2]]),
+            ('Joe Sandilands', 'attorneygeneral', 'Joe.Sandilands@afp.gov.au', [DIRECTORATES[3], DIRECTORATES_APPROVER_GROUPS[3], DIRECTORATES_DELEGATOR_GROUPS[3]]),
+            ('Lincoln Lincoln', 'lincolnlincoln', 'Lincoln.Lincoln@act.gov.au', [DIRECTORATES[4], DIRECTORATES_APPROVER_GROUPS[4]]),
         ])
         
-        self.stdout.write("creating organisation accounts(CustomerAccount)")
+        self.stdout.write("creating organisation accounts (CustomerAccount)")
         ORGANISATIONS= map(to_customer_account, [
             ('ORGANISATION', 'leaky_plumbing', 'wikiwho?', 'webmaster@leakyplumbing.org.au', []),
             ('ORGANISATION', 'kirstys_short_term_loans', 'kneecaps', 'col@kirstys.net.au', []),
         ])
         
-        self.stdout.write("creating customer accounts(CustomerAccount)")
+        self.stdout.write("creating customer accounts (CustomerAccount)")
         CUSTOMERS = map(to_customer_account, [
             ('CUSTOMER', 'cleaver_g', 'fubar', 'clever_cleaver167@yahoo.com', []),
             ('CUSTOMER', 'missy_tanner', 'harrysorryjoshua', 'missy@hotmail.com', [ORGANISATIONS[0]]),
@@ -44,22 +62,28 @@ class Command(BaseCommand):
         
         self.stdout.write("creating workflow specifications")
         WORKFLOW_SPECS = map(to_workflow_spec, [
-            ("Veterinary Visit Permit", DIRECTORATES[0], True, workflowspec_one()),
-            ("Police Checkup Request", DIRECTORATES[1], True, workflowspec_two()),
-            ("Request to Ban Persons from Private Businesses", DIRECTORATES[0], False, workflowspec_two())
+            ("Veterinary Visit Permit", "This application is for a Veterinary Visit Permit pursuant to the <i>Animal Welfare Act 1992</i>. Applicants must demonstrate that they don't hate animals.",
+                DIRECTORATES[0], DIRECTORATES_APPROVER_GROUPS[0], DIRECTORATES_DELEGATOR_GROUPS[0],
+                True, True, workflowspec_one()),
+            ("Police Checkup Request", "This application is for a National Police Certificate from the Australian Federal Police. A National Police Certificate will list all unspent convictions in the applicant's criminal history.",
+                DIRECTORATES[3], DIRECTORATES_APPROVER_GROUPS[3], DIRECTORATES_DELEGATOR_GROUPS[3],
+                True, True, workflowspec_two()),
+            ("Request to Ban Persons from Private Businesses", "This application is for a permit to ban persons from entering designated private premises during a declared State of Emergency.",
+                DIRECTORATES[2], DIRECTORATES_APPROVER_GROUPS[2], DIRECTORATES_DELEGATOR_GROUPS[2],
+                False, True, workflowspec_two())
         ])
         
         self.stdout.write("creating workflows")
         WORKFLOWS = map(to_workflow, [
             (CUSTOMERS[0], WORKFLOW_SPECS[0], APPROVERS[0]),
-            (CUSTOMERS[1], WORKFLOW_SPECS[0], APPROVERS[2]),            
+            (CUSTOMERS[1], WORKFLOW_SPECS[2], APPROVERS[2]),            
             (CUSTOMERS[2], WORKFLOW_SPECS[0], None),
             (ORGANISATIONS[0], WORKFLOW_SPECS[0], APPROVERS[1]),
             (ORGANISATIONS[1], WORKFLOW_SPECS[0], None),
-            (CUSTOMERS[0], WORKFLOW_SPECS[1], APPROVERS[0]),
-            (CUSTOMERS[1], WORKFLOW_SPECS[1], APPROVERS[2]),            
+            (CUSTOMERS[0], WORKFLOW_SPECS[1], APPROVERS[3]),
+            (CUSTOMERS[1], WORKFLOW_SPECS[1], APPROVERS[3]),            
             (CUSTOMERS[2], WORKFLOW_SPECS[1], None),
-            (ORGANISATIONS[0], WORKFLOW_SPECS[1], APPROVERS[1]),
+            (ORGANISATIONS[0], WORKFLOW_SPECS[1], APPROVERS[3]),
             (ORGANISATIONS[1], WORKFLOW_SPECS[1], None),
         ])
         
@@ -95,7 +119,7 @@ def directorate_to_group(group_name):
     
 def approver_to_user((name, password, email, groups)):
     """Returns django.contrib.auth user created from parameter tuple"""
-    user = User.objects.create_user(email, email, password)
+    user = User.objects.create_user(email[:email.find('@')], email, password)
     user.first_name, user.last_name = name.split()
     user.save()
     for group in groups:
@@ -112,9 +136,11 @@ def to_customer_account((account_type, username, password, email, parents)):
         customer.parent_accounts.add(parent)
     return customer
     
-def to_workflow_spec((name, group, public, wf_spec)):
+def to_workflow_spec((name, description, owner, delegators, approvers, public, toplevel, wf_spec)):
     """Returns a WorkflowSpec model from parameter tuple"""
-    spec_model = models.WorkflowSpec(name = name, owner = group, public = public, spec = wf_spec)
+    spec_model = models.WorkflowSpec(name=name, description=description, \
+        owner=owner, delegators=delegators, approvers=approvers, \
+            public=public, toplevel=toplevel, spec=wf_spec)
     spec_model.save()
     return spec_model
     
