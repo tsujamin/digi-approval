@@ -115,6 +115,7 @@ class WorkflowSpec(models.Model):
     name = models.CharField(max_length = "64")
     owner = models.ForeignKey(Group)
     public = models.BooleanField(default=False)
+    toplevel = models.BooleanField(default=True)
     spec = WorkflowSpecField(editable=False) # it doesn't render properly in Django admin, and besides we have no need to modify it in the admin interface anyway -- AJD
     
     def start_workflow(self, customer):
