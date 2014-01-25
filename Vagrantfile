@@ -106,6 +106,7 @@ curl -L https://www.opscode.com/chef/install.sh | bash"
       chef.roles_path = "chef-repo/roles"
       chef.environments_path = "chef-repo/environments"
       chef.environment = "awsdev"
+      chef.add_recipe("simple_iptables")
       # get this out of the way first, so we use it consistently
       # throughout the process
       chef.add_recipe("yum-epel")
