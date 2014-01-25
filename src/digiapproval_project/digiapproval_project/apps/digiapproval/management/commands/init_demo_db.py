@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from digiapproval_project.apps.digiapproval import models
-from digiapproval_project.apps.digiapproval.taskforms import AcceptAgreement, FieldEntry, CheckTally, ChooseBranch
+from digiapproval_project.apps.digiapproval.taskforms import AcceptAgreement, FieldEntry, CheckTally, ChooseBranch, ChooseBranches
 from django.contrib.auth.models import User, Group
 from SpiffWorkflow import specs
 
@@ -71,7 +71,7 @@ class Command(BaseCommand):
             ("Request to Ban Persons from Private Businesses", "This application is for a permit to ban persons from entering designated private premises during a declared State of Emergency.",
                 DIRECTORATES[2], DIRECTORATES_APPROVER_GROUPS[2], DIRECTORATES_DELEGATOR_GROUPS[2],
                 True, True, workflowspec_three()),
-            ("Submit feedback on a this service", "This application is for submitting feedback regarding the approval system",
+            ("Submit feedback on this service", "This application is for submitting feedback regarding the approval system",
                 DIRECTORATES[0], DIRECTORATES_APPROVER_GROUPS[0], DIRECTORATES_DELEGATOR_GROUPS[0],
                 True, True, workflowspec_four()),
         ])
@@ -258,15 +258,19 @@ def workflowspec_four():
     cust_agreement = specs.Simple(wf_spec, "Customer Agreement")
     cust_fieldentry = specs.Simple(wf_spec, "Permit Details")
     approver_agreement = specs.Simple(wf_spec, "Approver Agreement")
-    customer_choice = ChooseBranch.create_exclusive_task(wf_spec, "Accept Agreement or skip", 
-        (1, cust_agreement), 
-        (2, cust_fieldentry)
-    )
     task_join1 = specs.Join(wf_spec, "Parties In Agreement")
+    approver_choice = ChooseBranch.create_exclusive_task(wf_spec, "Accept Agreement or skip", 
+        (1, approver_agreement), 
+        (2, task_join1)
+    )
+    customer_choice = ChooseBranches.create_multichoice_task(wf_spec, "Choose tasks",
+        (1, cust_agreement),
+        (2, cust_fieldentry),
+    )
     
     
     wf_spec.start.connect(customer_choice)
-    wf_spec.start.connect(approver_agreement)
+    wf_spec.start.connect(approver_choice)
     cust_agreement.connect(task_join1)
     cust_fieldentry.connect(task_join1)
     approver_agreement.connect(task_join1)
@@ -279,9 +283,14 @@ def workflowspec_four():
     )
     approver_agreement.set_data(task_data = AcceptAgreement.make_task_dict(True, lorum_ipsum,'APPROVER'))
     
-    customer_choice.set_data(task_data = ChooseBranch.make_task_dict('CUSTOMER', 
+    customer_choice.set_data(task_data = ChooseBranches.make_task_dict('CUSTOMER', 1
         ('agreement', "Read and accept agreement", 1),
-        ('field_entry', "Go straight to field entry'", 2))
+        ('field_entry', "Go straight to field entry", 2))
+    )
+    
+    approver_choice.set_data(task_data = ChooseBranch.make_task_dict('APPROVER', 
+        ('agreement', "Read and accept agreement", 1),
+        ('skip', "Skip to next action", 2))
     )
     
     return wf_spec
