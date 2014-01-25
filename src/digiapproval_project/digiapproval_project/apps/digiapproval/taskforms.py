@@ -3,8 +3,9 @@ from django.shortcuts import render
 from . import models
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
-from exceptions import TypeError
+from exceptions import TypeError, AttributeError
 import uuid
+from SpiffWorkflow.specs import ExclusiveChoice
 
 class AbstractForm(object):
     """
@@ -101,7 +102,7 @@ class AbstractForm(object):
         self.workflow_model.save()
         waiting_tasks = self.workflow_model.get_ready_task_forms(actor=self.actor)
         if len(waiting_tasks) is 1:
-            return waiting_tasks[0].form_request(request)
+            return HttpResponseRedirect(reverse('view_task', args=(waiting_tasks[0].workflow_model.id, waiting_tasks[0].uuid,)))
         else:
             return HttpResponseRedirect(reverse('view_workflow', args=(self.workflow_model.id,)))
         
@@ -141,9 +142,15 @@ class AcceptAgreement(AbstractForm):
             return response
         if request.method == "POST":
             mandatory = self.task_dict['fields']['acceptance']['mandatory']
-            checkbox_value = request.POST.get('checkbox_value', False) 
-            if (mandatory and checkbox_value) or not mandatory: #success
-                self.task_dict['fields']['acceptance']['value'] = checkbox_value
+            checkbox_value = request.POST.get('checkbox_value', None)
+            if not mandatory:
+                if checkbox_value is not None:
+                    self.task_dict['fields']['acceptance']['value'] = True
+                else:
+                    self.task_dict['fields']['acceptance']['value'] = False
+                return self.complete_task(request)
+            elif mandatory and (checkbox_value is not None):
+                self.task_dict['fields']['acceptance']['value'] = True
                 return self.complete_task(request)
             error = "You must accept the agreement to continue"
         return render(request, 'digiapproval/taskforms/AcceptAgreement.html', { #default response
@@ -211,13 +218,154 @@ class FieldEntry(AbstractForm):
     def complete_task(self, request):
         """Perform post completion tasks"""
         return super(FieldEntry, self).complete_task(request)
-                    
+        
+class CheckTally(AbstractForm):
+    """Displays a list of checkboxes with associated values. Selects a branch based on the 
+    total score of elected values
+    """
+    
+    def __init__(self, spiff_task, workflow_model,  *args, **kwargs):
+        from SpiffWorkflow.specs import ExclusiveChoice
+        super(CheckTally, self).__init__(spiff_task, workflow_model,  *args, **kwargs)
+        if isinstance(spiff_task.task_spec, ExclusiveChoice) and \
+             isinstance(spiff_task.task_spec.get_data('min_score'), int):
+            spiff_task.set_data(min_score = spiff_task.task_spec.get_data('min_score'))
+            spiff_task.set_data(score = 0)
+        else:
+            raise TypeError("CheckTally requires an ExclusiveChoice task with score and min_score attributes")
+    
+    @staticmethod
+    def validate_task_data(task_data):
+        """Checks that the dictionary has integer branch score and scores for each field
+        """
+        AbstractForm.validate_task_data(task_data)
+        for item in task_data['fields'].values():
+            if item['type'] != 'checkbox' or \
+                not isinstance(item['score'], int):
+                print item
+                raise AttributeError("fields must have score and be checkbox")
                 
+        
+        
+    @staticmethod    
+    def make_task_dict(actor, *args, **kwargs):
+        """Builds a task dictionary, accepts *args of (name, label, mandatory, score). 
+        Only text currently supported for ftype
+        """
+        for (field_name, label, mandatory, score) in args:
+            task_dict['fields'][field_name] = {   
+                'label': label, 'mandatory': mandatory, 
+                'type': 'checkbox', 'value': False, 'score': score
+            }
+        CheckTally.validate_task_data(task_dict)
+        return task_dict
+        
+    def form_request(self, request):
+        response = super(CheckTally, self).form_request(request)
+        error = None
+        render_dict = {}
+        form_fields = self.task_dict['fields']
+        
+        if response is not None: return response #invalid access
+        
+        if request.method == "POST":
+            current_score = 0
+            for field in form_fields:
+                value = request.POST.get(field, None)
+                if value is None and form_fields[field]['mandatory'] is True: #Failed to enter mandatory field
+                    error = "\"" + str(form_fields[field]['label']) + "\" is a mandatory field."
+                    break
+                elif value is not None:  
+                    form_fields[field]['value'] = True
+                    current_score += form_fields[field]['score']
+            if error is None: #Correctly filled out
+                self.spiff_task.set_data(score=current_score)
+                return self.complete_task(request)
+        return render(request, 'digiapproval/taskforms/CheckTally.html', { #default response
+            'error': error,
+            'task': self.spiff_task.get_name(),
+            'form_fields': form_fields
+        })
+    
+    def complete_task(self, request):
+        """Perform post completion tasks"""
+        return super(CheckTally, self).complete_task(request)
+        
+    @staticmethod
+    def create_exclusive_task(spec, name, min_score, success, fail, *args, **kwargs):
+        """Build an ExclsiveChoice task for attachment to this task form. Requires a minimal pass score, success and fail branches
+        """
+        from SpiffWorkflow.operators import Attrib, GreaterThan, Equal, LessThan
+        ret_task = ExclusiveChoice(spec, name)
+        ret_task.set_data(min_score=min_score)
+        ret_task.connect_if(GreaterThan(Attrib('score'), Attrib('min_score'))
+           , success)
+        ret_task.connect_if(Equal(Attrib('score'), Attrib('min_score'))
+           , success)
+        ret_task.connect_if(LessThan(Attrib('score'), Attrib('min_score'))
+           , fail)
+        ret_task.connect(success) #Default taskspec
+        return ret_task
+        
+class ExampleTaskForm(AbstractForm):
+    """ A small example of a task form.
+        TaskForms based on this template must be added to the form_classes tuple array at the bottom of taskforms.py"""
+    
+    def __init__(self, spiff_task, workflow_model, *args, **kwargs):
+        """Task form initialisation and validation"""
+        super(ExampleTaskForm,self).__init__(spiff_task, workflow_model, args, kwargs)
+        #Task specific init/validation here
+
+        
+    @staticmethod
+    def validate_task_data(task_data):
+        """Validates that provided task_data dict is of valid construction, throws AttributeErrors"""    
+        AbstractForm.validate_task_data(task_data)
+        #Test taskform specific fields here
+        
+    @staticmethod    
+    def make_task_dict(actor, *args, **kwargs):
+        """Constructs a task_dict for this taskform using provided params"""
+        task_dict = AbstractForm.make_task_dict("example_task_form", actor) 
+        #Add task specific forms to task_dict
+        ExampleTaskForm.validate_task_data(task_dict)
+        return task_dict
+        
+        
+    def form_request(self, request):
+        """Controller for this task form, handles post and checks validity before completing task"""
+        response = super(ExampleTaskForm, self).form_request(request) #Check authorisation
+        if response is not None: return response #invalid access
+        errors = None
+    
+        if request.method == "POST":
+            for field in form_fields:
+                value = request.POST.get(field, None)
+                #Check validity of posted data 
+                    if not valid or (value is None and self.task_dict['fields'][field]['mandatory']):
+                        error = "Error text"
+                    else: #place value in task_dict
+                        self.task_dict['fields'][field]['value'] = value
+                if error is None: #All field data was valid, now complete the task
+                    return self.complete_task(request)
+        #default response, returns related template with current fields            
+        return render(request, 'digiapproval/taskforms/ExampleTaskForm.html', { 
+            'error': error,
+            'task': self.spiff_task.get_name(),
+            'form_fields': self.task_dict['fields']
+        })
+
+    def complete_task(self, request):
+        """Perform post completion tasks, no need to save models as handled by parent class"""
+        return super(ExampleTaskForm, self).complete_task(request)
+    
+        
         
     
 form_classes = {
     "accept_agreement": AcceptAgreement,
-    "field_entry": FieldEntry  
+    "field_entry": FieldEntry,
+    "check_tally": CheckTally  
 }
 field_types = [
     'checkbox',

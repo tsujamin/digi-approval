@@ -1,0 +1,16 @@
+{% extends "digiapproval/page.tpl.html" %} <!-- Make sure to use default template -->
+{% block title %}{{ task }}{% endblock %} <!--Name of task form -->
+
+{% block content %}
+{% if error %}{{error}}{% endif %} <!-- Displays error -->
+<form action="" method="POST"> <!-- Start of form -->
+    {% csrf_token %} <!-- Boilerplate tag to prevent cross site forgery -->
+    {% for field, items in form_fields.items %} <!-- Iterate through fields provided to template -->
+    <label for="{{field}}">{{items.label}}</label> <!-- Label for current field -->
+    <input type="{{ items.type }}" name="{{ field }}"
+    value={% if items.value %} "{{ items.value }}" {% else %} "" {% endif %}/><br> <!-- Creates field with specified field type -->
+    {% endfor %}
+    <input type="submit" name="submit" value="Continue"/> <!-- Submit field, multiple submit buttons can exist and be handled seperatly -->
+</form>
+{% endblock content %}
+    

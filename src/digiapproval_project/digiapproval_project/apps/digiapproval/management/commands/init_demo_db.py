@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from digiapproval_project.apps.digiapproval import models
-from digiapproval_project.apps.digiapproval.taskforms import AcceptAgreement, FieldEntry
+from digiapproval_project.apps.digiapproval.taskforms import AcceptAgreement, FieldEntry, CheckTally
 from django.contrib.auth.models import User, Group
 from SpiffWorkflow import specs
 
@@ -70,7 +70,7 @@ class Command(BaseCommand):
                 True, True, workflowspec_two()),
             ("Request to Ban Persons from Private Businesses", "This application is for a permit to ban persons from entering designated private premises during a declared State of Emergency.",
                 DIRECTORATES[2], DIRECTORATES_APPROVER_GROUPS[2], DIRECTORATES_DELEGATOR_GROUPS[2],
-                False, True, workflowspec_two())
+                True, True, workflowspec_three()),
         ])
         
         self.stdout.write("creating workflows")
@@ -199,6 +199,37 @@ def workflowspec_two():
         ('event_love', 'In 50 words or less, why do you love applying for events: ', 'text', True),)
     )
     approver_agreement.set_data(task_data = AcceptAgreement.make_task_dict(True, lorum_ipsum,'APPROVER'))
+    return wf_spec
+    
+def workflowspec_three():
+    
+    wf_spec = specs.WorkflowSpec()
+    cust_agreement = specs.Simple(wf_spec, "Customer Agreement")
+    cust_fieldentry = specs.Simple(wf_spec, "Permit Details")
+    approver_agreement = specs.Simple(wf_spec, "Approver Agreement")
+    customer_tally = CheckTally.create_exclusive_task(wf_spec, "Choose to read agreement", 20, cust_agreement, cust_fieldentry)
+
+    task_join1 = specs.Join(wf_spec, "Parties In Agreement")
+    
+    wf_spec.start.connect(approver_agreement)
+    wf_spec.start.connect(customer_tally)    
+    cust_agreement.connect(cust_fieldentry)
+    cust_fieldentry.connect(task_join1)
+    approver_agreement.connect(task_join1)
+    
+    cust_agreement.set_data(task_data = AcceptAgreement.make_task_dict(True, lorum_ipsum, 'CUSTOMER'))
+    cust_fieldentry.set_data(task_data = FieldEntry.make_task_dict('CUSTOMER', 
+        ('event_name', 'What is the name of your event:  ', 'text', True),
+        ('event_purpose', 'What is the purpose of your event: ', 'text', True),
+        ('event_love', 'In 50 words or less, why do you love applying for events: ', 'text', True),)
+    )
+    approver_agreement.set_data(task_data = AcceptAgreement.make_task_dict(True, lorum_ipsum,'APPROVER'))
+    customer_tally.set_data(task_data = CheckTally.make_task_dict('CUSTOMER',
+        ('like_bureaucracy', "Do you like Bureaucracy: ", False, 5),
+        ('like_events', "Do you like throwing events: ", False, 10),
+        ('like_digiactive', "Do you like DigiACTive: ", True, 15),)
+    )
+    
     return wf_spec
     
     
