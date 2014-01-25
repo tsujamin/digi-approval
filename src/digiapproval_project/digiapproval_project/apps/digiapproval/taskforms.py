@@ -357,7 +357,7 @@ class ExampleTaskForm(AbstractForm):
 
     def complete_task(self, request):
         """Perform post completion tasks, no need to save models as handled by parent class"""
-        return super(CheckTally, self).complete_task(request)
+        return super(ExampleTaskForm, self).complete_task(request)
     
         
         
