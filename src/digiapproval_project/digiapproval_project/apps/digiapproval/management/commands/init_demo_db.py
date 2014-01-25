@@ -283,7 +283,7 @@ def workflowspec_four():
     )
     approver_agreement.set_data(task_data = AcceptAgreement.make_task_dict(True, lorum_ipsum,'APPROVER'))
     
-    customer_choice.set_data(task_data = ChooseBranches.make_task_dict('CUSTOMER', 1
+    customer_choice.set_data(task_data = ChooseBranches.make_task_dict('CUSTOMER',
         ('agreement', "Read and accept agreement", 1),
         ('field_entry', "Go straight to field entry", 2))
     )
