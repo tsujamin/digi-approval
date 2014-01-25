@@ -252,7 +252,6 @@ class CheckTally(AbstractForm):
         """Builds a task dictionary, accepts *args of (name, label, mandatory, score). 
         Only text currently supported for ftype
         """
-        task_dict = AbstractForm.make_task_dict("check_tally", actor)
         for (field_name, label, mandatory, score) in args:
             task_dict['fields'][field_name] = {   
                 'label': label, 'mandatory': mandatory, 
@@ -289,7 +288,7 @@ class CheckTally(AbstractForm):
         })
     
     def complete_task(self, request):
-        """Perform post completion tasks, hope to christ task selection works"""
+        """Perform post completion tasks"""
         return super(CheckTally, self).complete_task(request)
         
     @staticmethod
@@ -307,6 +306,60 @@ class CheckTally(AbstractForm):
            , fail)
         ret_task.connect(success) #Default taskspec
         return ret_task
+        
+class ExampleTaskForm(AbstractForm):
+    """ A small example of a task form.
+        TaskForms based on this template must be added to the form_classes tuple array at the bottom of taskforms.py"""
+    
+    def __init__(self, spiff_task, workflow_model, *args, **kwargs):
+        """Task form initialisation and validation"""
+        super(ExampleTaskForm,self).__init__(spiff_task, workflow_model, args, kwargs)
+        #Task specific init/validation here
+
+        
+    @staticmethod
+    def validate_task_data(task_data):
+        """Validates that provided task_data dict is of valid construction, throws AttributeErrors"""    
+        AbstractForm.validate_task_data(task_data)
+        #Test taskform specific fields here
+        
+    @staticmethod    
+    def make_task_dict(actor, *args, **kwargs):
+        """Constructs a task_dict for this taskform using provided params"""
+        task_dict = AbstractForm.make_task_dict("example_task_form", actor) 
+        #Add task specific forms to task_dict
+        ExampleTaskForm.validate_task_data(task_dict)
+        return task_dict
+        
+        
+    def form_request(self, request):
+        """Controller for this task form, handles post and checks validity before completing task"""
+        response = super(ExampleTaskForm, self).form_request(request) #Check authorisation
+        if response is not None: return response #invalid access
+        errors = None
+    
+        if request.method == "POST":
+            for field in form_fields:
+                value = request.POST.get(field, None)
+                #Check validity of posted data 
+                    if not valid or (value is None and self.task_dict['fields'][field]['mandatory']):
+                        error = "Error text"
+                    else: #place value in task_dict
+                        self.task_dict['fields'][field]['value'] = value
+                if error is None: #All field data was valid, now complete the task
+                    return self.complete_task(request)
+        #default response, returns related template with current fields            
+        return render(request, 'digiapproval/taskforms/ExampleTaskForm.html', { 
+            'error': error,
+            'task': self.spiff_task.get_name(),
+            'form_fields': self.task_dict['fields']
+        })
+
+    def complete_task(self, request):
+        """Perform post completion tasks, no need to save models as handled by parent class"""
+        return super(CheckTally, self).complete_task(request)
+    
+        
         
     
 form_classes = {
