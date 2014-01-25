@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from digiapproval_project.apps.digiapproval import models
-from digiapproval_project.apps.digiapproval.taskforms import AcceptAgreement, FieldEntry, CheckTally
+from digiapproval_project.apps.digiapproval.taskforms import AcceptAgreement, FieldEntry, CheckTally, ChooseBranch, ChooseBranches
 from django.contrib.auth.models import User, Group
 from SpiffWorkflow import specs
 
@@ -71,20 +71,33 @@ class Command(BaseCommand):
             ("Request to Ban Persons from Private Businesses", "This application is for a permit to ban persons from entering designated private premises during a declared State of Emergency.",
                 DIRECTORATES[2], DIRECTORATES_APPROVER_GROUPS[2], DIRECTORATES_DELEGATOR_GROUPS[2],
                 True, True, workflowspec_three()),
+            ("Submit feedback on this service", "This application is for submitting feedback regarding the approval system",
+                DIRECTORATES[0], DIRECTORATES_APPROVER_GROUPS[0], DIRECTORATES_DELEGATOR_GROUPS[0],
+                True, True, workflowspec_four()),
         ])
         
         self.stdout.write("creating workflows")
         WORKFLOWS = map(to_workflow, [
             (CUSTOMERS[0], WORKFLOW_SPECS[0], APPROVERS[0]),
-            (CUSTOMERS[1], WORKFLOW_SPECS[2], APPROVERS[2]),            
+            (CUSTOMERS[1], WORKFLOW_SPECS[0], APPROVERS[0]),            
             (CUSTOMERS[2], WORKFLOW_SPECS[0], None),
-            (ORGANISATIONS[0], WORKFLOW_SPECS[0], APPROVERS[1]),
+            (ORGANISATIONS[0], WORKFLOW_SPECS[0], APPROVERS[0]),
             (ORGANISATIONS[1], WORKFLOW_SPECS[0], None),
-            (CUSTOMERS[0], WORKFLOW_SPECS[1], APPROVERS[3]),
-            (CUSTOMERS[1], WORKFLOW_SPECS[1], APPROVERS[3]),            
+            (CUSTOMERS[0], WORKFLOW_SPECS[1], APPROVERS[1]),
+            (CUSTOMERS[1], WORKFLOW_SPECS[1], APPROVERS[1]),            
             (CUSTOMERS[2], WORKFLOW_SPECS[1], None),
-            (ORGANISATIONS[0], WORKFLOW_SPECS[1], APPROVERS[3]),
+            (ORGANISATIONS[0], WORKFLOW_SPECS[1], APPROVERS[1]),
             (ORGANISATIONS[1], WORKFLOW_SPECS[1], None),
+            (CUSTOMERS[0], WORKFLOW_SPECS[2], APPROVERS[2]),
+            (CUSTOMERS[1], WORKFLOW_SPECS[2], APPROVERS[2]),            
+            (CUSTOMERS[2], WORKFLOW_SPECS[2], None),
+            (ORGANISATIONS[0], WORKFLOW_SPECS[2], APPROVERS[2]),
+            (ORGANISATIONS[1], WORKFLOW_SPECS[2], None),
+            (CUSTOMERS[0], WORKFLOW_SPECS[3], APPROVERS[3]),
+            (CUSTOMERS[1], WORKFLOW_SPECS[3], APPROVERS[3]),            
+            (CUSTOMERS[2], WORKFLOW_SPECS[3], None),
+            (ORGANISATIONS[0], WORKFLOW_SPECS[3], APPROVERS[3]),
+            (ORGANISATIONS[1], WORKFLOW_SPECS[3], None),
         ])
         
         self.stdout.write("processing workflows")
@@ -93,10 +106,18 @@ class Command(BaseCommand):
             (WORKFLOWS[2], 1),
             (WORKFLOWS[3], 1),
             (WORKFLOWS[4], 10),
-            (WORKFLOWS[5], 0),
-            (WORKFLOWS[6], 1),
+            (WORKFLOWS[6], 0),
             (WORKFLOWS[7], 1),
-            (WORKFLOWS[8], 10),
+            (WORKFLOWS[8], 1),
+            (WORKFLOWS[9], 10),
+            (WORKFLOWS[11], 0),
+            (WORKFLOWS[12], 1),
+            (WORKFLOWS[13], 1),
+            (WORKFLOWS[14], 10),
+            (WORKFLOWS[16], 0),
+            (WORKFLOWS[17], 1),
+            (WORKFLOWS[18], 1),
+            (WORKFLOWS[19], 10),
         ])
         
 
@@ -231,6 +252,51 @@ def workflowspec_three():
     )
     
     return wf_spec
+    
+def workflowspec_four():
+    wf_spec = specs.WorkflowSpec()
+    cust_agreement = specs.Simple(wf_spec, "Customer Agreement")
+    cust_fieldentry = specs.Simple(wf_spec, "Permit Details")
+    approver_agreement = specs.Simple(wf_spec, "Approver Agreement")
+    task_join1 = specs.Join(wf_spec, "Parties In Agreement")
+    approver_choice = ChooseBranch.create_exclusive_task(wf_spec, "Accept Agreement or skip", 
+        (1, approver_agreement), 
+        (2, task_join1)
+    )
+    customer_choice = ChooseBranches.create_multichoice_task(wf_spec, "Choose tasks",
+        (1, cust_agreement),
+        (2, cust_fieldentry),
+    )
+    
+    
+    wf_spec.start.connect(customer_choice)
+    wf_spec.start.connect(approver_choice)
+    cust_agreement.connect(task_join1)
+    cust_fieldentry.connect(task_join1)
+    approver_agreement.connect(task_join1)
+    
+    cust_agreement.set_data(task_data = AcceptAgreement.make_task_dict(True, lorum_ipsum, 'CUSTOMER'))
+    cust_fieldentry.set_data(task_data = FieldEntry.make_task_dict('CUSTOMER', 
+        ('event_name', 'What is the name of your event:  ', 'text', True),
+        ('event_purpose', 'What is the purpose of your event: ', 'text', True),
+        ('event_love', 'In 50 words or less, why do you love applying for events: ', 'text', True),)
+    )
+    approver_agreement.set_data(task_data = AcceptAgreement.make_task_dict(True, lorum_ipsum,'APPROVER'))
+    
+    customer_choice.set_data(task_data = ChooseBranches.make_task_dict('CUSTOMER', 1
+        ('agreement', "Read and accept agreement", 1),
+        ('field_entry', "Go straight to field entry", 2))
+    )
+    
+    approver_choice.set_data(task_data = ChooseBranch.make_task_dict('APPROVER', 
+        ('agreement', "Read and accept agreement", 1),
+        ('skip', "Skip to next action", 2))
+    )
+    
+    return wf_spec
+    
+    
+    
     
     
 #Dummy text for agreements    

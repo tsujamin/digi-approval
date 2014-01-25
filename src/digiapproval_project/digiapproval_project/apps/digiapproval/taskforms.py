@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from exceptions import TypeError, AttributeError
 import uuid
-from SpiffWorkflow.specs import ExclusiveChoice
+from SpiffWorkflow.specs import ExclusiveChoice, MultiChoice
 
 class AbstractForm(object):
     """
@@ -252,6 +252,7 @@ class CheckTally(AbstractForm):
         """Builds a task dictionary, accepts *args of (name, label, mandatory, score). 
         Only text currently supported for ftype
         """
+        task_dict = AbstractForm.make_task_dict("check_tally", actor) 
         for (field_name, label, mandatory, score) in args:
             task_dict['fields'][field_name] = {   
                 'label': label, 'mandatory': mandatory, 
@@ -307,6 +308,164 @@ class CheckTally(AbstractForm):
         ret_task.connect(success) #Default taskspec
         return ret_task
         
+class ChooseBranch(AbstractForm):
+    """ A small example of a task form.
+        TaskForms based on this template must be added to the form_classes tuple array at the bottom of taskforms.py"""
+    
+    def __init__(self, spiff_task, workflow_model, *args, **kwargs):
+        """Task form initialisation and validation"""
+        super(ChooseBranch,self).__init__(spiff_task, workflow_model, args, kwargs)
+        if not isinstance(spiff_task.task_spec, ExclusiveChoice):
+            raise TypeError("CheckTally requires an ExclusiveChoice task")
+
+        
+    @staticmethod
+    def validate_task_data(task_data):
+        """Validates that provided task_data dict is of valid construction, throws AttributeErrors"""
+        AbstractForm.validate_task_data(task_data)
+        for field in task_data['fields']:
+            if not hasattr(field, 'number') or \
+                field['type'] != 'radio':
+                AttributeError("fields must have number and be of type radio")
+        
+    @staticmethod    
+    def make_task_dict(actor, *args, **kwargs):
+        """Constructs a task_dict for this taskform using provided args (name, label, number), Actor must be CUSTOMER or APPROVER"""
+        task_dict = AbstractForm.make_task_dict("choose_branch", actor) 
+        for (name, label, number) in args:
+            task_dict['fields'][name] = {   
+                'label': label, 'mandatory': False, 
+                'type': 'radio', 'value': False, 'number': number
+            }
+        ChooseBranch.validate_task_data(task_dict)
+        return task_dict
+        
+        
+    def form_request(self, request):
+        """Controller for this task form, handles post and checks validity before completing task"""
+        response = super(ChooseBranch, self).form_request(request) #Check authorisation
+        if response is not None: return response #invalid access
+        error = None
+        form_fields = self.task_dict['fields']
+        if request.method == "POST":
+            value = request.POST.get('selection', None)
+            if value is not None and value in form_fields:
+                form_fields[value]['value'] = True
+                self.spiff_task.set_data(selection=form_fields[value]['number'])
+                return self.complete_task(request)
+            else:
+                error = "Invalid Selection"
+        #default response, returns related template with current fields            
+        return render(request, 'digiapproval/taskforms/ChooseBranch.html', { 
+            'error': error,
+            'task': self.spiff_task.get_name(),
+            'form_fields': form_fields
+        })
+
+    def complete_task(self, request):
+        """Perform post completion tasks, no need to save models as handled by parent class"""
+        return super(ChooseBranch, self).complete_task(request)
+        
+    @staticmethod
+    def create_exclusive_task(spec, name, *args, **kwargs):
+        """Build an ExclsiveChoice task for attachment to this task form. requires *args of (choice_no, taskspec)
+        """
+        from SpiffWorkflow.operators import Attrib, GreaterThan, Equal, LessThan
+        ret_task = ExclusiveChoice(spec, name)
+        for (number, taskspec) in args:
+            ret_task.connect_if(Equal(Attrib('selection'), number)
+               , taskspec)
+        (_, default_task) = args[0] #First task is default
+        ret_task.connect(default_task)
+        return ret_task
+        
+class ChooseBranches(AbstractForm):
+    """ A small example of a task form.
+        TaskForms based on this template must be added to the form_classes tuple array at the bottom of taskforms.py"""
+    
+    def __init__(self, spiff_task, workflow_model, *args, **kwargs):
+        """Task form initialisation and validation"""
+        super(ChooseBranches,self).__init__(spiff_task, workflow_model, args, kwargs)
+        if isinstance(spiff_task.task_spec, MultiChoice):
+            for field in self.task_dict['fields']:
+                data_field = "task" + str(self.task_dict['fields'][field]['number'])
+                if not hasattr(self.spiff_task.data, data_field): #init fields
+                    self.spiff_task.data[data_field] = False
+                self.task_model.save()
+        else:
+            raise TypeError("CheckTally requires an MultiChoice task")
+
+        
+    @staticmethod
+    def validate_task_data(task_data):
+        """Validates that provided task_data dict is of valid construction, throws AttributeErrors"""
+        AbstractForm.validate_task_data(task_data)
+        for field in task_data['fields']:
+            if not hasattr(field, 'number') or \
+                field['type'] != 'checkbox':
+                AttributeError("fields must have number and be of type checkbox")
+        if not hasattr(task_data['options'], 'minimum_choices') or \
+            not isinstance(task_data['options']['minimum_chioices'], int):
+            AttributeError("must have an integer minimum_choices option")
+            
+        
+    @staticmethod    
+    def make_task_dict(actor, minimum_choices, *args, **kwargs):
+        """Constructs a task_dict for this taskform using provided args (name, label, number), Actor must be CUSTOMER or APPROVER"""
+        task_dict = AbstractForm.make_task_dict("choose_branches", actor) 
+        for (name, label, number) in args:
+            task_dict['fields'][name] = {   
+                'label': label, 'mandatory': False, 
+                'type': 'checkbox', 'value': False, 'number': number
+            }
+        task_dict['options']['minimum_choices'] = minimum_choices
+        ChooseBranches.validate_task_data(task_dict)
+        return task_dict
+        
+        
+    def form_request(self, request):
+        """Controller for this task form, handles post and checks validity before completing task"""
+        response = super(ChooseBranches, self).form_request(request) #Check authorisation
+        if response is not None: return response #invalid access
+        
+        form_fields = self.task_dict['fields']
+        error = None
+        count = 0
+        if request.method == "POST":
+            for field in form_fields:    
+                value = request.POST.get(field, None)
+                if value is not None:
+                    form_fields[field]['value'] = True
+                    data_field = "task" + str(form_fields[field]['number'])
+                    self.spiff_task.data[data_field] = True
+                    count += 1
+            if count > self.task_dict['options']['minimum_choices']:
+                return self.complete_task(request)
+            else:
+                error = "Please select atleast " + str(self.task_dict['options']['minimum_choices']) + "options"                  
+        #default response, returns related template with current fields            
+        return render(request, 'digiapproval/taskforms/ChooseBranches.html', {
+            'error': error 
+            'task': self.spiff_task.get_name(),
+            'form_fields': form_fields
+        })
+
+    def complete_task(self, request):
+        """Perform post completion tasks, no need to save models as handled by parent class"""
+        return super(ChooseBranches, self).complete_task(request)
+        
+    @staticmethod
+    def create_multichoice_task(spec, name, *args, **kwargs):
+        """Build an ExclsiveChoice task for attachment to this task form. requires *args of (choice_no, taskspec)
+        """
+        from SpiffWorkflow.operators import Attrib, Equal
+        ret_task = MultiChoice(spec, name)
+        for (number, taskspec) in args:
+            data_field = "task" + str(number)
+            ret_task.connect_if(Equal(Attrib(data_field), True)
+               , taskspec)
+        return ret_task
+        
 class ExampleTaskForm(AbstractForm):
     """ A small example of a task form.
         TaskForms based on this template must be added to the form_classes tuple array at the bottom of taskforms.py"""
@@ -342,12 +501,12 @@ class ExampleTaskForm(AbstractForm):
             for field in form_fields:
                 value = request.POST.get(field, None)
                 #Check validity of posted data 
-                    if not valid or (value is None and self.task_dict['fields'][field]['mandatory']):
-                        error = "Error text"
-                    else: #place value in task_dict
-                        self.task_dict['fields'][field]['value'] = value
-                if error is None: #All field data was valid, now complete the task
-                    return self.complete_task(request)
+                if not valid or (value is None and self.task_dict['fields'][field]['mandatory']):
+                    error = "Error text"
+                else: #place value in task_dict
+                    self.task_dict['fields'][field]['value'] = value
+            if error is None: #All field data was valid, now complete the task
+                return self.complete_task(request)
         #default response, returns related template with current fields            
         return render(request, 'digiapproval/taskforms/ExampleTaskForm.html', { 
             'error': error,
@@ -365,11 +524,14 @@ class ExampleTaskForm(AbstractForm):
 form_classes = {
     "accept_agreement": AcceptAgreement,
     "field_entry": FieldEntry,
-    "check_tally": CheckTally  
+    "check_tally": CheckTally,
+    "choose_branch": ChooseBranch,
+    "choose_branches": ChooseBranches  
 }
 field_types = [
     'checkbox',
-    'text'
+    'text',
+    'radio',
 ]
         
         
