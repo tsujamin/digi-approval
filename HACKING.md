@@ -40,7 +40,9 @@ gem install chef
 ## Basic Usage ##
 
  * Local: ```vagrant up local```
- * AWS: ```vagrant up aws --provider aws```. Be warned that output from Chef comes in very, very delayed chunks, rather than being live. You'll also need to reboot the machine for it to pick up the firewall rules.
+ * AWS omnibus: ```vagrant up aws --provider aws```. Be warned that output from Chef comes in very, very delayed chunks, rather than being live. You'll also need to reboot the machine for it to pick up the firewall rules. Avoid vagrant reload because that causes things to change IP address. Of course, by rebooting, you'll lose the devstack.
+ * AWS storage only: try not to touch this - it's running nicely and changing it requires poking around in rofltron's dns.
+ * AWS mini: `vagrant up aws-mini --provider aws`. Same caveats about firewalls apply, except rebooting doesn't affect storage any more.
 
 ```shell
 vagrant ssh [aws|local]

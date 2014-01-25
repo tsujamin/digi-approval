@@ -7,11 +7,6 @@
 # All rights reserved - Do Not Redistribute
 #
 
-# Verify that we're a messy dev env only
-if node.chef_environment != "development" and node.chef_environment != "awsdev"
-  abort "No production environment defined yet, only 'development'/'awsdev'"
-end
-
 # Install Python
 # install the software collections, then install the python 2.7
 # package

@@ -40,14 +40,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     local.vm.synced_folder ".", "/vagrant", disabled: true
     local.vm.synced_folder ".", "/mnt/vagrant_nfs", type: "nfs"
     local.bindfs.bind_folder "/mnt/vagrant_nfs", "/vagrant"
-    
-  
-    # Provider-specific configuration so you can fine-tune various
-    # backing providers for Vagrant. These expose provider-specific options.
-    local.vm.provider :virtualbox do |vb|
-      # Use VBoxManage to customize the VM.
-      vb.customize ["modifyvm", :id, "--memory", "2048", "--cpus", "2"]
-    end
 
     local.vm.provision "chef_solo" do |chef|
       chef.cookbooks_path = ["chef-repo/cookbooks", "chef-repo/site-cookbooks"]
@@ -80,26 +72,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                                                             ".git", "*.pyc", "__pycache__", "node_modules" # sigh
                                                            ]
 
-    aws.vm.provider :aws do |aws, override|
-      aws.access_key_id = "AKIAJSDNWPSHVYBOMFGA"
-      aws.secret_access_key = "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"
-      aws.keypair_name = "digiaws.pem"
-
-      aws.ami = "ami-a25415cb"
-      aws.instance_type = "m1.small"
-
-      aws.security_groups = ["digiapproval-basic"]
-
-      # allow sudo without a tty; required for provisioning.
-      # also install chef.
-      aws.user_data = "#!/bin/bash
-echo 'Defaults:ec2-user !requiretty' > /etc/sudoers.d/999-vagrant-cloud-init-requiretty && chmod 440 /etc/sudoers.d/999-vagrant-cloud-init-requiretty
-curl -L https://www.opscode.com/chef/install.sh | bash"
-
-      override.ssh.username = "ec2-user"
-      override.ssh.private_key_path = "~/.ssh/digiawspem.pem"
-    end
-
+    
     aws.vm.provision "chef_solo" do |chef|
       chef.cookbooks_path = ["chef-repo/cookbooks", "chef-repo/site-cookbooks"]
       chef.data_bags_path = "chef-repo/data_bags"
@@ -118,5 +91,94 @@ curl -L https://www.opscode.com/chef/install.sh | bash"
       chef.add_recipe("broker")
       chef.add_recipe("clamav")
     end
+  end
+
+  config.vm.define "aws-mini" do |aws|
+    aws.vm.box = "dummy"
+    aws.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
+
+    # make this a little less painful
+    aws.vm.synced_folder ".", "/vagrant", :rsync_excludes=>["env", # no point in syncing that, it'll be built at that end
+                                                            "chef-repo", # this is synced elsewhere
+                                                            "design", "casestudy", "pitch", "scope", # unnecessary & big
+                                                            "vagrant", "cookbooks", # vestigal
+                                                            ".git", "*.pyc", "__pycache__", "node_modules" # sigh
+                                                           ]
+
+    
+    aws.vm.provision "chef_solo" do |chef|
+      chef.cookbooks_path = ["chef-repo/cookbooks", "chef-repo/site-cookbooks"]
+      chef.data_bags_path = "chef-repo/data_bags"
+      chef.roles_path = "chef-repo/roles"
+      chef.environments_path = "chef-repo/environments"
+      chef.environment = "awsmini"
+      chef.add_recipe("simple_iptables")
+      # get this out of the way first, so we use it consistently
+      # throughout the process
+      chef.add_recipe("yum-epel")
+      # web role is useless atm
+      #chef.add_role("web")
+      chef.add_role("database")
+      chef.add_role("app")
+      chef.add_recipe("broker")
+      chef.add_recipe("clamav")
+    end
+  end
+
+
+  config.vm.define "aws-storage" do |aws|
+    aws.vm.box = "dummy"
+    aws.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
+
+    # make this a little less painful
+    aws.vm.synced_folder ".", "/vagrant", :rsync_excludes=>["env", # no point in syncing that, it'll be built at that end
+                                                            "chef-repo", # this is synced elsewhere
+                                                            "design", "casestudy", "pitch", "scope", # unnecessary & big
+                                                            "vagrant", "cookbooks", # vestigal
+                                                            ".git", "*.pyc", "__pycache__", "node_modules" # sigh
+                                                           ]
+
+    
+    aws.vm.provision "chef_solo" do |chef|
+      chef.cookbooks_path = ["chef-repo/cookbooks", "chef-repo/site-cookbooks"]
+      chef.data_bags_path = "chef-repo/data_bags"
+      chef.roles_path = "chef-repo/roles"
+      chef.environments_path = "chef-repo/environments"
+      chef.environment = "awsdev"
+      chef.add_recipe("simple_iptables")
+      # get this out of the way first, so we use it consistently
+      # throughout the process
+      chef.add_recipe("yum-epel")
+      # web role is useless atm
+      #chef.add_role("web")
+      chef.add_recipe("storage")
+    end
+  end
+
+  # Provider-specific configuration so you can fine-tune various
+  # backing providers for Vagrant. These expose provider-specific options.
+  config.vm.provider :virtualbox do |vb|
+    # Use VBoxManage to customize the VM.
+    vb.customize ["modifyvm", :id, "--memory", "2048", "--cpus", "2"]
+  end
+
+  config.vm.provider :aws do |aws, override|
+    aws.access_key_id = "AKIAJSDNWPSHVYBOMFGA"
+    aws.secret_access_key = "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"
+    aws.keypair_name = "digiaws.pem"
+
+    aws.ami = "ami-a25415cb"
+    aws.instance_type = "m1.small"
+
+    aws.security_groups = ["digiapproval-basic"]
+    
+    # allow sudo without a tty; required for provisioning.
+    # also install chef.
+    aws.user_data = "#!/bin/bash
+echo 'Defaults:ec2-user !requiretty' > /etc/sudoers.d/999-vagrant-cloud-init-requiretty && chmod 440 /etc/sudoers.d/999-vagrant-cloud-init-requiretty
+curl -L https://www.opscode.com/chef/install.sh | bash"
+
+    override.ssh.username = "ec2-user"
+    override.ssh.private_key_path = "~/.ssh/digiawspem.pem"
   end
 end

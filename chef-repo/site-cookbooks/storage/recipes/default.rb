@@ -8,12 +8,8 @@
 # All rights reserved - Do Not Redistribute
 #
 
-# Verify that we're a messy dev env only
-if node.chef_environment != "development" and node.chef_environment != "awsdev"
-  abort "No production environment defined yet, only 'development'/'awsdev'"
-end
-
 include_recipe "git"
+include_recipe "build-essential"
 
 # hack. don't know why this is necessary but whatever
 if node['platform_family'] == "rhel"
