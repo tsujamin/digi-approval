@@ -3,14 +3,14 @@
 # Cookbook Name:: storage
 # Recipe:: default
 #
-# Copyright 2013, YOUR_COMPANY_NAME
+# Copyright 2013, DigiACTive Pty Ltd
 #
 # All rights reserved - Do Not Redistribute
 #
 
 # Verify that we're a messy dev env only
-if node.chef_environment != "development" 
-  abort "No production environment defined yet, only 'development'"
+if node.chef_environment != "development" and node.chef_environment != "awsdev"
+  abort "No production environment defined yet, only 'development'/'awsdev'"
 end
 
 include_recipe "git"
@@ -22,26 +22,26 @@ if node['platform_family'] == "rhel"
   end
 end
 
-git "/home/vagrant/devstack" do
+git "/home/" + node['digiactive']['user'] + "/devstack" do
   repository "https://github.com/openstack-dev/devstack.git"
-  user "vagrant"
-  group "vagrant"
+  user node['digiactive']['user']
+  group node['digiactive']['user']
   action :sync
 end
 
 # fixme: ignores environment
-template "/home/vagrant/devstack/localrc" do
+template "/home/" + node['digiactive']['user'] + "/devstack/localrc" do
   source "localrc.erb"
-  user "vagrant"
-  group "vagrant"
+  owner node['digiactive']['user']
+  group node['digiactive']['user']
 end
 
 # check if there is an existing one running - stolen from stack.sh
 Chef::Log.info("Installing OpenStack devstack")
-execute 'type -p screen >/dev/null && screen -ls | egrep -q "[0-9].stack" || /home/vagrant/devstack/stack.sh' do
-  cwd "/home/vagrant/devstack"
-  user "vagrant"
-  group "vagrant"
+execute 'type -p screen >/dev/null && screen -ls | egrep -q "[0-9].stack" || /home/' + node['digiactive']['user'] + '/devstack/stack.sh' do
+  cwd "/home/" + node['digiactive']['user'] + "/devstack"
+  user node['digiactive']['user']
+  group node['digiactive']['user']
 end
 
 # Set the Temp URL key
@@ -51,9 +51,9 @@ execute "set temp url key" do
           "--os-password password --os-auth-url http://127.0.0.1:5000/v2.0 " +
           "post -m 'Temp-URL-Key:" + node['digiactive']['swift_temp_url_key'] +
           "'"
-  cwd "/home/vagrant/devstack"
-  user "vagrant"
-  group "vagrant"
+  cwd "/home/" + node['digiactive']['user'] + "/devstack"
+  user node['digiactive']['user']
+  group node['digiactive']['user']
 end
 
 # open fw for web interface on 8080

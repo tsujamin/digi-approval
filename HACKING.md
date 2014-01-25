@@ -15,7 +15,15 @@ wget http://digiactive.com.au/digiactive-repo/gems/vagrant-bindfs-0.2.4.digiacti
 vagrant plugin install vagrant-bindfs-0.2.4.digiactive2.gem
 ```
 
-## Chef ##
+## vagrant-aws ##
+
+```shell
+vagrant plugin install vagrant-aws
+```
+
+Grab the SSH key (`digiawspem.pem`) and put it in `~/.ssh`, with appropriate permissions (600).
+
+## Chef Development Only ##
 
 ### Setup ###
 
@@ -28,6 +36,33 @@ gem install chef
 ```
 
 # Regular use #
+
+## Basic Usage ##
+
+ * Local: ```vagrant up local```
+ * AWS: ```vagrant up aws --provider aws```. Be warned that output from Chef comes in very, very delayed chunks, rather than being live. You'll also need to reboot the machine for it to pick up the firewall rules.
+
+```shell
+vagrant ssh [aws|local]
+
+scl enable python27 bash
+
+cd /vagrant/src/digiapproval_project/
+source ../../env/bin/activate
+python manage.py runserver 0.0.0.0:8000
+```
+
+The superuser's username is "super" and the password is "startthecode". (It's defined in ```chef-repo/environments/development.json```.)
+
+## Hacking on AWS ##
+
+Files are put on AWS with Rsync. However, things are only rsynced (rsunk?) on `up`, `provision`, and `reload`, which is kind of infrequent.
+
+If you want to manually do it, you're looking at something like:
+
+```shell
+/usr/bin/rsync --verbose --archive -z --exclude .vagrant/ --exclude Vagrantfile --exclude env --exclude chef-repo --exclude design --exclude casestudy --exclude pitch --exclude scope --exclude vagrant --exclude cookbooks --exclude .git --exclude "*.pyc" --exclude __pycache__ --exclude node_modules -e "ssh -p 22 -o StrictHostKeyChecking=no -i '/HOMEPATH/YOU/.ssh/digiawspem.pem'" /path/to/digi-approval/ ec2-user@THE_IP_ADDRESS:/vagrant
+```
 
 ## Hacking on chef ##
 
@@ -62,17 +97,6 @@ Password is set in the django_db cookbook in the default recipe, for now.
 
 ## App ##
 
-```shell
-vagrant ssh
-
-scl enable python27 bash
-
-cd /vagrant/src/digiapproval_project/
-source ../../env/bin/activate
-python manage.py runserver 0.0.0.0:8000
-```
-
-The superuser's username is "super" and the password is "startthecode". (It's defined in ```chef-repo/environments/development.json```.)
 
 ## Storage ##
 Hack on it with the following credentials:
