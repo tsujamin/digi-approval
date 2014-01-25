@@ -445,7 +445,7 @@ class ChooseBranches(AbstractForm):
                 error = "Please select atleast " + str(self.task_dict['options']['minimum_choices']) + "options"                  
         #default response, returns related template with current fields            
         return render(request, 'digiapproval/taskforms/ChooseBranches.html', {
-            'error': error 
+            'error': error,
             'task': self.spiff_task.get_name(),
             'form_fields': form_fields
         })
