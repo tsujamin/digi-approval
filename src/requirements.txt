@@ -20,8 +20,8 @@ kombu==3.0.8
 pytz==2013.8
 # helpfully, the version of pyclamd on pypi is out of date
 http://xael.org/norman/python/pyclamd/pyClamd-0.3.4.tar.gz
-git+git://github.com/knipknap/SpiffWorkflow.git#egg=SpiffWorkflow
-# lamson
+git+git://github.com/DigiACTive/SpiffWorkflow.git#egg=SpiffWorkflow
+#lamson
 Jinja2==2.7.1
 MarkupSafe==0.18
 chardet==2.2.1
