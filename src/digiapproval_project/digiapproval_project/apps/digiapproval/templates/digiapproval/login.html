@@ -2,6 +2,7 @@
 {% block title %}Login{% endblock title %}
 
 {% block content %}
+{%if error %} {{error}} {%endif%}
 <form action="{% url 'login' %}", method="post">
     {% csrf_token %}
     {{ form.as_p }}

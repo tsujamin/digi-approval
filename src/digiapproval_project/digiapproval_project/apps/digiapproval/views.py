@@ -37,16 +37,18 @@ def register_customer(request):
 def login(request):
     """Login controller for customer accounts, Currently doesnt display error on bad credentials"""
     from django.contrib.auth import login as auth_login
+    error = None
     if request.method == 'POST':
         login_form = LoginForm(request.POST)
         user = login_form.is_valid()
         if user is not None:
             auth_login(request, user)
             return HttpResponseRedirect(reverse('index'))
-    else:
-        login_form = LoginForm()
+        else:
+            error = "Bad username/password combination"
     return render(request, 'digiapproval/login.html', {
-        'form' : login_form,
+        'form' : LoginForm(),
+        'error': error
     })
     
 def logout(request):
