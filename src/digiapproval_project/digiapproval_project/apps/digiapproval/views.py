@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
+from django.forms.formsets import formset_factory
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
@@ -136,7 +137,45 @@ def delegator_worklist(request):
     
     Requires authenticated User with delegator privileges on approval stages.
     """
-    raise NotImplementedError
+    # TODO TOTALLY UNTESTED AND STUFF
+    
+    if request.method == 'POST' and request.POST.get('delegate_workflows', False):
+        # TODO: Actually change approvers
+        raise NotImplementedError
+    
+    # Work out specs for which this user is delegator
+    workflowspecs = set([spec
+                         for subl in [group.workflowspecs_delegators.all() for group in request.user.groups.all()]
+                         for spec in subl])
+                # if hasattr(spec, 'workflow_set')])
+    
+    # FIXME DEBUG
+    print repr(workflowspecs)
+    print [[(approver.username, approver.get_full_name()) for approver in spec.approvers.user_set.all()] for spec in workflowspecs]
+    
+    formsets = [
+        formset_factory(DelegatorForm, formset=DelegatorFormSet)(
+            approvers=
+                [(approver.username, approver.get_full_name()) for approver in spec.approvers.user_set.all()],
+            initial=
+                [{'approver': workflow.approver.username} for workflow in spec.workflow_set.all()]
+        )
+        for spec in workflowspecs
+    ]
+    
+    print "formset reprs"
+    print repr(formset_factory(DelegatorForm, formset=DelegatorFormSet))
+    print "formsets"
+    print repr(formsets)
+    import pydoc
+    print pydoc.render_doc(formsets[0])
+    print "construct forms docs"
+    print pydoc.render_doc(formsets[0]._construct_forms)
+    
+    return render(request, 'digiapproval/delegator_worklist.html', {
+        'formsets': formsets
+    })
+    
 
 
 ## WORKFLOWS / TASKS

@@ -1,4 +1,5 @@
 from django import forms
+from django.forms.formsets import BaseFormSet
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 import models
@@ -82,12 +83,31 @@ class LoginForm(forms.Form):
             else:
                 self._errors['bad_combination'] = "Invalid username/password combination"
         return None
-            
-            
+
+           
+class DelegatorForm(forms.Form):
+    """Form for delegator to change workflow's approver"""
+    
+    def __init__(self, approvers, *args, **kwargs):
+        super(DelegatorForm, self).__init__(*args, **kwargs)
+        self.approver = forms.ChoiceField(choices=approvers)
         
-        
-        
-        
+class DelegatorFormSet(BaseFormSet):
+    """Formset to populate DelegatorForms with appropriate choices
+    
+    See https://djangosnippets.org/snippets/1863/"""
+    
+    def __init__(self, *args, **kwargs):
+        self.approvers = kwargs.pop('approvers', None)
+        super(DelegatorFormSet, self).__init__(*args, **kwargs) # this calls _construct_forms()
+
+    def _construct_forms(self):
+        # this one is merely taken from Django's BaseFormSet
+        # except the additional approvers parameter for the form constructor
+        self.forms = []
+        for i in xrange(self.total_form_count()):
+            self.forms.append(self._construct_form(i, approvers=self.approvers))    
+    
             
             
         

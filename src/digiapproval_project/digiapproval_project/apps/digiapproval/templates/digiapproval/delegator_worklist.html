@@ -1,0 +1,23 @@
+{% extends "digiapproval/page.tpl.html" %}
+{% block title %}Delegator Worklist{% endblock %}
+
+{% block content %}
+<h2>Current applications</h2>
+
+<!-- TODO: is this appropriate for a table? -->
+{% for formset in formsets %}
+<!--<h3>{{ spec.name }}</h3>
+<table>
+  {% for workflow in workflows %}
+  <tr>
+    <td><a href="{% url 'view_workflow' workflow_id=workflow.id %}">{{ workflow.customer.user.username }}</a></td>
+  </tr>
+  {% endfor %}
+</table>-->
+New formset!
+{% for form in formset %}
+{{ form.as_table }}
+{% endfor %}
+{% endfor %}
+
+{% endblock content %}
