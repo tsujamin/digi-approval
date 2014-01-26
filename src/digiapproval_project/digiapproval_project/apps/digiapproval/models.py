@@ -205,3 +205,9 @@ class Task(models.Model):
     workflow = models.ForeignKey(Workflow)
     task = JSONField()
     uuid = models.CharField(max_length = "36")
+
+class Message(models.Model):
+    workflow = models.ForeignKey(Workflow)
+    sender = models.ForeignKey(User)
+    posted = models.DateTimeField(auto_now=True)
+    message = models.TextField()

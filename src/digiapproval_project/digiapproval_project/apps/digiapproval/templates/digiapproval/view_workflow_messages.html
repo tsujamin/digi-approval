@@ -1,0 +1,18 @@
+{% extends "digiapproval/page.tpl.html" %}
+{% block title %}{{workflow.spec.name}}: Messages{% endblock title %}
+
+{% block content %}
+<form action="", method="post">
+    {% csrf_token %}
+    <label for="new_message">New Message:</label>
+    <input type='text' name="new_message" value = ""/><br>
+    <input type="submit", value="Post Message"/>
+</form>
+{% for message in messages %}
+
+    <h3>Date: {{message.posted}}, User: {{message.sender.username}}</h3>
+    <pre>
+        {{message.message}}
+    </pre>
+{% endfor %}
+{% endblock content %}

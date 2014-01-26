@@ -243,4 +243,26 @@ def view_task_data(request, task_uuid):
                   {'task': task,
                    'spiff_task': spiff_task})
 
+@login_required
+def view_workflow_messages(request, workflow_id):
+    workflow = get_object_or_404(Workflow, id=workflow_id)
+    
+    #Check auth
+    if  request.user != workflow.customer.user and \
+        request.user not in map(lambda custacc: (custacc.user), workflow.customer.sub_accounts.all()) and \
+        request.user != workflow.approver:
+        raise PermissionDenied
+        
+    if request.method == 'POST' and request.POST.get('new_message', False):
+        new_message = Message(workflow = workflow, 
+            sender = request.user, 
+            message = request.POST.get('new_message', False
+        ))
+        new_message.save()
+        return HttpResponseRedirect(reverse('view_workflow_messages', args=(workflow_id,)))
+    else: 
+        return render(request, 'digiapproval/view_workflow_messages.html', {
+                'messages': workflow.message_set.order_by('id').reverse(),
+                'workflow': workflow,
+        })    
     

@@ -4,6 +4,7 @@
 {% block content %}
 <p class="muted">Customer: {{workflow.customer.user.username}}.</p>
 <p class="muted">Approver: {{workflow.approver.get_full_name}}.</p>
+<P class="muted"><a href="{% url 'view_workflow_messages' workflow.id %}">View Messages </a> </p>
 
 <ul>
   {% for task in tasks %}
