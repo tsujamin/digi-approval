@@ -432,7 +432,6 @@ class ChooseBranches(AbstractForm):
         error = None
         count = 0
         if request.method == "POST":
-            print request.POST
             for field in form_fields:    
                 value = request.POST.get(field, None)
                 if value is not None:
