@@ -432,6 +432,7 @@ class ChooseBranches(AbstractForm):
         error = None
         count = 0
         if request.method == "POST":
+            print request.POST
             for field in form_fields:    
                 value = request.POST.get(field, None)
                 if value is not None:
@@ -439,10 +440,10 @@ class ChooseBranches(AbstractForm):
                     data_field = "task" + str(form_fields[field]['number'])
                     self.spiff_task.data[data_field] = True
                     count += 1
-            if count > self.task_dict['options']['minimum_choices']:
+            if count >= self.task_dict['options']['minimum_choices']:
                 return self.complete_task(request)
             else:
-                error = "Please select atleast " + str(self.task_dict['options']['minimum_choices']) + "options"                  
+                error = "Please select atleast " + str(self.task_dict['options']['minimum_choices']) + " option(s)"                  
         #default response, returns related template with current fields            
         return render(request, 'digiapproval/taskforms/ChooseBranches.html', {
             'error': error,
