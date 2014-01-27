@@ -5,14 +5,17 @@
 <form action="", method="post">
     {% csrf_token %}
     <label for="new_message">New Message:</label>
-    <input type='text' name="new_message" value = ""/><br>
+    <input type='text' rows="4" cols="40" name="new_message" value = ""/><br>
     <input type="submit", value="Post Message"/>
 </form>
-{% for message in messages %}
-
+{% if messages %}
+  {% for message in messages %}
     <h3>Date: {{message.posted}}, User: {{message.sender.username}}</h3>
     <pre>
-        {{message.message}}
+      {{message.message}}
     </pre>
-{% endfor %}
+  {% endfor %}
+{% else %}
+There are no messages associated with this workflow
+{% endif %}
 {% endblock content %}

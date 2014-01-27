@@ -186,7 +186,8 @@ def view_workflow(request, workflow_id):
 
     return render(request, 'digiapproval/view_workflow.html', {
         'workflow': workflow,
-        'tasks': tasks
+        'tasks': tasks,
+        'messages': workflow.message_set.order_by('id').reverse()[0:5],
         })
 
 
@@ -262,7 +263,7 @@ def view_workflow_messages(request, workflow_id):
             message = request.POST.get('new_message', False
         ))
         new_message.save()
-        return HttpResponseRedirect(reverse('view_workflow_messages', args=(workflow_id,)))
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
     else: 
         return render(request, 'digiapproval/view_workflow_messages.html', {
                 'messages': workflow.message_set.order_by('id').reverse(),

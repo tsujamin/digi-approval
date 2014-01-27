@@ -6,28 +6,54 @@
 <p class="muted">Approver: {{workflow.approver.get_full_name}}.</p>
 <P class="muted"><a href="{% url 'view_workflow_messages' workflow.id %}">View Messages </a> </p>
 
-<ul>
-  {% for task in tasks %}
-  <li><b>{{task.name}}</b> - {{task.state_name|title}}
-  {% if task.actor %}
-  - {{task.actor|title}}
-  {% if task.show_task_link %}
-  - <a href="{% url 'view_task' workflow.id task.uuid %}">View</a>
-  {% endif %}
-  {% if task.show_data_link %}
-  - <a href="{% url 'view_task_data' task.uuid %}">View</a>
-  {% endif %}
+<div class="row">
+  <div class="col-md-7">
+    <h2>Tasks</h2>
+    <ul>
+      {% for task in tasks %}
+      <li><b>{{task.name}}</b> - {{task.state_name|title}}
+      {% if task.actor %}
+      - {{task.actor|title}}
+      {% if task.show_task_link %}
+      - <a href="{% url 'view_task' workflow.id task.uuid %}">View</a>
+      {% endif %}
+      {% if task.show_data_link %}
+      - <a href="{% url 'view_task_data' task.uuid %}">View</a>
+      {% endif %}
   
-  {% endif %}
-  </li>
-  {% endfor %}
-</ul>
+      {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
 
-<h2>Debug Info</h2>
-<pre>
-  {{workflow.workflow.spec.get_dump}}
-</pre>
-<pre>
-  {{workflow.workflow.get_dump}}
-</pre>
+    <h2>Debug Info</h2>
+    <pre>
+      {{workflow.workflow.spec.get_dump}}
+    </pre>
+    <pre>
+      {{workflow.workflow.get_dump}}
+    </pre>
+  </div>
+  
+  <div class="col-md-5">
+    <h2>Recent Messages</h2>
+    <form action="{% url 'view_workflow_messages' workflow.id %}" method="POST">
+      {% csrf_token %}
+      <label for="new_message">New Message:</label>
+      <input type='text' name="new_message" value = ""/><br>
+      <input type="submit", value="Post Message"/>
+    </form>
+    {% if messages %}
+      <a href="{% url 'view_workflow_messages' workflow.id%}">View all messages</a><br>
+      {% for message in messages %}
+        <b>Posted: {{message.posted}}, User: {{message.sender.username}}</b>
+        <pre>
+          {{message.message}}
+        </pre>
+      {% endfor %}
+    {% else %}
+    There are no messages associated with this workflow
+    {% endif %}
+  </div>
+</div>
 {% endblock content %}
