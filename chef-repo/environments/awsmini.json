@@ -24,6 +24,8 @@
           "swift_temp_url_key": "super sekrit key",
           "swift_base_url": "http://storage.digiactive.com.au:8080",
           "django_celery_broker_url": "amqp://guest:guest@localhost//",
+          "email_host": "localhost",
+          "email_port": "8823",
           "user": "ec2-user",
           "group": "ec2-user"
       },

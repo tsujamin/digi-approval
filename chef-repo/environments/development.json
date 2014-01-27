@@ -24,6 +24,8 @@
           "swift_base_url": "http://127.0.0.1:8080",
           "swift_temp_url_key": "super sekrit key",
           "django_celery_broker_url": "amqp://guest:guest@localhost//",
+          "email_host": "localhost",
+          "email_port": "8823",
           "user": "vagrant",
           "group": "vagrant"
       },
