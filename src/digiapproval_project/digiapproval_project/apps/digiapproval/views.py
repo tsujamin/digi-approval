@@ -180,7 +180,9 @@ def view_workflow(request, workflow_id):
         result['show_task_link'] = (task.state == task.READY and result['actor'] == actor)
         result['show_data_link'] = (task.state == task.COMPLETED and result['actor'])
         
-        tasks.append(result)
+        #Filter non completed/ready tasks from customers
+        if result['state_name'] == 'READY' or result['state_name'] == 'COMPLETED' or actor == 'APPROVER':
+            tasks.append(result)
 
     return render(request, 'digiapproval/view_workflow.html', {
         'workflow': workflow,
@@ -245,6 +247,7 @@ def view_task_data(request, task_uuid):
 
 @login_required
 def view_workflow_messages(request, workflow_id):
+    """Controller for workflow_messages view. Creates new messages and renders current ones"""
     workflow = get_object_or_404(Workflow, id=workflow_id)
     
     #Check auth
