@@ -465,6 +465,72 @@ class ChooseBranches(AbstractForm):
             ret_task.connect_if(Equal(Attrib(data_field), True)
                , taskspec)
         return ret_task
+class FileUpload(AbstractForm):
+    """ A small example of a task form.
+        TaskForms based on this template must be added to the form_classes tuple array at the bottom of taskforms.py"""
+    
+    def __init__(self, spiff_task, workflow_model, *args, **kwargs):
+        """Task form initialisation and validation"""
+        super(FileUpload,self).__init__(spiff_task, workflow_model, args, kwargs)
+        #Task specific init/validation here
+
+        
+    @staticmethod
+    def validate_task_data(task_data):
+        """Validates that provided task_data dict is of valid construction, throws AttributeErrors"""    
+        AbstractForm.validate_task_data(task_data)
+        if not hasattr(task_data['fields'], 'file') and \
+            hasattr(task_data['fields'], 'file_name'):
+            raise AttributeError("Needs file field")
+        
+    @staticmethod    
+    def make_task_dict(mandatory, actor, *args, **kwargs):
+        """Constructs a task_dict for this taskform using provided params"""
+        task_dict = AbstractForm.make_task_dict("file_upload", actor) 
+        task_dict['fields']['file_name'] = {
+            'label': 'Name of File: ', 'mandatory': mandatory,
+            'type': 'text', 'value': "",
+        }
+        task_dict['fields']['file'] = {
+            'label': 'Upload File:', 'mandatory': mandatory, 
+            'type': 'file', 'value': None,
+        }
+        FileUpload.validate_task_data(task_dict)
+        return task_dict
+        
+        
+    def form_request(self, request):
+        """Controller for this task form, handles post and checks validity before completing task"""
+        response = super(FileUpload, self).form_request(request) #Check authorisation
+        if response is not None: return response #invalid access
+        error = None
+    
+        if request.method == "POST":
+            file = request.FILES.get('file', None)
+            file_name = request.POST.get('file_name', None)
+            #Check validity of posted data 
+            if file is None and self.task_dict['fields']['file']['mandatory']:
+                error = "Uploading a file is mandatory"
+            elif file_name == "" and file is not None:
+                error = "Uploaded files require a label"
+            else: #place filevalue in task_dict
+                file_model = models.UserFile(_file=file, name = file_name)
+                file_model.save()
+                self.task_dict['fields']['file_name']['value'] = file_name
+                self.task_dict['fields']['file']['value'] = file_model.id
+                return self.complete_task(request)
+        #default response, returns related template with current fields            
+        return render(request, 'digiapproval/taskforms/FileUpload.html', { 
+            'error': error,
+            'task': self.spiff_task.get_name(),
+            'form_fields': self.task_dict['fields']
+        })
+
+    def complete_task(self, request):
+        """Perform post completion tasks, no need to save models as handled by parent class"""
+        return super(FileUpload, self).complete_task(request)
+ 
+
         
 class ExampleTaskForm(AbstractForm):
     """ A small example of a task form.
@@ -526,12 +592,14 @@ form_classes = {
     "field_entry": FieldEntry,
     "check_tally": CheckTally,
     "choose_branch": ChooseBranch,
-    "choose_branches": ChooseBranches  
+    "choose_branches": ChooseBranches,
+    "file_upload": FileUpload,  
 }
 field_types = [
     'checkbox',
     'text',
     'radio',
+    'file',
 ]
         
         

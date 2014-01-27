@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from digiapproval_project.apps.digiapproval import models
-from digiapproval_project.apps.digiapproval.taskforms import AcceptAgreement, FieldEntry, CheckTally, ChooseBranch, ChooseBranches
+from digiapproval_project.apps.digiapproval.taskforms import *
 from django.contrib.auth.models import User, Group
 from SpiffWorkflow import specs
 
@@ -259,13 +259,16 @@ def workflowspec_four():
     cust_fieldentry = specs.Simple(wf_spec, "Permit Details")
     approver_agreement = specs.Simple(wf_spec, "Approver Agreement")
     task_join1 = specs.Join(wf_spec, "Parties In Agreement")
+    cust_upload = specs.Simple(wf_spec, "Upload Cheque")
     approver_choice = ChooseBranch.create_exclusive_task(wf_spec, "Accept Agreement or skip", 
         (1, approver_agreement), 
         (2, task_join1)
+
     )
     customer_choice = ChooseBranches.create_multichoice_task(wf_spec, "Choose tasks",
         (1, cust_agreement),
         (2, cust_fieldentry),
+        (3, cust_upload),
     )
     
     
@@ -281,11 +284,13 @@ def workflowspec_four():
         ('event_purpose', 'What is the purpose of your event: ', 'text', True),
         ('event_love', 'In 50 words or less, why do you love applying for events: ', 'text', True),)
     )
+    cust_upload.set_data(task_data = FileUpload.make_task_dict(True, 'CUSTOMER'))
     approver_agreement.set_data(task_data = AcceptAgreement.make_task_dict(True, lorum_ipsum,'APPROVER'))
     
     customer_choice.set_data(task_data = ChooseBranches.make_task_dict('CUSTOMER', 1,
         ('agreement', "Read and accept agreement", 1),
-        ('field_entry', "Go straight to field entry", 2))
+        ('field_entry', "Go straight to field entry", 2),
+        ('cust_upload', "Upload most recently signed bank checque", 3),)
     )
     
     approver_choice.set_data(task_data = ChooseBranch.make_task_dict('APPROVER', 
