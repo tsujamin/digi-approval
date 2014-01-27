@@ -23,3 +23,8 @@ This has a number of knock-on effects:
 
 
 Most frustratingly, a lot of this work was largely unnecessary. The project agreement dictated that we hold insurance, for example. This was despite the fact that, for the duration of the project, none of our work could actually cause the government direct loss (the only compensible loss per the agreement): it was a proof of concept not hosted on government servers. It can't melt a machine. It can't lose payments. It can't cause direct loss to the government, and it struggles to cause the government indirect or consequential loss. The entire insurance policy was basically a complete waste of money, brains and time.
+
+# Various notes
+
+ * It would have been good to spend money on equivalent hardware for all of us - so much lost time on AJD's linux box. (bindfs!)
+ * There are no leaderless groups - we would have benefitted from picking a leader at the start.
