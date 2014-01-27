@@ -1,6 +1,6 @@
 #!/bin/bash
 
-which tmux || yum install -y tmux
+which tmux || sudo yum install -y tmux
 
 cd `dirname $0`/../..
 
