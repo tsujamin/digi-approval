@@ -3,9 +3,9 @@
 
 {% block content %}
 <h2>Current applications</h2>
-
-<!-- TODO: is this appropriate for a table? -->
 {% for formset in formsets %}
+{% comment %} TODO: is this appropriate for a table? -->
+
 <!--<h3>{{ spec.name }}</h3>
 <table>
   {% for workflow in workflows %}
@@ -14,10 +14,16 @@
   </tr>
   {% endfor %}
 </table>-->
+{% endcomment %}
 New formset!
-{% for form in formset %}
+<form>
+{% csrf_token %}
+<table>
+{% for form in formset.forms %}
 {{ form.as_table }}
 {% endfor %}
+</table>
+</form>
 {% endfor %}
 
 {% endblock content %}

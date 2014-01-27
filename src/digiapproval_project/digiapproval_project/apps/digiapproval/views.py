@@ -149,12 +149,8 @@ def delegator_worklist(request):
                          for spec in subl])
                 # if hasattr(spec, 'workflow_set')])
     
-    # FIXME DEBUG
-    print repr(workflowspecs)
-    print [[(approver.username, approver.get_full_name()) for approver in spec.approvers.user_set.all()] for spec in workflowspecs]
-    
     formsets = [
-        formset_factory(DelegatorForm, formset=DelegatorFormSet)(
+        formset_factory(DelegatorForm, formset=DelegatorBaseFormSet)(
             approvers=
                 [(approver.username, approver.get_full_name()) for approver in spec.approvers.user_set.all()],
             initial=
@@ -162,15 +158,6 @@ def delegator_worklist(request):
         )
         for spec in workflowspecs
     ]
-    
-    print "formset reprs"
-    print repr(formset_factory(DelegatorForm, formset=DelegatorFormSet))
-    print "formsets"
-    print repr(formsets)
-    import pydoc
-    print pydoc.render_doc(formsets[0])
-    print "construct forms docs"
-    print pydoc.render_doc(formsets[0]._construct_forms)
     
     return render(request, 'digiapproval/delegator_worklist.html', {
         'formsets': formsets

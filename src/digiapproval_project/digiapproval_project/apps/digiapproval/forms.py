@@ -90,24 +90,19 @@ class DelegatorForm(forms.Form):
     
     def __init__(self, approvers, *args, **kwargs):
         super(DelegatorForm, self).__init__(*args, **kwargs)
-        self.approver = forms.ChoiceField(choices=approvers)
+        self.fields['approver'] = forms.ChoiceField(choices=approvers)
         
-class DelegatorFormSet(BaseFormSet):
-    """Formset to populate DelegatorForms with appropriate choices
-    
-    See https://djangosnippets.org/snippets/1863/"""
+        
+class DelegatorBaseFormSet(BaseFormSet):
+    """Base formset to populate DelegatorForms with appropriate choices"""
     
     def __init__(self, *args, **kwargs):
         self.approvers = kwargs.pop('approvers', None)
-        super(DelegatorFormSet, self).__init__(*args, **kwargs) # this calls _construct_forms()
-
-    def _construct_forms(self):
-        # this one is merely taken from Django's BaseFormSet
-        # except the additional approvers parameter for the form constructor
-        self.forms = []
-        for i in xrange(self.total_form_count()):
-            self.forms.append(self._construct_form(i, approvers=self.approvers))    
+        super(DelegatorBaseFormSet, self).__init__(*args, **kwargs) # this calls _construct_forms()
     
+    def _construct_form(self, index, **kwargs):
+        kwargs['approvers'] = self.approvers
+        return super(DelegatorBaseFormSet, self)._construct_form(index, **kwargs)
             
             
         
