@@ -44,6 +44,18 @@ gem install chef
  * AWS storage only: try not to touch this - it's running nicely and changing it requires poking around in rofltron's dns.
  * AWS mini: `vagrant up aws-mini --provider aws`. Same caveats about firewalls apply, except rebooting doesn't affect storage any more.
 
+### Easy new way ###
+
+```shell
+vagrant ssh machine-of-your-choice
+/vagrant/src/dev/init.sh
+```
+
+You're now in tmux - use Ctrl-b, Ctrl-[n,p] to move to the [next, previous] terminal.
+Celery and Django are automatically spun up for you.
+
+### Hard old way ###
+
 ```shell
 vagrant ssh [aws|local]
 

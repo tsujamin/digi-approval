@@ -1,0 +1,1 @@
+source env/bin/activate; cd src/digiapproval_project/; celery -A digiapproval_project worker -l info
