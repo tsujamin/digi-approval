@@ -241,7 +241,15 @@ def view_task_data(request, task_uuid):
         # TODO: throw some sort of error
         return HttpResponse("You can't view the data of a task that hasn't been completed.")
 
-    
+    #iterates and replaces values of file fields with link
+    for field in task.task['fields']:
+        if task.task['fields'][field]['type'] == 'file':
+            user_file = get_object_or_404(UserFile, id=task.task['fields'][field]['value'])
+            if user_file.file is not None:
+                task.task['fields'][field]['value'] = user_file.file.url
+            else:
+                task.task['fields'][field]['value'] = user_file.virus_status
+                
     return render(request, 'digiapproval/view_task_data.html',
                   {'task': task,
                    'spiff_task': spiff_task})

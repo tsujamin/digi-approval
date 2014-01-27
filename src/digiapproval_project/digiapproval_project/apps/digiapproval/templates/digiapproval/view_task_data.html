@@ -9,7 +9,14 @@
 <dl>
   {% for field in task.task.fields.items %}
   <dt>{{field.0|title}}</dt>
-  <dd><emph>{{field.1.label}}</emph> {{field.1.value}}</dd>
+  <dd><emph>{{field.1.label}}</emph> 
+    <!-- create link if file field -->
+    {% ifequal field.1.type 'file' %}
+      <a href="{{field.1.value}}">Click to download</a> 
+    {% else %} 
+      {{field.1.value}} 
+    {% endifequal %}
+  </dd>
   {% endfor %}
 </dl>
 
