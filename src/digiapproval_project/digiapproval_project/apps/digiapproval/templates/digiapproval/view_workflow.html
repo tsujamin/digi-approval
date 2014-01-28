@@ -36,20 +36,20 @@
   
   <div class="col-md-5">
     <h2>Recent Messages</h2>
-    <form action="{% url 'view_workflow_messages' workflow.id %}" method="POST">
+    <form action="{% url 'view_workflow_messages' workflow.id %}" method="POST" role="form">
       {% csrf_token %}
       <label for="new_message">New Message:</label>
-      <input type='text' name="new_message" value = ""/><br>
-      <input type="submit", value="Post Message"/>
+      <textarea name="new_message" class="form-control" rows="4"></textarea><br>
+      <button type="submit" name="submit" class="btn btn-default">Post Message</button>
     </form>
     {% if messages %}
-      <a href="{% url 'view_workflow_messages' workflow.id%}">View all messages</a><br>
       {% for message in messages %}
         <b>Posted: {{message.posted}}, User: {{message.sender.username}}</b>
         <pre>
           {{message.message}}
         </pre>
       {% endfor %}
+      <a href="{% url 'view_workflow_messages' workflow.id%}">View all messages</a>
     {% else %}
     There are no messages associated with this workflow
     {% endif %}
