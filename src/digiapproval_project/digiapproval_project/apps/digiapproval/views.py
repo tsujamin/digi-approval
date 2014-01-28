@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
+from django.forms.formsets import formset_factory
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
@@ -138,7 +139,40 @@ def delegator_worklist(request):
     
     Requires authenticated User with delegator privileges on approval stages.
     """
-    raise NotImplementedError
+    # TODO TOTALLY UNTESTED AND STUFF
+    
+    if request.method == 'POST' and request.POST.get('delegate_workflows', False):
+        # TODO: Actually change approvers
+        raise NotImplementedError
+    
+    # Work out specs for which this user is delegator
+    workflowspecs = set([spec
+                         for subl in [group.workflowspecs_delegators.all() for group in request.user.groups.all()]
+                         for spec in subl])
+                # if hasattr(spec, 'workflow_set')])
+    
+    # TODO: probably breaks with more than one formset
+    formsets = [
+        {'formset': formset_factory(DelegatorForm, formset=DelegatorBaseFormSet, max_num=0)(
+            approvers=
+                [(approver.username, approver.get_full_name()) for approver in spec.approvers.user_set.all()],
+            initial=
+                [{
+                    'workflow_id': workflow.id,
+                    'workflow_customer': workflow.customer.user.get_full_name(),
+                    'workflow_customer_username': workflow.customer.user.username,
+                    'approver': workflow.approver.username
+                 } for workflow in spec.workflow_set.all()]
+            ),
+        'spec_name': spec.name
+        }
+        for spec in workflowspecs
+    ]
+    
+    return render(request, 'digiapproval/delegator_worklist.html', {
+        'formsets': formsets
+    })
+    
 
 
 ## WORKFLOWS / TASKS
