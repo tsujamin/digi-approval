@@ -1,7 +1,9 @@
-from __future__ import absolute_import
-import os
+import os, sys
 
-os.environ['DJANGO_SETTINGS_MODULE'] = '.digiapproval_project.settings'
+os.environ['DJANGO_SETTINGS_MODULE'] = 'digiapproval_project.settings'
+# allow us to import digiapproval_project
+# digimail/config/../..
+sys.path.append(os.path.join(os.path.dirname(__file__),'..','..'))
 
 # This file contains python variables that configure Lamson for email processing.
 import logging
@@ -14,9 +16,9 @@ relay_config = {'host': 'localhost', 'port': 8825}
 
 receiver_config = {'host': 'localhost', 'port': 8823}
 
-handlers = ['app.handlers.sample']
+handlers = ['app.handlers.digimail']
 
-router_defaults = {'host': '.+'}
+router_defaults = {'host': 'digiactive.com.au'}
 
 template_config = {'dir': 'app', 'module': 'templates'}
 
