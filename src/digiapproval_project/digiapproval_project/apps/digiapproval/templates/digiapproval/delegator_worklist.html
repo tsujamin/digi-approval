@@ -5,7 +5,7 @@
 <h2>Current applications</h2>
 {% for formset in formsets %}
 <h3>{{ formset.spec_name }}</h3>
-<form>
+<form method="POST">
 {% csrf_token %}
 <table>
 <tr><th>Application Customer</th><th>Approver</th></tr>
@@ -16,7 +16,7 @@
 </tr>
 {% endfor %}
 </table>
-<input type="submit" value="Update Approvers" />
+<input type="submit" name="delegate_workflows" value="Update Approvers" />
 </form>
 {% endfor %}
 
