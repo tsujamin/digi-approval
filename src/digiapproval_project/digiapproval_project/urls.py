@@ -9,4 +9,5 @@ urlpatterns = patterns('',
     # url(r'^blog/', include('blog.urls')),
     url(r'^digiapproval/', include('digiapproval_project.apps.digiapproval.urls')),
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^pages/', include('django.contrib.flatpages.urls'))
 )
