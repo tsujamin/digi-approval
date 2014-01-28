@@ -109,8 +109,23 @@ psql django django_user -h 127.0.0.1
 
 Password is set in the django_db cookbook in the default recipe, for now.
 
-## App ##
+## Mail (lamson) ##
 
+### AWS ###
+If you're on AWS, you automatically get the ability to send real email. You also get an SMTP server running on 25. If you want it to recieve email, you need to set Route 53 to point mail.digiactive.com.au at your instance. You can then send email with e.g. gmail.
+
+### Local ###
+If you're on a local machine, you can recieve emails on port 25 still, and they'll be processed by lamson as per normal. You can send an email like so:
+```shell
+lamson send -body YOURBODYHERE -sender EMAILADDRESS -to EMAILADDRESS@digiactive.com.au -subject SUBJECT -port 25
+```
+
+In order to see the emails that Django sends, you need to:
+```shell
+cd /vagrant/src/digiactive_project/digimail
+lamson log
+tail -f logs/logger.log
+```
 
 ## Storage ##
 Hack on it with the following credentials:

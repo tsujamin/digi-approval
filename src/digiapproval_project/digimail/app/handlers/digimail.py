@@ -11,7 +11,6 @@ LOG = logging.getLogger("handler")
 @route("workflow-(uuid)@(host)", uuid="[a-fA-F0-9]+")
 @stateless
 def WORKFLOW_MESSAGE(message, uuid=None, host=None):
-    LOG.debug("%r", message.From)
     # try to find the relevant workflow and user
     try:
         workflow = Workflow.objects.get(uuid=uuid)

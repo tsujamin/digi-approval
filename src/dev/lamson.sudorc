@@ -1,0 +1,6 @@
+source env/bin/activate; 
+cd src/digiapproval_project/digimail;
+service postfix stop || echo "Trouble stopping postfix."
+lamson stop || echo "Lamson not running."
+lamson start -uid 500 -gid 500
+tail -f logs/lamson.log

@@ -14,7 +14,7 @@ import logging
 # for secure connections.
 relay_config = {'host': 'localhost', 'port': 8825}
 
-receiver_config = {'host': 'localhost', 'port': 8823}
+receiver_config = {'host': '0.0.0.0', 'port': 25}
 
 handlers = ['app.handlers.digimail']
 
