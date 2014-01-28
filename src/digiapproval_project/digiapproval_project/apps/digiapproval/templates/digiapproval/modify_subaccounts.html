@@ -1,20 +1,27 @@
 {% extends "digiapproval/page.tpl.html" %}
 {% block content %}
 <h2>Add Sub Account</h2>
-<form action="{% url 'modify_subaccounts' %}" method="post">
+<form action="{% url 'modify_subaccounts' %}" method="post" role="form">
     {% csrf_token %}
-    Username: <input type="text" name="add_account" />
-    <input type="submit" value="Add Account"/>
+    <div class="form-group">
+        <label for="add_account">Username</label>
+        <input type="text" name="add_account" class="form-control"/>
+    </div>
+    <button type="submit" name="submit" class="btn btn-default">Add Account</button>
 </form>
 
 
 <h2>Remove Sub Account</h2>
-<form action="{% url 'modify_subaccounts' %}" method="post">
+<form action="{% url 'modify_subaccounts' %}" method="post" role="form">
     {% csrf_token %}
     {% for account in subaccounts %}
-        <input type="radio" name="remove_account" id="rem_account{{forloop.counter}}" value="{{account.id}}" />
-        <label for="rem_account{{forloop.counter}}">{{account.user.username}}({{account.user.email}})</label><br>
+    <div class="radio">
+        <label>
+            <input type="radio" name="remove_account" id="rem_account{{forloop.counter}}" value="{{account.id}}" />
+            {{account.user.username}}({{account.user.email}})
+        </label><br>
+    </div>
     {% endfor %}
-    <input type="submit" value="Remove Account"/>
+    <button type="submit" name="submit" class="btn btn-default">Remove Account</button>
 </form>
 {% endblock content %}
