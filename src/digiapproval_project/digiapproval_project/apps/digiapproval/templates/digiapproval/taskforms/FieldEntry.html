@@ -1,8 +1,5 @@
-{% extends "digiapproval/page.tpl.html" %}
-{% block title %}{{ task }}{% endblock %}
-
-{% block content %}
-{% if error %}{{error}}{% endif %}
+{%extends 'digiapproval/taskforms/AbstractForm.html' %}
+{% block form %}
 <form action="" method="POST">
     {% csrf_token %}
     {% for field, items in form_fields.items %}
@@ -12,5 +9,5 @@
     {% endfor %}
     <input type="submit" name="submit" value="Continue"/>
 </form>
-{% endblock content %}
+{% endblock form %}
     

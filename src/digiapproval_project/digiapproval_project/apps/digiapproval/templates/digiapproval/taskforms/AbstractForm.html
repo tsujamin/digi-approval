@@ -1,0 +1,14 @@
+{% extends "digiapproval/page.tpl.html" %}
+{% block title %}{{ task }}{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-6">
+      {% if error %}{{error}}{% endif %}
+      {% block form %}{% endblock form %}
+  </div>
+  <div class "col-md-6">
+    Information!
+  </div>
+</div>
+{% endblock content %}
