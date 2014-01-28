@@ -4,11 +4,11 @@
 {% block content %}
 <div class="row">
   <div class="col-md-6">
-      {% if error %}{{error}}{% endif %}
+      {% if error %}{{ error }}{% endif %}
       {% block form %}{% endblock form %}
   </div>
   <div class "col-md-6">
-    Information!
+    {% if task_info %}{{task_info|safe}} {% else %}There is no information associated with this task{% endif %}
   </div>
 </div>
 {% endblock content %}

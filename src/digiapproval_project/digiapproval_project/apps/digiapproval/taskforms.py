@@ -59,8 +59,10 @@ class AbstractForm(object):
         from exceptions import AttributeError
         if task_data['form'] not in form_classes.keys():
             raise AttributeError("form of task must be key of form_classes")
-        if  task_data['actor'] not in ['CUSTOMER', 'APPROVER']:
+        if task_data['actor'] not in ['CUSTOMER', 'APPROVER']:
             raise AttributeError("actor of task must be customer or approver")
+        if 'task_info' not in task_data['data']:
+            task_data['actor']['task_info'] = ""
         if 'fields' in task_data:
             for field in task_data['fields'].values():
                 if  'label' not in field or \
@@ -72,16 +74,18 @@ class AbstractForm(object):
                         
     @staticmethod
     def make_task_dict(form, actor, *args, **kwargs):
-        """Build valid task dictionary"""
+        """Build valid task dictionary, takes kwarg of task_info that is displayed alongside the task"""
         from exceptions import AttributeError
         if actor not in ['CUSTOMER', 'APPROVER']:
             raise AttributeError("actor of task must be customer or approver")
         elif form not in form_classes:
             raise AttributeError("form must be key of form_classes")
+        if 'task_info' in kwargs: task_info = kwargs['task_info']
+        else: task_info = ""        
         return {'form': form, 
                 'actor': actor, 
                 'fields': {}, 
-                'data': {}, 
+                'data': {'task_info': task_info}, 
                 'options': {}
                 }            
         
@@ -128,7 +132,7 @@ class AcceptAgreement(AbstractForm):
             label = kwargs['label']
         else:
             label = "Do you accept this agreement?"
-        task_dict = AbstractForm.make_task_dict("accept_agreement", actor)
+        task_dict = AbstractForm.make_task_dict("accept_agreement", actor, *args, **kwargs)
         task_dict['fields']['acceptance'] = {   'label': label, 'mandatory': mandatory, 
                                                 'type': 'checkbox', 'value': False}
         task_dict['data']['agreement'] = agreement
@@ -159,6 +163,7 @@ class AcceptAgreement(AbstractForm):
             'agreement': self.task_dict['data']['agreement'],
             'checkbox_label': self.task_dict['fields']['acceptance']['label'],
             'checkbox_value': self.task_dict['fields']['acceptance']['value'],
+            'task_info': self.task_dict['data']['task_info']
         })
         
     def complete_task(self, request):
@@ -183,7 +188,7 @@ class FieldEntry(AbstractForm):
         """Builds a task dictionary, accepts *args of (name, label, ftype, required). 
         Only text currently supported for ftype
         """
-        task_dict = AbstractForm.make_task_dict("field_entry", actor)
+        task_dict = AbstractForm.make_task_dict("field_entry", actor, *args, **kwargs)
         for (field_name, label, ftype, mandatory) in args:
             task_dict['fields'][field_name] = {   
                 'label': label, 'mandatory': mandatory, 
@@ -212,7 +217,8 @@ class FieldEntry(AbstractForm):
         return render(request, 'digiapproval/taskforms/FieldEntry.html', { #default response
             'error': error,
             'task': self.spiff_task.get_name(),
-            'form_fields': form_fields
+            'form_fields': form_fields,
+            'task_info': self.task_dict['data']['task_info']
         })
             
     def complete_task(self, request):
@@ -252,7 +258,7 @@ class CheckTally(AbstractForm):
         """Builds a task dictionary, accepts *args of (name, label, mandatory, score). 
         Only text currently supported for ftype
         """
-        task_dict = AbstractForm.make_task_dict("check_tally", actor) 
+        task_dict = AbstractForm.make_task_dict("check_tally", actor, *args, **kwargs) 
         for (field_name, label, mandatory, score) in args:
             task_dict['fields'][field_name] = {   
                 'label': label, 'mandatory': mandatory, 
@@ -285,7 +291,8 @@ class CheckTally(AbstractForm):
         return render(request, 'digiapproval/taskforms/CheckTally.html', { #default response
             'error': error,
             'task': self.spiff_task.get_name(),
-            'form_fields': form_fields
+            'form_fields': form_fields,
+            'task_info': self.task_dict['data']['task_info']
         })
     
     def complete_task(self, request):
@@ -314,7 +321,7 @@ class ChooseBranch(AbstractForm):
     
     def __init__(self, spiff_task, workflow_model, *args, **kwargs):
         """Task form initialisation and validation"""
-        super(ChooseBranch,self).__init__(spiff_task, workflow_model, args, kwargs)
+        super(ChooseBranch,self).__init__(spiff_task, workflow_model, *args, **kwargs)
         if not isinstance(spiff_task.task_spec, ExclusiveChoice):
             raise TypeError("CheckTally requires an ExclusiveChoice task")
 
@@ -331,7 +338,7 @@ class ChooseBranch(AbstractForm):
     @staticmethod    
     def make_task_dict(actor, *args, **kwargs):
         """Constructs a task_dict for this taskform using provided args (name, label, number), Actor must be CUSTOMER or APPROVER"""
-        task_dict = AbstractForm.make_task_dict("choose_branch", actor) 
+        task_dict = AbstractForm.make_task_dict("choose_branch", actor, *args, **kwargs) 
         for (name, label, number) in args:
             task_dict['fields'][name] = {   
                 'label': label, 'mandatory': False, 
@@ -359,7 +366,8 @@ class ChooseBranch(AbstractForm):
         return render(request, 'digiapproval/taskforms/ChooseBranch.html', { 
             'error': error,
             'task': self.spiff_task.get_name(),
-            'form_fields': form_fields
+            'form_fields': form_fields,
+            'task_info': self.task_dict['data']['task_info']
         })
 
     def complete_task(self, request):
@@ -385,7 +393,7 @@ class ChooseBranches(AbstractForm):
     
     def __init__(self, spiff_task, workflow_model, *args, **kwargs):
         """Task form initialisation and validation"""
-        super(ChooseBranches,self).__init__(spiff_task, workflow_model, args, kwargs)
+        super(ChooseBranches,self).__init__(spiff_task, workflow_model, *args, **kwargs)
         if isinstance(spiff_task.task_spec, MultiChoice):
             for field in self.task_dict['fields']:
                 data_field = "task" + str(self.task_dict['fields'][field]['number'])
@@ -412,7 +420,7 @@ class ChooseBranches(AbstractForm):
     @staticmethod    
     def make_task_dict(actor, minimum_choices, *args, **kwargs):
         """Constructs a task_dict for this taskform using provided args (name, label, number), Actor must be CUSTOMER or APPROVER"""
-        task_dict = AbstractForm.make_task_dict("choose_branches", actor) 
+        task_dict = AbstractForm.make_task_dict("choose_branches", actor, *args, **kwargs) 
         for (name, label, number) in args:
             task_dict['fields'][name] = {   
                 'label': label, 'mandatory': False, 
@@ -447,7 +455,8 @@ class ChooseBranches(AbstractForm):
         return render(request, 'digiapproval/taskforms/ChooseBranches.html', {
             'error': error,
             'task': self.spiff_task.get_name(),
-            'form_fields': form_fields
+            'form_fields': form_fields,
+            'task_info': self.task_dict['data']['task_info']
         })
 
     def complete_task(self, request):
@@ -471,7 +480,7 @@ class FileUpload(AbstractForm):
     
     def __init__(self, spiff_task, workflow_model, *args, **kwargs):
         """Task form initialisation and validation"""
-        super(FileUpload,self).__init__(spiff_task, workflow_model, args, kwargs)
+        super(FileUpload,self).__init__(spiff_task, workflow_model, *args, **kwargs)
         #Task specific init/validation here
 
         
@@ -486,7 +495,7 @@ class FileUpload(AbstractForm):
     @staticmethod    
     def make_task_dict(mandatory, actor, *args, **kwargs):
         """Constructs a task_dict for this taskform using provided params"""
-        task_dict = AbstractForm.make_task_dict("file_upload", actor) 
+        task_dict = AbstractForm.make_task_dict("file_upload", actor, *args, **kwargs) 
         task_dict['fields']['file_name'] = {
             'label': 'Name of File: ', 'mandatory': mandatory,
             'type': 'text', 'value': "",
@@ -523,7 +532,8 @@ class FileUpload(AbstractForm):
         return render(request, 'digiapproval/taskforms/FileUpload.html', { 
             'error': error,
             'task': self.spiff_task.get_name(),
-            'form_fields': self.task_dict['fields']
+            'form_fields': self.task_dict['fields'],
+            'task_info': self.task_dict['data']['task_info']
         })
 
     def complete_task(self, request):
@@ -538,7 +548,7 @@ class ExampleTaskForm(AbstractForm):
     
     def __init__(self, spiff_task, workflow_model, *args, **kwargs):
         """Task form initialisation and validation"""
-        super(ExampleTaskForm,self).__init__(spiff_task, workflow_model, args, kwargs)
+        super(ExampleTaskForm,self).__init__(spiff_task, workflow_model, *args, **kwargs)
         #Task specific init/validation here
 
         
@@ -551,7 +561,7 @@ class ExampleTaskForm(AbstractForm):
     @staticmethod    
     def make_task_dict(actor, *args, **kwargs):
         """Constructs a task_dict for this taskform using provided params"""
-        task_dict = AbstractForm.make_task_dict("example_task_form", actor) 
+        task_dict = AbstractForm.make_task_dict("example_task_form", actor, *args, **kwargs) 
         #Add task specific forms to task_dict
         ExampleTaskForm.validate_task_data(task_dict)
         return task_dict
@@ -577,7 +587,8 @@ class ExampleTaskForm(AbstractForm):
         return render(request, 'digiapproval/taskforms/ExampleTaskForm.html', { 
             'error': error,
             'task': self.spiff_task.get_name(),
-            'form_fields': self.task_dict['fields']
+            'form_fields': self.task_dict['fields'],
+            'task_info': self.task_dict['data']['task_info']
         })
 
     def complete_task(self, request):
