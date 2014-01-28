@@ -97,7 +97,7 @@ class AbstractForm(object):
         is_customer_and_actor = (self.actor == 'CUSTOMER') and \
             (request.user.customeraccount.id is self.workflow_model.customer.id or
              self.workflow_model.customer in request.user.customeraccount.parent_accounts.all())
-        print vars(self)
+        
         if not (is_authenticated and (is_approver or is_customer_and_actor)):
             return HttpResponseRedirect(reverse('applicant_home'))
     
