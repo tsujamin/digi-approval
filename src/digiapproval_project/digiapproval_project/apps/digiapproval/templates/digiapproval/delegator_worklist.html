@@ -4,25 +4,19 @@
 {% block content %}
 <h2>Current applications</h2>
 {% for formset in formsets %}
-{% comment %} TODO: is this appropriate for a table? -->
-
-<!--<h3>{{ spec.name }}</h3>
-<table>
-  {% for workflow in workflows %}
-  <tr>
-    <td><a href="{% url 'view_workflow' workflow_id=workflow.id %}">{{ workflow.customer.user.username }}</a></td>
-  </tr>
-  {% endfor %}
-</table>-->
-{% endcomment %}
-New formset!
+<h3>{{ formset.spec_name }}</h3>
 <form>
 {% csrf_token %}
 <table>
-{% for form in formset.forms %}
-{{ form.as_table }}
+<tr><th>Application Customer</th><th>Approver</th></tr>
+{% for form in formset.formset.forms %}
+<tr>
+    <td><a href="{% url 'view_workflow' workflow_id=form.workflow_id.value %}">{{ form.workflow_customer_username.value }} ({{ form.workflow_customer.value }})</a></td>
+    <td>{{ form.approver }}</td>
+</tr>
 {% endfor %}
 </table>
+<input type="submit" value="Update Approvers" />
 </form>
 {% endfor %}
 

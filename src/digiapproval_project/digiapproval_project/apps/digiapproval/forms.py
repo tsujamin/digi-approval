@@ -87,6 +87,9 @@ class LoginForm(forms.Form):
            
 class DelegatorForm(forms.Form):
     """Form for delegator to change workflow's approver"""
+    workflow_id = forms.IntegerField(widget=forms.HiddenInput)
+    workflow_customer = forms.CharField(widget=forms.HiddenInput)
+    workflow_customer_username = forms.CharField(widget=forms.HiddenInput)
     
     def __init__(self, approvers, *args, **kwargs):
         super(DelegatorForm, self).__init__(*args, **kwargs)

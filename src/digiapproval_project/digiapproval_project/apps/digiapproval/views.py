@@ -150,12 +150,19 @@ def delegator_worklist(request):
                 # if hasattr(spec, 'workflow_set')])
     
     formsets = [
-        formset_factory(DelegatorForm, formset=DelegatorBaseFormSet)(
+        {'formset': formset_factory(DelegatorForm, formset=DelegatorBaseFormSet, max_num=0)(
             approvers=
                 [(approver.username, approver.get_full_name()) for approver in spec.approvers.user_set.all()],
             initial=
-                [{'approver': workflow.approver.username} for workflow in spec.workflow_set.all()]
-        )
+                [{
+                    'workflow_id': workflow.id,
+                    'workflow_customer': workflow.customer.user.get_full_name(),
+                    'workflow_customer_username': workflow.customer.user.username,
+                    'approver': workflow.approver.username
+                 } for workflow in spec.workflow_set.all()]
+            ),
+        'spec_name': spec.name
+        }
         for spec in workflowspecs
     ]
     
