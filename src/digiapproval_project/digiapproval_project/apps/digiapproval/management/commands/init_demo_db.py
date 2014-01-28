@@ -326,7 +326,7 @@ def workflowspec_realistic_one():
     cust_ramp_review = AbstractForm.create_approval_wrapper(wf_spec, cust_event_attendance_start, appr_join1, 
         "Risk Assessment", task_info="""Assess the customers RAMP application in accordance with the relevant legislation and business rules (<a href=\"link.to/ramp_rules\">link</a>)""")
     cust_insure_review = AbstractForm.create_approval_wrapper(wf_spec, cust_insurance_start, appr_join1, 
-    "Insurance", , task_info="""Assess the customers insurance papers in accordance with the relevant legislation and business rules (<a href=\"link.to/insurance_rules\">link</a>)""")
+    "Insurance", task_info="""Assess the customers insurance papers in accordance with the relevant legislation and business rules (<a href=\"link.to/insurance_rules\">link</a>)""")
     cust_waste_plan_review = AbstractForm.create_approval_wrapper(wf_spec, cust_waste_plan, appr_join2, 
     "Waste Plan" , task_info="""Assess the customers Waste Plan application in accordance with the relevant legislation and business rules (<a href=\"link.to/waste_rules\">link</a>)""")
     cust_traffic_plan_review = AbstractForm.create_approval_wrapper(wf_spec, cust_traffic_plan, appr_join2, 
@@ -407,7 +407,7 @@ If you need assistance applying for cover, please refer to our help page (<a hre
     )
     
     #S3: Approval stage
-    appr_review1.set_data(task_data = ChooseBranches.make_task_dict('APPROVER', 0
+    appr_review1.set_data(task_data = ChooseBranches.make_task_dict('APPROVER', 0,
         ('waste_plan', "Assign Waste Management Plan", 1),
         ('traffic_plan', "Assign Traffic Management Plan", 2),
         task_info = """Please review the previously completed stages and, if appropriate, assign further tasks for the customer to complete"""
