@@ -30,7 +30,22 @@ class AbstractForm(object):
             spiff_task.complete()
             workflow_model.save()
             return None
+            
+    @staticmethod
+    def create_approval_wrapper(wf_spec, first_task, next_task, section, *args, **kwargs):
+        """Returns an APPROVER taskform which prompts the reviewer to accept the customers 
+        responses in the wrapped tasks. If they are unacceptable the task loops back. """      
         
+        review_task = ChooseBranch.create_exclusive_task(wf_spec, (section + ": Review"),
+            (1, first_task),
+            (2, next_task),
+        )
+        review_task.set_data(task_data = ChooseBranch.make_task_dict('APPROVER', 
+            ('restart_section', "Previous section needs to be re-completed", 1),
+            ('continue', "Previous section was completed acceptably", 2),
+            task_info = kwargs.get('task_info',"")
+        ))
+        return review_task
     
     def __init__(self, spiff_task, workflow_model,  *args, **kwargs):
         """Loads the saved task_model instance if it exists, 

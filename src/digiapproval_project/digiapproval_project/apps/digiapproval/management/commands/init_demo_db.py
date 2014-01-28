@@ -75,7 +75,7 @@ class Command(BaseCommand):
                 DIRECTORATES[0], DIRECTORATES_APPROVER_GROUPS[0], DIRECTORATES_DELEGATOR_GROUPS[0],
                 True, True, workflowspec_four()),
                 ("Apply to hold a public event", 
-                "This application will take you through the process of applying for a public events permit,",
+                "This application will take you through the process of applying for a public events permit",
                 DIRECTORATES[0], DIRECTORATES_APPROVER_GROUPS[0], DIRECTORATES_DELEGATOR_GROUPS[0],
                 True, True, workflowspec_realistic_one()),
         ])
@@ -319,10 +319,21 @@ def workflowspec_realistic_one():
     cust_upload_insure = specs.Simple(wf_spec, "Upload Insurance Policy")
     cust_waste_plan = specs.Simple(wf_spec, "Upload Waste Management Plan")
     cust_traffic_plan = specs.Simple(wf_spec, "Upload Traffic Plan")
+    cust_insurance_start = specs.Simple(wf_spec, "Start Customer Insurance section")
+    cust_event_attendance_start = specs.Simple(wf_spec, "Start RAMP Section")
 
+    #Review forms
+    cust_ramp_review = AbstractForm.create_approval_wrapper(wf_spec, cust_event_attendance_start, appr_join1, 
+        "Risk Assessment", task_info="""Assess the customers RAMP application in accordance with the relevant legislation and business rules (<a href=\"link.to/ramp_rules\">link</a>)""")
+    cust_insure_review = AbstractForm.create_approval_wrapper(wf_spec, cust_insurance_start, appr_join1, 
+    "Insurance", , task_info="""Assess the customers insurance papers in accordance with the relevant legislation and business rules (<a href=\"link.to/insurance_rules\">link</a>)""")
+    cust_waste_plan_review = AbstractForm.create_approval_wrapper(wf_spec, cust_waste_plan, appr_join2, 
+    "Waste Plan" , task_info="""Assess the customers Waste Plan application in accordance with the relevant legislation and business rules (<a href=\"link.to/waste_rules\">link</a>)""")
+    cust_traffic_plan_review = AbstractForm.create_approval_wrapper(wf_spec, cust_traffic_plan, appr_join2, 
+    "Traffic Plan" , task_info="""Assess the customers Traffic Plan application in accordance with the relevant legislation and business rules (<a href=\"link.to/traffic_rules\">link</a>)""")
     #Branching taskforms
     cust_ramp_tally = CheckTally.create_exclusive_task(wf_spec, "Preliminary Risk Assessment", 40, 
-                                                            cust_upload_ramp, appr_join1)
+                                                            cust_upload_ramp, cust_ramp_review)
     
     cust_event_attendance = ChooseBranch.create_exclusive_task(wf_spec, "Participant attendance expectation",
         (1, cust_upload_ramp),
@@ -338,14 +349,27 @@ def workflowspec_realistic_one():
         (1, cust_waste_plan),
         (2, cust_traffic_plan)
     )
-
+    
+    #Connections
+    wf_spec.start.connect(cust_agreement)
+    wf_spec.start.connect(appr_agreement)
+    
+    cust_agreement.connect(cust_event_info)
+    
+    cust_event_info.connect(cust_event_attendance_start)
+    cust_event_attendance_start.connect(cust_event_attendance)
+    cust_event_info.connect(cust_insurance_start)
+    cust_insurance_start.connect(cust_insurance_req)
+    cust_upload_ramp.connect(cust_ramp_review)
+    appr_join1.connect(appr_review1)
+    appr_join1.connect(appr_join2)
+    cust_waste_plan.connect(cust_waste_plan_review)
+    cust_traffic_plan.connect(cust_traffic_plan_review)
     
     #S1: Agreement acceptance
     cust_agreement.set_data(task_data = AcceptAgreement.make_task_dict(True, cust_agreement_text, 'CUSTOMER'))
     appr_agreement.set_data(task_data = AcceptAgreement.make_task_dict(True, appr_agreement_text, 'APPROVER'))
-    wf_spec.start.connect(cust_agreement)
-    wf_spec.start.connect(appr_agreement)
-    
+
     #S2: Event Info form
     cust_event_info.set_data(task_data = FieldEntry.make_task_dict('CUSTOMER',
         ('event_name', "What is the name of your proposed event", 'text', True),
@@ -356,14 +380,11 @@ def workflowspec_realistic_one():
         task_info="""Welcome to the <b>DigiApproval</b> system. 
 If you have any concern during your application process please contact your assigned assessor."""
     ))
-    cust_agreement.connect(cust_event_info)
     cust_event_attendance.set_data(task_data = ChooseBranch.make_task_dict('CUSTOMER',
         ('need_ramp', "Over 50 participants are expected to attend", 1),
         ('assess_ramp', "Less than 50 participants are expected to attend ", 2),
         task_info="""In order to assess your need for a <b>Risk Assessment Management Plan</b> (RAMP) we require some information on the number of expected attendies."""
     ))
-    cust_event_info.connect(cust_event_attendance)
-    cust_event_info.connect(cust_insurance_req)
     cust_ramp_tally.set_data(task_data = CheckTally.make_task_dict('CUSTOMER',
         ('public_land', "Is the event held on public land", False, 41),
         ('large_structures', "Will there be large structures at your event", False, 10),
@@ -372,11 +393,9 @@ If you have any concern during your application process please contact your assi
         ('hazardous_materials', "Does your event involve hazardous materials ", False, 41),
         task_info="""In order to assess your need for a <b>Risk Assessment Management Plan</b> (RAMP) we require some information on the nature of your event."""
     ))
-    cust_upload_ramp.set_data(task_data = FileUpload.make_task_dict(True, 'CUSTOMER'),
+    cust_upload_ramp.set_data(task_data = FileUpload.make_task_dict(True, 'CUSTOMER',
         task_info="""Please upload a completed <b>Risk Assessment Management Plan</b> (RAMP). 
-A template can be found on the DigiApproval website (<a href=\"link.to/ramp_template\">link</a>)""")
-    
-    cust_upload_ramp.connect(appr_join1)
+A template can be found on the DigiApproval website (<a href=\"link.to/ramp_template\">link</a>)"""))    
     cust_insurance_req.set_data(task_data = ChooseBranch.make_task_dict('CUSTOMER',
         ('need_insurance', "My event falls under the requirements of public liability insurance", 1),
         ('no_insurance', "My event does not fall under the requirements of Public Liability Insurance",2),
@@ -388,15 +407,12 @@ If you need assistance applying for cover, please refer to our help page (<a hre
     )
     
     #S3: Approval stage
-    appr_review1.set_data(task_data = ChooseBranches.make_task_dict('APPROVER',
+    appr_review1.set_data(task_data = ChooseBranches.make_task_dict('APPROVER', 0
         ('waste_plan', "Assign Waste Management Plan", 1),
         ('traffic_plan', "Assign Traffic Management Plan", 2),
         task_info = """Please review the previously completed stages and, if appropriate, assign further tasks for the customer to complete"""
         
-    ))
-    appr_join1.connect(appr_review1)
-    appr_join1.connect(appr_join2)
-    
+    ))    
     #S4: Second application stage
     cust_waste_plan.set_data(task_data = FileUpload.make_task_dict(True, 'CUSTOMER'), 
         task_info="""Please upload a completed <b>Waste Management Plan</b>. 
@@ -410,14 +426,7 @@ A template can be found on the DigiApproval website (<a href=\"link.to/traffic_m
     cust_traffic_plan.connect(appr_join2)
     
     return wf_spec
-    
-    
-    
-    
-    
-    
-    
-    
+
 #Dummy text for agreements    
 lorum_ipsum = """Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer sollicitudin ultrices elementum. Nam vel luctus tortor. Sed pretium sodales dui. Nullam id ante a metus ultricies sagittis. Vestibulum porttitor pretium imperdiet. Curabitur dolor est, euismod quis tellus a, volutpat scelerisque felis. Sed ac venenatis libero. Fusce quis tortor nec arcu malesuada faucibus sed at tellus. Fusce a consectetur magna. Integer ullamcorper sollicitudin ligula. Donec interdum luctus nisl ac eleifend. Nunc lobortis quam non nisl laoreet, quis fermentum elit sagittis.
 
