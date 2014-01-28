@@ -352,12 +352,15 @@ def workflowspec_realistic_one():
         ('event_description', "Please describe the nature of your event: ", 'text', True),
         ('event_public_land', "Is your event planned on Public Unleased Land?", 'checkbox', False),
         ('info_first_event', "Is this the first time you've organised an event?" , 'checkbox', False),
-        ('event_other', "Please enter any relevant comments about your event: ", 'text', False)
+        ('event_other', "Please enter any relevant comments about your event: ", 'text', False),
+        task_info="""Welcome to the <b>DigiApproval</b> system. 
+If you have any concern during your application process please contact your assigned assessor."""
     ))
     cust_agreement.connect(cust_event_info)
     cust_event_attendance.set_data(task_data = ChooseBranch.make_task_dict('CUSTOMER',
         ('need_ramp', "Over 50 participants are expected to attend", 1),
-        ('assess_ramp', "Less than 50 participants are expected to attend ", 2)
+        ('assess_ramp', "Less than 50 participants are expected to attend ", 2),
+        task_info="""In order to assess your need for a <b>Risk Assessment Management Plan</b> (RAMP) we require some information on the number of expected attendies."""
     ))
     cust_event_info.connect(cust_event_attendance)
     cust_event_info.connect(cust_insurance_req)
@@ -367,27 +370,42 @@ def workflowspec_realistic_one():
         ('electircal_equipment', "Will there be electrical cabling: ", False, 20),
         ('water_hazards', "Will there be bodies of water at your event", False, 15),
         ('hazardous_materials', "Does your event involve hazardous materials ", False, 41),
+        task_info="""In order to assess your need for a <b>Risk Assessment Management Plan</b> (RAMP) we require some information on the nature of your event."""
     ))
-    cust_upload_ramp.set_data(task_data = FileUpload.make_task_dict(True, 'CUSTOMER'))
+    cust_upload_ramp.set_data(task_data = FileUpload.make_task_dict(True, 'CUSTOMER'),
+        task_info="""Please upload a completed <b>Risk Assessment Management Plan</b> (RAMP). 
+A template can be found on the DigiApproval website (<a href=\"link.to/ramp_template\">link</a>)""")
+    
     cust_upload_ramp.connect(appr_join1)
     cust_insurance_req.set_data(task_data = ChooseBranch.make_task_dict('CUSTOMER',
         ('need_insurance', "My event falls under the requirements of public liability insurance", 1),
-        ('no_insurance', "My event does not fall under the requirements of public liability insurance",2)
+        ('no_insurance', "My event does not fall under the requirements of <b>Public Liability Insurance</b>",2),
+        task_info="""Some events require the holding of Public Liability Insurance. If you are unsure about if it is required for your event, please refer to our help page (<a href=\"link.to/insurance_help\">link</a>)"""
     ))
-    cust_upload_insure.set_data(task_data = FileUpload.make_task_dict(True, 'CUSTOMER'))
+    cust_upload_insure.set_data(task_data = FileUpload.make_task_dict(True, 'CUSTOMER'),
+        task_info="""Please upload proof of your <b>Public Liability Insurance</b> for this event. 
+If you need assistance applying for cover, please refer to our help page (<a href=\"link.to/insurance_help\">link</a>)"""
+    )
     
     #S3: Approval stage
     appr_review1.set_data(task_data = ChooseBranches.make_task_dict('APPROVER',
         ('waste_plan', "Assign Waste Management Plan", 1),
         ('traffic_plan', "Assign Traffic Management Plan", 2),
+        task_info = """Please review the previously completed stages and, if appropriate, assign further tasks for the customer to complete"""
         
     ))
     appr_join1.connect(appr_review1)
     appr_join1.connect(appr_join2)
     
     #S4: Second application stage
-    cust_waste_plan.set_data(task_data = FileUpload.make_task_dict(True, 'CUSTOMER'))
-    cust_traffic_plan.set_data(task_data = FileUpload.make_task_dict(True, 'CUSTOMER'))
+    cust_waste_plan.set_data(task_data = FileUpload.make_task_dict(True, 'CUSTOMER'), 
+        task_info="""Please upload a completed <b>Waste Management Plan</b>. 
+A template can be found on the DigiApproval website (<a href=\"link.to/waste_management_plan_template\">link</a>)"""
+    )
+    cust_traffic_plan.set_data(task_data = FileUpload.make_task_dict(True, 'CUSTOMER'),
+        task_info="""Please upload a completed <b>Traffic Management Plan</b>. 
+A template can be found on the DigiApproval website (<a href=\"link.to/traffic_management_plan_template\">link</a>)"""
+    )
     cust_waste_plan.connect(appr_join2)
     cust_traffic_plan.connect(appr_join2)
     
