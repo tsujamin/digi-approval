@@ -149,6 +149,7 @@ def delegator_worklist(request):
                          for spec in subl])
                 # if hasattr(spec, 'workflow_set')])
     
+    # TODO: probably breaks with more than one formset
     formsets = [
         {'formset': formset_factory(DelegatorForm, formset=DelegatorBaseFormSet, max_num=0)(
             approvers=
