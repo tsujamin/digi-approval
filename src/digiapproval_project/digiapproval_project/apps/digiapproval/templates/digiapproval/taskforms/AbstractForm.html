@@ -4,7 +4,7 @@
 {% block content %}
 <div class="row">
   <div class="col-md-6">
-      {% if error %}{{ error }}{% endif %}
+      {% if error %}<b>{{ error }}</b><p>{% endif %}
       {% block form %}{% endblock form %}
   </div>
   <div class "col-md-6">

@@ -1,12 +1,15 @@
 {%extends 'digiapproval/taskforms/AbstractForm.html' %}
 {% block form %}
-<form action="" method="POST">
+<form action="" method="POST" role="form">
     {% csrf_token %}
     {% for field, items in form_fields.items %}
-    <input type="checkbox" name={{field}} value={{ items.value }} />
-    <label for={{field}}>{{items.label}}</label><br>
+    <div class="checkbox">
+        <label>
+            <input type="checkbox" name="{{field}}"/>{{items.label}}
+        </label>
+    </div>
     {% endfor %}
-    <input type="submit" name="submit" value="Continue"/>
+    <button type="submit" name="submit" class="btn btn-default">Continue</button>
 </form>
 {% endblock form %}
     

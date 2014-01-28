@@ -1,11 +1,14 @@
 {%extends 'digiapproval/taskforms/AbstractForm.html' %}
 {% block form %}
-<form action="" method="POST" enctype="multipart/form-data"> <!-- Start of form -->
+<form action="" method="POST" enctype="multipart/form-data" role="form"> <!-- Start of form -->
     {% csrf_token %} <!-- Boilerplate tag to prevent cross site forgery -->
     {% for field, items in form_fields.items %} <!-- Iterate through fields provided to template -->
-    <label for="{{field}}">{{items.label}}</label> <!-- Label for current field -->
-    <input type="{{items.type}}" name="{{ field }}"/><br> <!-- Creates field with specified field type -->
+    <div class="form-group">
+        <label for="{{field}}">{{items.label}}</label>
+        <input type="{{items.type}}" name="{{ field }}" 
+        {% ifnotequal items.type 'file' %} class="form-control" {% endifnotequal %}/><!-- Creates field with specified field type -->
+    </div>
     {% endfor %}
-    <input type="submit" name="submit" value="Upload"/> <!-- Submit field, multiple submit buttons can exist and be handled seperatly -->
+    <button type="submit" name="submit" class="btn btn-default">Upload</button><!-- Submit field, multiple submit buttons can exist and be handled seperatly -->
 </form>
 {% endblock form %}

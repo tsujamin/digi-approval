@@ -211,6 +211,7 @@ class FieldEntry(AbstractForm):
                 if (value == '' or value == None) and form_fields[field]['mandatory'] is True: #Failed to enter mandatory field
                     error = "\"" + str(form_fields[field]['label']) + "\" is a mandatory field."
                     break
+                elif form_fields[field]['type'] == 'checkbox': form_fields[field]['value'] = True
                 else: form_fields[field]['value'] = value
             if error is None: #Correctly filled out
                 return self.complete_task(request)
@@ -441,6 +442,7 @@ class ChooseBranches(AbstractForm):
         count = 0
         if request.method == "POST":
             for field in form_fields:    
+                print request.POST
                 value = request.POST.get(field, None)
                 if value is not None:
                     form_fields[field]['value'] = True
@@ -450,7 +452,7 @@ class ChooseBranches(AbstractForm):
             if count >= self.task_dict['options']['minimum_choices']:
                 return self.complete_task(request)
             else:
-                error = "Please select atleast " + str(self.task_dict['options']['minimum_choices']) + " option(s)"                  
+                error = "Please select at least " + str(self.task_dict['options']['minimum_choices']) + " option(s)"                  
         #default response, returns related template with current fields            
         return render(request, 'digiapproval/taskforms/ChooseBranches.html', {
             'error': error,

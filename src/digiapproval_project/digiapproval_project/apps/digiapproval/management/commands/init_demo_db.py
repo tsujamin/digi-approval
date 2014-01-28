@@ -250,9 +250,9 @@ def workflowspec_three():
     )
     approver_agreement.set_data(task_data = AcceptAgreement.make_task_dict(True, lorum_ipsum,'APPROVER'))
     customer_tally.set_data(task_data = CheckTally.make_task_dict('CUSTOMER',
-        ('like_bureaucracy', "Do you like Bureaucracy: ", False, 5),
-        ('like_events', "Do you like throwing events: ", False, 10),
-        ('like_digiactive', "Do you like DigiACTive: ", True, 15),)
+        ('like_bureaucracy', "Do you like Bureaucracy", False, 5),
+        ('like_events', "Do you like throwing events", False, 10),
+        ('like_digiactive', "Do you like DigiACTive", True, 15),)
     )
     
     return wf_spec
@@ -348,11 +348,11 @@ def workflowspec_realistic_one():
     
     #S2: Event Info form
     cust_event_info.set_data(task_data = FieldEntry.make_task_dict('CUSTOMER',
-        ('event_name', "What is the name of your proposed event: ", 'text', True),
-        ('event_description', "Please describe the nature of your event: ", 'text', True),
+        ('event_name', "What is the name of your proposed event", 'text', True),
+        ('event_description', "Please describe the nature of your event", 'text', True),
         ('event_public_land', "Is your event planned on Public Unleased Land?", 'checkbox', False),
         ('info_first_event', "Is this the first time you've organised an event?" , 'checkbox', False),
-        ('event_other', "Please enter any relevant comments about your event: ", 'text', False),
+        ('event_other', "Please enter any relevant comments about your event", 'text', False),
         task_info="""Welcome to the <b>DigiApproval</b> system. 
 If you have any concern during your application process please contact your assigned assessor."""
     ))
@@ -365,9 +365,9 @@ If you have any concern during your application process please contact your assi
     cust_event_info.connect(cust_event_attendance)
     cust_event_info.connect(cust_insurance_req)
     cust_ramp_tally.set_data(task_data = CheckTally.make_task_dict('CUSTOMER',
-        ('public_land', "Is the event held on public land: ", False, 41),
-        ('large_structures', "Will there be large structures at your event: ", False, 10),
-        ('electircal_equipment', "Will there be electrical cabling: ", False, 20),
+        ('public_land', "Is the event held on public land", False, 41),
+        ('large_structures', "Will there be large structures at your event", False, 10),
+        ('electircal_equipment', "Will there be electrical cabling", False, 20),
         ('water_hazards', "Will there be bodies of water at your event", False, 15),
         ('hazardous_materials', "Does your event involve hazardous materials ", False, 41),
         task_info="""In order to assess your need for a <b>Risk Assessment Management Plan</b> (RAMP) we require some information on the nature of your event."""
@@ -379,7 +379,7 @@ A template can be found on the DigiApproval website (<a href=\"link.to/ramp_temp
     cust_upload_ramp.connect(appr_join1)
     cust_insurance_req.set_data(task_data = ChooseBranch.make_task_dict('CUSTOMER',
         ('need_insurance', "My event falls under the requirements of public liability insurance", 1),
-        ('no_insurance', "My event does not fall under the requirements of <b>Public Liability Insurance</b>",2),
+        ('no_insurance', "My event does not fall under the requirements of Public Liability Insurance",2),
         task_info="""Some events require the holding of Public Liability Insurance. If you are unsure about if it is required for your event, please refer to our help page (<a href=\"link.to/insurance_help\">link</a>)"""
     ))
     cust_upload_insure.set_data(task_data = FileUpload.make_task_dict(True, 'CUSTOMER'),

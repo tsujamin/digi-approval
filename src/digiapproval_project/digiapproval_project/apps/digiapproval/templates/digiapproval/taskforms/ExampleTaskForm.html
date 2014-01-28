@@ -1,13 +1,16 @@
 {%extends 'digiapproval/taskforms/AbstractForm.html' %}
-{% block form %}
-<form action="" method="POST"> <!-- Start of form -->
+{% block form %} <!-- overwrite AbstractForm form block -->
+<form action="" method="POST" role="form"> <!-- Start of form -->
     {% csrf_token %} <!-- Boilerplate tag to prevent cross site forgery -->
     {% for field, items in form_fields.items %} <!-- Iterate through fields provided to template -->
-    <label for="{{field}}">{{items.label}}</label> <!-- Label for current field -->
-    <input type="{{ items.type }}" name="{{ field }}"
-    value={% if items.value %} "{{ items.value }}" {% else %} "" {% endif %}/><br> <!-- Creates field with specified field type -->
+    <div class="form-group"> <!-- Replace class with appropriate bootstrap class-->
+        <label> <!-- Label for current field -->
+            <input type="{{ items.type }}" name="{{ field }}"
+            value={% if items.value %} "{{ items.value }}" {% else %} "" {% endif %}/>{{items.label}} <!-- Creates field with specified field type -->
+        </label>
+    </div>
     {% endfor %}
-    <input type="submit" name="submit" value="Continue"/> <!-- Submit field, multiple submit buttons can exist and be handled seperatly -->
+    <button type="submit" name="submit" class="btn btn-default">Continue</button> <!-- Submit field, multiple submit buttons can exist and be handled seperatly -->
 </form>
 {% endblock form %}
     
