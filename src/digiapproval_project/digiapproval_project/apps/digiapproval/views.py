@@ -139,11 +139,26 @@ def delegator_worklist(request):
     
     Requires authenticated User with delegator privileges on approval stages.
     """
-    # TODO TOTALLY UNTESTED AND STUFF
+    message = None
     
     if request.method == 'POST' and request.POST.get('delegate_workflows', False):
-        # TODO: Actually change approvers
-        raise NotImplementedError
+        # TODO: do this much more nicely, error handling and all that
+        spec = WorkflowSpec.objects.get(id=request.POST.get('spec_id', None))
+        if spec.delegators not in request.user.groups.all():
+            raise PermissionDenied
+        
+        DelegatorFormFormSet = formset_factory(DelegatorForm, formset=DelegatorBaseFormSet, max_num=0)
+        formset = DelegatorFormFormSet(request.POST, request.FILES, approvers=[(approver.username, approver.get_full_name()) for approver in spec.approvers.user_set.all()])
+        if formset.is_valid():
+            for form_data in formset.cleaned_data:
+                workflow = Workflow.objects.get(id=form_data['workflow_id'])
+                approver = User.objects.get(username=form_data['approver'])
+                workflow.approver = approver
+                workflow.save()
+            message = "Approvers successfully updated."
+        else:
+            # TODO: better error handling
+            message = "Error updating approvers."
     
     # Work out specs for which this user is delegator
     workflowspecs = set([spec
@@ -151,7 +166,6 @@ def delegator_worklist(request):
                          for spec in subl])
                 # if hasattr(spec, 'workflow_set')])
     
-    # TODO: probably breaks with more than one formset
     formsets = [
         {'formset': formset_factory(DelegatorForm, formset=DelegatorBaseFormSet, max_num=0)(
             approvers=
@@ -164,13 +178,15 @@ def delegator_worklist(request):
                     'approver': workflow.approver.username
                  } for workflow in spec.workflow_set.all()]
             ),
-        'spec_name': spec.name
+        'spec_name': spec.name,
+        'spec_id': spec.id
         }
         for spec in workflowspecs
     ]
     
     return render(request, 'digiapproval/delegator_worklist.html', {
-        'formsets': formsets
+        'formsets': formsets,
+        'message': message
     })
     
 
