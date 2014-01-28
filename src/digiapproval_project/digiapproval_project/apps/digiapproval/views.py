@@ -202,16 +202,26 @@ def new_workflow(request, workflowspec_id):
     # TODO: what's the best way to handle non-public workflows? And non-top-level workflows?
     
     workflowspec = get_object_or_404(WorkflowSpec, id=workflowspec_id, public=True, toplevel=True)
+    error = None
     
     customer = request.user.customeraccount
+    permitted_accounts = [customer]
+    for account in customer.parent_accounts.all():
+        permitted_accounts.append(account)
+        
     if request.method == 'POST' and request.POST.get('create_workflow', False):
-        workflow = workflowspec.start_workflow(customer)
-        workflow.save()
-        return HttpResponseRedirect(reverse('view_workflow', args=(workflow.id,)))
-    else:
-        return render(request, 'digiapproval/new_workflow.html', {
-            'workflowspec': workflowspec
-        })
+        print request.POST
+        wf_customer = get_object_or_404(CustomerAccount, id=int(request.POST.get('account', None)))
+        if wf_customer in permitted_accounts:
+            workflow = workflowspec.start_workflow(wf_customer)
+            workflow.save()
+            return HttpResponseRedirect(reverse('view_workflow', args=(workflow.id,)))
+        error = "Please select a valid account"        
+    return render(request, 'digiapproval/new_workflow.html', {
+        'workflowspec': workflowspec,
+        'accounts': permitted_accounts,
+        'error': error
+    })
 
 @login_required
 def view_task(request, workflow_id, task_uuid):

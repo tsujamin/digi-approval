@@ -7,8 +7,16 @@
 <li><strong>Approving Agency:</strong> {{ workflowspec.owner.name }}</li>
 <li><strong>Description:</strong> {{ workflowspec.description | safe }}</li>
 </ul>
+
+{% if error %}{{error}}{% endif %}
 <form action="{% url 'new_workflow' workflowspec.id %}" method="POST">
     {% csrf_token %}
+    <label for='account'>Start application as: </label>
+    <select name="account">
+      {% for account in accounts %}
+      <option value="{{account.id}}">{{account.user.username}}</option>
+      {% endfor %}
+    </select><br>
     <input name="create_workflow" type="submit" value="Start Application" />
 </form>
 {% endblock content %}
