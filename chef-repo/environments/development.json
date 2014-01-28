@@ -26,6 +26,9 @@
           "django_celery_broker_url": "amqp://guest:guest@localhost//",
           "email_host": "localhost",
           "email_port": "8825",
+          "email_user": "",
+          "email_password": "",
+          "email_tls": false,
           "user": "vagrant",
           "group": "vagrant"
       },
