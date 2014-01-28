@@ -1,0 +1,23 @@
+{% extends "digiapproval/page.tpl.html" %}
+{% block title %}Delegator Worklist{% endblock %}
+
+{% block content %}
+<h2>Current applications</h2>
+{% for formset in formsets %}
+<h3>{{ formset.spec_name }}</h3>
+<form method="POST">
+{% csrf_token %}
+<table>
+<tr><th>Application Customer</th><th>Approver</th></tr>
+{% for form in formset.formset.forms %}
+<tr>
+    <td><a href="{% url 'view_workflow' workflow_id=form.workflow_id.value %}">{{ form.workflow_customer_username.value }} ({{ form.workflow_customer.value }})</a></td>
+    <td>{{ form.approver }}</td>
+</tr>
+{% endfor %}
+</table>
+<input type="submit" name="delegate_workflows" value="Update Approvers" />
+</form>
+{% endfor %}
+
+{% endblock content %}
