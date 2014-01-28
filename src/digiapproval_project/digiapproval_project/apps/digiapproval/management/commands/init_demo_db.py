@@ -74,6 +74,10 @@ class Command(BaseCommand):
             ("Submit feedback on this service", "This application is for submitting feedback regarding the approval system",
                 DIRECTORATES[0], DIRECTORATES_APPROVER_GROUPS[0], DIRECTORATES_DELEGATOR_GROUPS[0],
                 True, True, workflowspec_four()),
+                ("Apply to hold a public event", 
+                "This application will take you through the process of applying for a public events permit,",
+                DIRECTORATES[0], DIRECTORATES_APPROVER_GROUPS[0], DIRECTORATES_DELEGATOR_GROUPS[0],
+                True, True, workflowspec_realistic_one()),
         ])
         
         self.stdout.write("creating workflows")
@@ -127,7 +131,7 @@ def clear_data():
         user.delete()
     for group in Group.objects.all():
         group.delete()
-    for model in [models.Task, models.Workflow, models.WorkflowSpec, models.CustomerAccount, models.UserFile]:
+    for model in [models.Task, models.Workflow, models.WorkflowSpec, models.CustomerAccount, models.UserFile, models.Message]:
         for instance in model.objects.all():
             instance.delete()
 
@@ -300,6 +304,98 @@ def workflowspec_four():
     
     return wf_spec
     
+def workflowspec_realistic_one():
+    """Workflow spec representative of actual TAMS processes
+    """
+    wf_spec = specs.WorkflowSpec()
+    cust_agreement = specs.Simple(wf_spec, "Customer Usage Agreement")
+    appr_agreement = specs.Simple(wf_spec, "Approver Usage Agreement")
+    
+    #Entry taskforms
+    cust_event_info = specs.Simple(wf_spec, "Basic Event Description")
+    cust_upload_ramp = specs.Simple(wf_spec, "Upload Risk Assessment Management Plan")
+    appr_join1 = specs.Join(wf_spec, "Workflow Assessment Join 1")
+    appr_join2 = specs.Join(wf_spec, "Workflow Assessment Join 2")
+    cust_upload_insure = specs.Simple(wf_spec, "Upload Insurance Policy")
+    cust_waste_plan = specs.Simple(wf_spec, "Upload Waste Management Plan")
+    cust_traffic_plan = specs.Simple(wf_spec, "Upload Traffic Plan")
+
+    #Branching taskforms
+    cust_ramp_tally = CheckTally.create_exclusive_task(wf_spec, "Preliminary Risk Assessment", 40, 
+                                                            cust_upload_ramp, appr_join1)
+    
+    cust_event_attendance = ChooseBranch.create_exclusive_task(wf_spec, "Participant attendance expectation",
+        (1, cust_upload_ramp),
+        (2, cust_ramp_tally)
+    )
+                                                            
+    cust_insurance_req = ChooseBranch.create_exclusive_task(wf_spec, "Event insurance requirement",
+        (1, cust_upload_insure),
+        (2, appr_join1)
+    )
+    
+    appr_review1 = ChooseBranches.create_multichoice_task(wf_spec, 'Review and Assign Tasks',
+        (1, cust_waste_plan),
+        (2, cust_traffic_plan)
+    )
+
+    
+    #S1: Agreement acceptance
+    cust_agreement.set_data(task_data = AcceptAgreement.make_task_dict(True, cust_agreement_text, 'CUSTOMER'))
+    appr_agreement.set_data(task_data = AcceptAgreement.make_task_dict(True, appr_agreement_text, 'APPROVER'))
+    wf_spec.start.connect(cust_agreement)
+    wf_spec.start.connect(appr_agreement)
+    
+    #S2: Event Info form
+    cust_event_info.set_data(task_data = FieldEntry.make_task_dict('CUSTOMER',
+        ('event_name', "What is the name of your proposed event: ", 'text', True),
+        ('event_description', "Please describe the nature of your event: ", 'text', True),
+        ('event_public_land', "Is your event planned on Public Unleased Land?", 'checkbox', False),
+        ('info_first_event', "Is this the first time you've organised an event?" , 'checkbox', False),
+        ('event_other', "Please enter any relevant comments about your event: ", 'text', False)
+    ))
+    cust_agreement.connect(cust_event_info)
+    cust_event_attendance.set_data(task_data = ChooseBranch.make_task_dict('CUSTOMER',
+        ('need_ramp', "Over 50 participants are expected to attend", 1),
+        ('assess_ramp', "Less than 50 participants are expected to attend ", 2)
+    ))
+    cust_event_info.connect(cust_event_attendance)
+    cust_event_info.connect(cust_insurance_req)
+    cust_ramp_tally.set_data(task_data = CheckTally.make_task_dict('CUSTOMER',
+        ('public_land', "Is the event held on public land: ", False, 41),
+        ('large_structures', "Will there be large structures at your event: ", False, 10),
+        ('electircal_equipment', "Will there be electrical cabling: ", False, 20),
+        ('water_hazards', "Will there be bodies of water at your event", False, 15),
+        ('hazardous_materials', "Does your event involve hazardous materials ", False, 41),
+    ))
+    cust_upload_ramp.set_data(task_data = FileUpload.make_task_dict(True, 'CUSTOMER'))
+    cust_upload_ramp.connect(appr_join1)
+    cust_insurance_req.set_data(task_data = ChooseBranch.make_task_dict('CUSTOMER',
+        ('need_insurance', "My event falls under the requirements of public liability insurance", 1),
+        ('no_insurance', "My event does not fall under the requirements of public liability insurance",2)
+    ))
+    cust_upload_insure.set_data(task_data = FileUpload.make_task_dict(True, 'CUSTOMER'))
+    
+    #S3: Approval stage
+    appr_review1.set_data(task_data = ChooseBranches.make_task_dict('APPROVER',
+        ('waste_plan', "Assign Waste Management Plan", 1),
+        ('traffic_plan', "Assign Traffic Management Plan", 2),
+        
+    ))
+    appr_join1.connect(appr_review1)
+    appr_join1.connect(appr_join2)
+    
+    #S4: Second application stage
+    cust_waste_plan.set_data(task_data = FileUpload.make_task_dict(True, 'CUSTOMER'))
+    cust_traffic_plan.set_data(task_data = FileUpload.make_task_dict(True, 'CUSTOMER'))
+    cust_waste_plan.connect(appr_join2)
+    cust_traffic_plan.connect(appr_join2)
+    
+    return wf_spec
+    
+    
+    
+    
     
     
     
@@ -313,6 +409,10 @@ Pellentesque ullamcorper scelerisque justo et sagittis. Sed tempor nisl at purus
 
 Vivamus condimentum sapien non ultrices interdum. Nullam dignissim, elit quis consectetur convallis, dui ipsum commodo lorem, sit amet eleifend lectus lacus non eros. Etiam dapibus elit et enim viverra commodo. Pellentesque sit amet imperdiet massa, vitae aliquet augue. Proin lacinia egestas diam eu mattis. Vestibulum pretium lobortis lectus, a scelerisque risus pretium at. Cras malesuada sapien eu mauris suscipit lacinia. Phasellus et accumsan lorem, interdum pretium neque. Curabitur magna nibh, sollicitudin at magna at, rhoncus fringilla quam. Vivamus nec accumsan est. Maecenas hendrerit ut sapien eu auctor.
 
-Morbi imperdiet mauris et mi suscipit tempor. Aenean congue risus ac ante aliquet interdum. Integer metus ligula, luctus vel nisi sed, blandit varius elit. Nam et purus quis tortor faucibus faucibus et quis ipsum. In nibh orci, pretium nec elementum at, malesuada eget ligula. Phasellus imperdiet tempus hendrerit. Sed ut sollicitudin augue, eu molestie mauris. In consequat aliquet dui vitae vulputate. Aliquam vitae dolor a sapien cursus sagittis in vitae magna. Fusce rutrum arcu a eros facilisis sodales. """  
+Morbi imperdiet mauris et mi suscipit tempor. Aenean congue risus ac ante aliquet interdum. Integer metus ligula, luctus vel nisi sed, blandit varius elit. Nam et purus quis tortor faucibus faucibus et quis ipsum. In nibh orci, pretium nec elementum at, malesuada eget ligula. Phasellus imperdiet tempus hendrerit. Sed ut sollicitudin augue, eu molestie mauris. In consequat aliquet dui vitae vulputate. Aliquam vitae dolor a sapien cursus sagittis in vitae magna. Fusce rutrum arcu a eros facilisis sodales. """
+
+cust_agreement_text = """By accepting this agreement you acknowledge your reading and acceptance of both the ACT Government Acceptable Use of ICT Resources Policy and DigiApproval Fair Use agreement. Any information you provide throughout the application process is true and correct to the best of your knowledge. This service provides no warranty with regards to your application process."""
+
+appr_agreement_text = """By accepting this agreement you acknowledge your reading and acceptance of both the ACT Government Acceptable Use of ICT Resources Policy and DigiApproval Fair Use agreement. Any information you provide throughout the application process is true and correct to the best of your knowledge. You agree to assess this application with complete impartiality and in accordance with the relevant legislation and business rules. This service provides no warranty with regards to your application process."""   
 
 
