@@ -203,7 +203,7 @@ class FieldEntry(AbstractForm):
         if request.method == "POST":
             for field in form_fields:
                 value = request.POST.get(field, None)
-                if value == '' and form_fields[field]['mandatory'] is True: #Failed to enter mandatory field
+                if (value == '' or value == None) and form_fields[field]['mandatory'] is True: #Failed to enter mandatory field
                     error = "\"" + str(form_fields[field]['label']) + "\" is a mandatory field."
                     break
                 else: form_fields[field]['value'] = value
