@@ -51,8 +51,10 @@ vagrant ssh machine-of-your-choice
 /vagrant/src/dev/init.sh
 ```
 
-You're now in tmux - use Ctrl-b, Ctrl-[n,p] to move to the [next, previous] terminal.
+You're now in tmux - use Ctrl-b, n|p to move to the next|previous terminal.
 Celery and Django are automatically spun up for you.
+
+The superuser's username is "super" and the password is "startthecode". (It's defined in ```chef-repo/environments/development.json```.)
 
 ### Hard old way ###
 
@@ -65,8 +67,6 @@ cd /vagrant/src/digiapproval_project/
 source ../../env/bin/activate
 python manage.py runserver 0.0.0.0:8000
 ```
-
-The superuser's username is "super" and the password is "startthecode". (It's defined in ```chef-repo/environments/development.json```.)
 
 ## Hacking on AWS ##
 
@@ -108,6 +108,8 @@ psql django django_user -h 127.0.0.1
 ```
 
 Password is set in the django_db cookbook in the default recipe, for now.
+
+Alternatively: `sudo -u postgres psql django`
 
 ## Mail (lamson) ##
 
@@ -183,6 +185,24 @@ source ../../env/bin/activate
 python manage.py init\_demo\_db
 ```
 **Waring** The only model instance that survives this command is the super account
+
+## Documentation! ##
+The flatpages are raw html. Authoring HTML sucks, so we render it from Markdown with `docs/website/makedocs.py`.
+
+You must already have the `markdown` utility installed.
+
+Then:
+
+```shell
+cd docs/website
+python makedocs.py
+```
+
+This creates `src/digiappoval_project/digiapproval_project/fixtures/initial_data.json` out of every `.md` file found in the tree starting at `.` (which is why you have to change directory first.)
+
+The title of the page is the file name with underscores replaced with spaces. The path is the file name in lower case.
+
+You then need to get the fixtures file to the virtual machine (either by nfs or rsync) and run `python manage.py migrate` from the appropriate location.
 
 # Frequently Encountered Problems #
 

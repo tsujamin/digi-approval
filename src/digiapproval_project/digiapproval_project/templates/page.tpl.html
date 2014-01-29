@@ -33,7 +33,7 @@
               <ul class="nav navbar-nav">
                 {% block nav %}
                 <li><a href="/pages/help">Help</a></li>
-                <li><a href="/pages/contact">Contact</a></li>
+                <li><a href="/pages/contact_us">Contact</a></li>
                 {% if user.is_authenticated %}
                 {% if user.customeraccount %}
                 <li><a href="{% url 'applicant_home' %}">Applicant Home</a></li>
@@ -51,9 +51,9 @@
                   </li>
                   <li>
                   {% if user.customeraccount.account_type == 'CUSTOMER' %}
-                    <a href="{% url 'remove_parentaccounts' %}">Modify your Parent Accounts</a>
+                    <a href="{% url 'remove_parentaccounts' %}">My Organisations</a>
                   {% elif user.customeraccount.account_type == 'ORGANISATION' %}
-                    <a href="{% url 'modify_subaccounts' %}">Modify your Substituent Accounts</a>
+                    <a href="{% url 'modify_subaccounts' %}">My Members</a>
                   {% endif %}
                   <li>
                     <a href="{% url 'logout' %}">Log out</a>
@@ -82,7 +82,7 @@
 
     <div id="footer">
       <div class="container">
-        <p class="credit"><a href="{% url 'index' %}">Home</a> | <a href="/pages/help">Help</a> | <a href="/pages/contact">Contact</a> | <a href="/pages/privacy">Privacy</a></p>
+        <p class="credit"><a href="{% url 'index' %}">Home</a> | <a href="/pages/help">Help</a> | <a href="/pages/contact_us">Contact</a> | <a href="/pages/privacy">Privacy</a></p>
       </div>
     </div>
 
