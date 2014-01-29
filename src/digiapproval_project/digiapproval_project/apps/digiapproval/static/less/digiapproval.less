@@ -1,0 +1,16 @@
+@text: #000000;
+@redtint: desaturate(#ff0000, 30%);
+
+p.muted {
+    font-size: 90%;
+    color: lighten(@text, 40%);
+}
+
+.task {
+    &.task-completed {
+        color: lighten(@text, 40%);
+    }
+    &.task-ready.task-actionable {
+        color: (@text + @redtint);
+    }
+}

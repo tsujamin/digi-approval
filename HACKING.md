@@ -204,6 +204,18 @@ The title of the page is the file name with underscores replaced with spaces. Th
 
 You then need to get the fixtures file to the virtual machine (either by nfs or rsync) and run `python manage.py migrate` from the appropriate location.
 
+## CSS Stylesheets ##
+
+Because I don't hate myself, I'm not writing raw CSS, but rather using LESS. Unfortunately, that means you need to:
+
+ * Install node.js
+ * Install npm (should come with node)
+ * `sudo npm install -g less`
+ * `cd src/digiapproval_project/digiapproval_project/apps/digiapproval/static`
+ * `lessc less/digiapproval.less > css/digiapproval.css`
+
+If you're using node from homebrew on a mac, you may need to use `/usr/local/share/npm/bin/lessc`
+
 # Frequently Encountered Problems #
 
 + **I've lost network access in the guest**: have you moved networks? Do a ```vagrant reload``` and try again.

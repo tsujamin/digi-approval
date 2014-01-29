@@ -1,25 +1,24 @@
-{% extends "page.tpl.html" %}
+{% extends "digiapproval/base.tpl.html" %}
 {% block title %}{{workflow.spec.name}}{% endblock %}
-
 {% block content %}
-<p class="muted">Customer: {{workflow.customer.user.get_full_name}}.</p>
-<p class="muted">Approver: {{workflow.approver.get_full_name}}.</p>
+<p class="muted">Customer: {{workflow.customer.user.get_full_name}}<br/>
+Approver: {{workflow.approver.get_full_name}}</p>
 
 <div class="row">
   <div class="col-md-7">
     <h2>Tasks</h2>
     <ul>
       {% for task in tasks %}
-      <li><b>{{task.name}}</b> - {{task.state_name|title}}
+      <li class="task task-{{task.state_name|lower}} {% if task.show_task_link %}task-actionable{% endif %}">
+      <b>{{task.name}}</b> - {{task.state_name|title}}
       {% if task.actor %}
       - {{task.actor|title}}
       {% if task.show_task_link %}
-      - <a href="{% url 'view_task' workflow.id task.uuid %}">View</a>
+      - <a href="{% url 'view_task' workflow.id task.uuid %}">Complete</a>
       {% endif %}
       {% if task.show_data_link %}
       - <a href="{% url 'view_task_data' task.uuid %}">View</a>
       {% endif %}
-  
       {% endif %}
       </li>
       {% endfor %}
