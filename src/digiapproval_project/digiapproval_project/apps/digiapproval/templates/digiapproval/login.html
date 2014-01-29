@@ -7,7 +7,7 @@
 {%if error %} {{error}} {%endif%}
 <div class="row">
     <div class="col-md-6">
-        <form action="{% url 'login' %}", method="post" role="form">
+        <form method="post" role="form">
             {% csrf_token %}
             {% bootstrap_form form %}
             <button type="submit" name="submit" class="btn btn-default">Login</button>

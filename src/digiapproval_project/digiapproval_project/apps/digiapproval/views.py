@@ -44,6 +44,8 @@ def login(request):
         user = login_form.is_valid()
         if user is not None:
             auth_login(request, user)
+            if request.GET.get('next', None):
+                return HttpResponseRedirect(request.GET.get('next'))
             return HttpResponseRedirect(reverse('index'))
         else:
             error = "Bad username/password combination"
