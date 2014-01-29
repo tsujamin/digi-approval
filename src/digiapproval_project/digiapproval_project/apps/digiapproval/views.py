@@ -153,6 +153,8 @@ def delegator_worklist(request):
             for form_data in formset.cleaned_data:
                 workflow = Workflow.objects.get(id=form_data['workflow_id'])
                 approver = User.objects.get(username=form_data['approver'])
+                if spec.approvers not in approver.groups.all():
+                    raise PermissionDenied
                 workflow.approver = approver
                 workflow.save()
             message = "Approvers successfully updated."
@@ -176,7 +178,7 @@ def delegator_worklist(request):
                     'workflow_customer': workflow.customer.user.get_full_name(),
                     'workflow_customer_username': workflow.customer.user.username,
                     'approver': workflow.approver.username
-                 } for workflow in spec.workflow_set.all()]
+                 } for workflow in spec.workflow_set.filter(completed=False)]
             ),
         'spec_name': spec.name,
         'spec_id': spec.id
