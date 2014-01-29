@@ -161,7 +161,7 @@ def to_customer_account((account_type, username, password, email, parents)):
         customer.parent_accounts.add(parent)
     return customer
     
-def to_workflow_spec((name, description, owner, delegators, approvers, public, toplevel, wf_spec)):
+def to_workflow_spec((name, description, owner, approvers, delegators, public, toplevel, wf_spec)):
     """Returns a WorkflowSpec model from parameter tuple"""
     spec_model = models.WorkflowSpec(name=name, description=description, \
         owner=owner, delegators=delegators, approvers=approvers, \
