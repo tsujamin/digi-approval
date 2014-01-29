@@ -3,6 +3,8 @@ from django.shortcuts import render
 from . import models
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
+from django.core.mail import send_mail
+from django.template import Context, loader
 from exceptions import TypeError, AttributeError
 import uuid
 from SpiffWorkflow.specs import ExclusiveChoice, MultiChoice
@@ -117,11 +119,33 @@ class AbstractForm(object):
             return HttpResponseRedirect(reverse('applicant_home'))
     
     def complete_task(self, request):
-        """ Sets current task as complete, saves the models and redirects to ndex or next task (if there is only one)
-            Doesnt just get next task due to Join tasks being separate instances"""
+        """ Sets current task as complete, saves the models and redirects to index or next task (if there is only one)
+            Doesnt just get next task due to Join tasks being separate instances.
+            Also emails those involved."""
         self.spiff_task.complete()
         self.task_model.save()
         self.workflow_model.save()
+        # send email. Todo break into celery.
+        # don't use the message class: we don't want it displayed/stored
+        sender = (self.workflow_model.approver if self.actor == 'APPROVER'
+                  else self.workflow_model.customer.user)
+        # construct a list of recipients
+        recipients = [self.workflow_model.customer.user.email,
+                      self.workflow_model.approver.email]
+        recipients.extend(map(lambda custacc: (custacc.user.email), self.workflow_model.customer.sub_accounts.all()))
+        recipients.remove(sender.email)
+            
+        # for now, send a very boring plain text only email via django.
+        template = loader.get_template('digiapproval/emails/completed_step.txt')
+        context = Context({'taskform': self})
+        # eww magic data
+        # todo break this out to celery.
+        send_mail('DigiApproval: ' + self.workflow_model.spec.name,
+                  template.render(context),
+                  'workflow-' + self.workflow_model.uuid + '@digiactive.com.au',
+                  recipients, fail_silently=False)
+        
+        # redirect
         waiting_tasks = self.workflow_model.get_ready_task_forms(actor=self.actor)
         if len(waiting_tasks) is 1:
             return HttpResponseRedirect(reverse('view_task', args=(waiting_tasks[0].workflow_model.id, waiting_tasks[0].uuid,)))
