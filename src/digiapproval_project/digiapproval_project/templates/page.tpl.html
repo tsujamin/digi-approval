@@ -34,10 +34,14 @@
                 {% block nav %}
                 <li><a href="/pages/help">Help</a></li>
                 <li><a href="/pages/contact">Contact</a></li>
-                <!-- TODO: Filter these appropriately -->
+                {% if user.is_authenticated %}
+                {% if user.customeraccount %}
                 <li><a href="{% url 'applicant_home' %}">Applicant Home</a></li>
+                {% else %}
                 <li><a href="{% url 'approver_worklist' %}">Approver Worklist</a></li>
                 <li><a href="{% url 'delegator_worklist' %}">Delegator Worklist</a></li>
+                {% endif %}
+                {% endif %}
                 {% endblock %}
               </ul>
               <ul class="nav navbar-nav navbar-right">
