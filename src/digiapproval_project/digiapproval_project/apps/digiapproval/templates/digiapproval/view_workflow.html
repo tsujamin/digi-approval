@@ -44,10 +44,10 @@
     </form>
     {% if messages %}
       {% for message in messages %}
-        <b>Posted: {{message.posted}}, User: {{message.sender.username}}</b>
-        <pre>
+        <blockquote>
           {{message.message}}
-        </pre>
+          <small>User: {{message.sender.username}}, Date: {{message.posted}}</small>
+        </blockquote>
       {% endfor %}
       <a href="{% url 'view_workflow_messages' workflow.id%}">View all messages</a>
     {% else %}
