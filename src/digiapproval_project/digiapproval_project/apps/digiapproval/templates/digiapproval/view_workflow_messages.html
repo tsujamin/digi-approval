@@ -11,7 +11,7 @@
 {% if messages %}
   {% for message in messages %}
     <blockquote>
-      {{message.message}}
+      <pre>{{message.message}}</pre>
       <small>User: {{message.sender.username}}, Date: {{message.posted}}</small>
     </blockquote>
   {% endfor %}
