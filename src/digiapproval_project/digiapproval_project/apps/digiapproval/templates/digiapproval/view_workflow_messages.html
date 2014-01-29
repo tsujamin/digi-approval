@@ -10,9 +10,9 @@
 </form>
 {% if messages %}
   {% for message in messages %}
-    <h3>Date: {{message.posted}}, User: {{message.sender.username}}</h3>
     <blockquote>
       {{message.message}}
+      <small>User: {{message.sender.username}}, Date: {{message.posted}}</small>
     </blockquote>
   {% endfor %}
 {% else %}
