@@ -11,9 +11,9 @@
 {% if messages %}
   {% for message in messages %}
     <h3>Date: {{message.posted}}, User: {{message.sender.username}}</h3>
-    <pre>
+    <blockquote>
       {{message.message}}
-    </pre>
+    </blockquote>
   {% endfor %}
 {% else %}
 There are no messages associated with this workflow
