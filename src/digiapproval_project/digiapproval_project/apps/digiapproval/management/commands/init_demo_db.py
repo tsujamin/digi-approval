@@ -48,16 +48,17 @@ class Command(BaseCommand):
         
         self.stdout.write("creating organisation accounts (CustomerAccount)")
         ORGANISATIONS= map(to_customer_account, [
-            ('ORGANISATION', 'leaky_plumbing', 'wikiwho?', 'webmaster@leakyplumbing.org.au', []),
-            ('ORGANISATION', 'kirstys_short_term_loans', 'kneecaps', 'col@kirstys.net.au', []),
+            ('ORGANISATION', 'Leaky', 'Plumbing', 'leaky_plumbing', 'wikiwho?', 'webmaster@leakyplumbing.org.au', []),
+            ('ORGANISATION', 'Kirsty\'s Short', 'Term Loans', 'kirstys_short_term_loans', 'kneecaps', 'col@kirstys.net.au', []),
         ])
         
         self.stdout.write("creating customer accounts (CustomerAccount)")
         CUSTOMERS = map(to_customer_account, [
-            ('CUSTOMER', 'cleaver_g', 'fubar', 'clever_cleaver167@yahoo.com', []),
-            ('CUSTOMER', 'missy_tanner', 'harrysorryjoshua', 'missy@hotmail.com', [ORGANISATIONS[0]]),
-            ('CUSTOMER', 'j_floyd', 'ihaveaguy', 'joshua.floyd@leakyplumbing.org.au', [ORGANISATIONS[0]]),
-            ('CUSTOMER', 'la_hole', '5stars', 'lane_hold@laneholdings.com.au', []),
+            ('CUSTOMER', 'Cleaver', 'Greene', 'cleaver_g', 'fubar', 'clever_cleaver167@yahoo.com', []),
+            ('CUSTOMER', 'Melissa', 'Partridge', 'missy_tanner', 'harrysorryjoshua', 'missy@hotmail.com', [ORGANISATIONS[0]]),
+            ('CUSTOMER', 'Joshua', 'Floyd', 'j_floyd', 'ihaveaguy', 'joshua.floyd@leakyplumbing.org.au', [ORGANISATIONS[0]]),
+            ('CUSTOMER', 'Lane', 'Hold', 'la_hole', '5stars', 'lane_hold@laneholdings.com.au', []),
+            ('CUSTOMER', 'Daniel', 'Axtens', 'daxtens', 'notrake', 'daniel@axtens.net', []),
         ])
         
         self.stdout.write("creating workflow specifications")
@@ -151,9 +152,11 @@ def approver_to_user((name, password, email, groups)):
         user.groups.add(group)
     return user
     
-def to_customer_account((account_type, username, password, email, parents)):
+def to_customer_account((account_type, first_name, last_name, username, password, email, parents)):
     """Returns customer account created from parameter tuple"""
     user = User.objects.create_user(username, email, password)
+    user.first_name = first_name
+    user.last_name = last_name
     user.save()
     customer = models.CustomerAccount(account_type = account_type, user = user)
     customer.save()

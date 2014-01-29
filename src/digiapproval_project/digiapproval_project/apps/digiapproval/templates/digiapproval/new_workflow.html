@@ -17,7 +17,7 @@
             <label for='account'>Start application as: </label>
             <select name="account" class="form-control">
               {% for account in accounts %}
-              <option value="{{account.id}}">{{account.user.username}}</option>
+              <option value="{{account.id}}">{{account.user.get_full_name}}</option>
               {% endfor %}
             </select><br>
             <button type="submit" name="create_workflow" value='create_workflow' class="btn btn-default">Start Application</button>

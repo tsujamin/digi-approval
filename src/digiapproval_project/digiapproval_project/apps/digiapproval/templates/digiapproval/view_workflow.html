@@ -2,7 +2,7 @@
 {% block title %}{{workflow.spec.name}}{% endblock %}
 
 {% block content %}
-<p class="muted">Customer: {{workflow.customer.user.username}}.</p>
+<p class="muted">Customer: {{workflow.customer.user.get_full_name}}.</p>
 <p class="muted">Approver: {{workflow.approver.get_full_name}}.</p>
 
 <div class="row">
@@ -47,7 +47,7 @@
       {% for message in messages %}
         <blockquote>
           <pre>{{message.message}}</pre>
-          <small>User: {{message.sender.username}}, Date: {{message.posted}}</small>
+          <small>User: {{message.sender.get_full_name}}, Date: {{message.posted}}</small>
         </blockquote>
       {% endfor %}
       <a href="{% url 'view_workflow_messages' workflow.id%}">View all messages</a>

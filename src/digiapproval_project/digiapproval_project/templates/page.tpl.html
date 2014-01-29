@@ -47,7 +47,7 @@
               <ul class="nav navbar-nav navbar-right">
                 {% if user.is_authenticated %}
                   <li>
-                    <a href="{% url 'settings' %}">Logged in as: {{ user.username.title }}</a>
+                    <a href="{% url 'settings' %}">Logged in as: {{ user.get_full_name }}</a>
                   </li>
                   <li>
                   {% if user.customeraccount.account_type == 'CUSTOMER' %}

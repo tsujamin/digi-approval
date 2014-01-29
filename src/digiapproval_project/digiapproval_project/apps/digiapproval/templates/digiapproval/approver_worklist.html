@@ -7,7 +7,9 @@
 <ul>
   {% for workflow, tasks in running_workflows_and_tasks %}
   <li>
-  <a href="{% url 'view_workflow' workflow_id=workflow.id %}">{{workflow.spec.name}} - ({{ workflow.customer.user.username }})</a>
+  <a href="{% url 'view_workflow' workflow_id=workflow.id
+  %}">{{workflow.spec.name}} -
+  ({{ workflow.customer.user.get_full_name }})</a>
   <ul>
     {% for task in tasks %}
     <li>

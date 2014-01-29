@@ -1,6 +1,6 @@
 DigiApproval message
 
 Workflow: {{message.workflow.spec.name}}
-Sender: {{message.sender.username}}
+Sender: {{message.sender.get_full_name}}
 
 Message: {{message.message}}
