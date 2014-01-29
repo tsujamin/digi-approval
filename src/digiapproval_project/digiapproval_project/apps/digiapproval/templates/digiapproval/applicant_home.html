@@ -28,7 +28,7 @@
   {% for workflow in completed_workflows %}
   <li>
   <a href="{% url 'view_workflow' workflow_id=workflow.id %}">{{workflow.spec.name}}
-  - (({{ workflow.customer.user.get_full_name }}))</a>
+  - ({{ workflow.customer.user.get_full_name }})</a>
   </li>
   {% endfor %}
 </ul>
