@@ -13,7 +13,7 @@
 {% comment %}This is pretty hackish.{% endcomment %}
 {{ formset.formset.management_form }}
 <input type="hidden" name="spec_id" value="{{ formset.spec_id }}" />
-<table>
+<table class="table table-striped table-hover table-condensed">
 <tr><th>Application Customer</th><th>Approver</th></tr>
 {% for form in formset.formset.forms %}
 <tr>
@@ -22,7 +22,7 @@
 </tr>
 {% endfor %}
 </table>
-<input type="submit" name="delegate_workflows" value="Update Approvers" />
+<button class="btn btn-normal" type="submit" name="delegate_workflows" value="Update Approvers">Update Approvers</button>
 </form>
 {% endfor %}
 

@@ -95,7 +95,8 @@ class DelegatorForm(forms.Form):
     
     def __init__(self, approvers, *args, **kwargs):
         super(DelegatorForm, self).__init__(*args, **kwargs)
-        self.fields['approver'] = forms.ChoiceField(choices=approvers)
+        self.fields['approver'] = forms.ChoiceField(choices=approvers,
+                                                    widget=forms.Select(attrs={'class': 'form-control'}))
         
         
 class DelegatorBaseFormSet(BaseFormSet):
