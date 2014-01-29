@@ -24,7 +24,7 @@
       </li>
       {% endfor %}
     </ul>
-
+{% comment %}
     <h2>Debug Info</h2>
     <pre>
       {{workflow.workflow.spec.get_dump}}
@@ -32,6 +32,7 @@
     <pre>
       {{workflow.workflow.get_dump}}
     </pre>
+{% endcomment %}
   </div>
   
   <div class="col-md-5">
