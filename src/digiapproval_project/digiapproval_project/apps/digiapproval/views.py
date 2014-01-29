@@ -126,12 +126,12 @@ def approver_worklist(request):
     
     Requires authenticated User with approver privileges on approval stages."""
     
-    # TODO: check staff status and redirect normal users
     workflows = request.user.workflow_approver.all()
+    running_workflows_and_tasks = map(lambda wf: (wf, wf.get_ready_task_forms(actor = 'APPROVER')),
+                                      workflows)
     
-    # TODO: more advanced logic here!
     return render(request, 'digiapproval/approver_worklist.html', {
-        'workflows': workflows,
+        'running_workflows_and_tasks': running_workflows_and_tasks,
     })
 
 
