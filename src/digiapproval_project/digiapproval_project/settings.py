@@ -107,6 +107,12 @@ TEMPLATE_DIRS = (
     os.path.join(BASE_DIR, 'templates'),
 )
 
+# Fixtures
+FIXTURE_DIRS = (
+    os.path.join(BASE_DIR, 'fixtures'),
+)
+
+
 # Files
 DEFAULT_FILE_STORAGE='swift.storage.SwiftStorage'
 
