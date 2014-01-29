@@ -1,0 +1,6 @@
+DigiApproval message
+
+Workflow: {{message.workflow.spec.name}}
+Sender: {{message.sender.username}}
+
+Message: {{message.message}}

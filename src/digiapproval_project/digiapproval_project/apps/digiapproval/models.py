@@ -1,10 +1,13 @@
 from __future__ import absolute_import
 from django.db import models
 from django.contrib.auth.models import Group, User
+from django.core.mail import send_mail
+from django.template import Context, loader
 from .fields import WorkflowField, WorkflowSpecField
 from jsonfield import JSONField
 from django.core.exceptions import ObjectDoesNotExist
 import itertools
+import uuid
 
 class UserFile(models.Model):
     VIRUS_STATUS_CHOICES = (
@@ -146,6 +149,8 @@ class Workflow(models.Model):
     workflow = WorkflowField(editable=False) # it doesn't render properly in Django admin, and besides we have no need to modify it in the admin interface anyway -- AJD
     completed = models.BooleanField(default=False)
     spec = models.ForeignKey(WorkflowSpec)
+    # for reference in emails
+    uuid = models.CharField(max_length=36, editable=False, default=lambda: uuid.uuid4().hex)
     
     def assign_approver(self):
         """Finds the least busy approver (in the approvers group of the Workflows spec), 
@@ -211,3 +216,29 @@ class Message(models.Model):
     sender = models.ForeignKey(User)
     posted = models.DateTimeField(auto_now=True)
     message = models.TextField()
+    _sent = models.BooleanField(default=False, editable=False)
+    
+    def save(self, *args, **kwargs):
+        """Sends an email to other people involved in the workflow if it hasn't been sent already."""
+        
+        if not self._sent:
+            # construct a list of recipients
+            recipients = [self.workflow.customer.user.email,
+                          self.workflow.approver.email]
+            recipients.extend(map(lambda custacc: (custacc.user.email), self.workflow.customer.sub_accounts.all()))
+            recipients.remove(self.sender.email)
+            
+            # for now, send a very boring plain text only email via django.
+            template = loader.get_template('digiapproval/emails/message.txt')
+            context = Context({'message': self})
+            # eww magic data
+            # todo break this out to celery.
+            send_mail('DigiApproval: ' + self.workflow.spec.name,
+                      template.render(context),
+                      'workflow-' + self.workflow.uuid + '@digiactive.com.au',
+                      recipients, fail_silently=False)
+            
+            self._sent = True
+            
+            
+        super(Message, self).save(*args, **kwargs)

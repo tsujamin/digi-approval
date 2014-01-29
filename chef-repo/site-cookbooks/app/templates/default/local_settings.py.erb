@@ -31,3 +31,11 @@ CELERY_RESULT_BACKEND = 'amqp'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
+
+# Email: Django
+EMAIL_HOST = '<%= @email_host %>'
+EMAIL_PORT = <%= @email_port %>
+DEFAULT_FROM_EMAIL = 'digiactive.canberra@gmail.com'
+EMAIL_HOST_USER = '<%= @email_user %>'
+EMAIL_HOST_PASSWORD = '<%= @email_password %>'
+EMAIL_USE_TLS = <%= @email_tls ? "True" : "False" %>
