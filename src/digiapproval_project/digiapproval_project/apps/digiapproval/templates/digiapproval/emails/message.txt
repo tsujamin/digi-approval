@@ -1,3 +1,4 @@
+{% autoescape off %}
 DigiApproval message
 
 Workflow: {{message.workflow.spec.name}}
