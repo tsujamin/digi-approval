@@ -20,7 +20,7 @@ urlpatterns = patterns('',
     
     url(r'^password_reset/$', password_reset,
         {'template_name': 'digiapproval/password_reset.html',
-         'email_template_name': 'digiapproval/password_reset_email.txt'}, name='password_reset'),
+         'email_template_name': 'digiapproval/emails/password_reset_email.txt'}, name='password_reset'),
     url(r'^password_reset_done/$', password_reset_done,
         {'template_name': 'digiapproval/password_reset_done.html'},
         name='password_reset_done'),
