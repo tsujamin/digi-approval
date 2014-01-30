@@ -143,11 +143,20 @@ class WorkflowSpec(models.Model):
 
 
 class Workflow(models.Model):
+    STATE_CHOICES = [
+    ('STARTED', "The workflow has been started"),
+    ('CANCELLED', "The workflow was canceled"),
+    ('APPROVED', "The workflow was approved"),
+    ('DENIED', "The workflow was denied approval")
+    ]
     
     customer = models.ForeignKey(CustomerAccount, related_name='workflow_customer')
     approver = models.ForeignKey(User, related_name='workflow_approver')
     workflow = WorkflowField(editable=False) # it doesn't render properly in Django admin, and besides we have no need to modify it in the admin interface anyway -- AJD
     completed = models.BooleanField(default=False)
+    state = models.CharField(max_length=10,
+                             choices=STATE_CHOICES, 
+                             default='STARTED')
     spec = models.ForeignKey(WorkflowSpec)
     # for reference in emails
     uuid = models.CharField(max_length=36, editable=False, default=lambda: uuid.uuid4().hex)
