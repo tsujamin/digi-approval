@@ -1,0 +1,7 @@
+source env/bin/activate; 
+cd src/digiapproval_project/digimail;
+lamson stop -pid run/log.pid || echo "Lamson logger not running."
+lamson log -FORCE
+# give lamson a sec to actually open the logfiles
+sleep 5;
+tail -f logs/logger.log

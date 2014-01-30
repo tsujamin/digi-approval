@@ -122,12 +122,7 @@ If you're on a local machine, you can recieve emails on port 25 still, and they'
 lamson send -body YOURBODYHERE -sender EMAILADDRESS -to EMAILADDRESS@digiactive.com.au -subject SUBJECT -port 25
 ```
 
-In order to see the emails that Django sends, you need to:
-```shell
-cd /vagrant/src/digiactive_project/digimail
-lamson log
-tail -f logs/logger.log
-```
+In order to see the emails that Django sends, you need to just change to the `email_log` window in tmux, where the Lamson logger has been started for you.
 
 ## Storage ##
 Hack on it with the following credentials:
