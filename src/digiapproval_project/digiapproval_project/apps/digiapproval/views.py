@@ -111,9 +111,12 @@ def applicant_home(request):
     """
     customer = request.user.customeraccount
     return render(request, 'digiapproval/applicant_home.html', {
-        'running_workflows_and_tasks' : map(lambda wf: (wf, wf.get_ready_task_forms(actor = 'CUSTOMER')), 
+        'running_workflows_and_tasks' : map(
+            lambda wf: (wf, wf.get_ready_task_forms(actor = 'CUSTOMER'), Message.get_unread_messages(wf, request.user).count()), 
             customer.get_all_workflows(completed=False)),
-        'completed_workflows' : customer.get_all_workflows(completed=True),
+        'completed_workflows' : map(
+            lambda wf: (wf, Message.get_unread_messages(wf, request.user).count()), 
+            customer.get_all_workflows(completed=True)),
         'workflow_specs' : WorkflowSpec.objects.filter(public=True, toplevel=True)
     })
     
@@ -127,7 +130,8 @@ def approver_worklist(request):
     Requires authenticated User with approver privileges on approval stages."""
     
     workflows = request.user.workflow_approver.filter(completed=False)
-    running_workflows_and_tasks = map(lambda wf: (wf, wf.get_ready_task_forms(actor = 'APPROVER')),
+    running_workflows_and_tasks = map(
+        lambda wf: (wf, wf.get_ready_task_forms(actor = 'APPROVER'), Message.get_unread_messages(wf, request.user)),
                                       workflows)
     
     return render(request, 'digiapproval/approver_worklist.html', {
@@ -238,7 +242,10 @@ def view_workflow(request, workflow_id):
         if (result['state_name'] == 'READY' or result['state_name'] == 'COMPLETED' or actor == 'APPROVER') \
             and result['actor'] != '':
             tasks.append(result)
-
+    
+    #mark all messages read
+    Message.mark_all_read(workflow, request.user)
+    
     return render(request, 'digiapproval/view_workflow.html', {
         'workflow': workflow,
         'tasks': tasks,
@@ -329,7 +336,8 @@ def view_workflow_messages(request, workflow_id):
         request.user not in map(lambda custacc: (custacc.user), workflow.customer.sub_accounts.all()) and \
         request.user != workflow.approver:
         raise PermissionDenied
-        
+    
+    Message.mark_all_read(workflow, request.user)    
     if request.method == 'POST' and request.POST.get('new_message', False):
         new_message = Message(workflow = workflow, 
             sender = request.user, 
@@ -337,7 +345,7 @@ def view_workflow_messages(request, workflow_id):
         ))
         new_message.save()
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
-    else: 
+    else:
         return render(request, 'digiapproval/view_workflow_messages.html', {
                 'messages': workflow.message_set.order_by('id').reverse(),
                 'workflow': workflow,
