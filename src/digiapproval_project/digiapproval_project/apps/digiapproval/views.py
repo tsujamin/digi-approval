@@ -126,7 +126,7 @@ def approver_worklist(request):
     
     Requires authenticated User with approver privileges on approval stages."""
     
-    workflows = request.user.workflow_approver.all()
+    workflows = request.user.workflow_approver.filter(completed=False)
     running_workflows_and_tasks = map(lambda wf: (wf, wf.get_ready_task_forms(actor = 'APPROVER')),
                                       workflows)
     
