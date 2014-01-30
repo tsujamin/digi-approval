@@ -583,7 +583,59 @@ class FileUpload(AbstractForm):
     def complete_task(self, request):
         """Perform post completion tasks, no need to save models as handled by parent class"""
         return super(FileUpload, self).complete_task(request)
- 
+
+
+class Subworkflow(AbstractForm):
+    """Allows workflow to be embedded as a task in a different workflow"""
+    
+    def __init__(self, spiff_task, workflow_model, *args, **kwargs):
+        """Task form initialisation and validation"""
+        super(Subworkflow,self).__init__(spiff_task, workflow_model, *args, **kwargs)
+        #Task specific init/validation here
+
+        
+    @staticmethod
+    def validate_task_data(task_data):
+        """Validates that provided task_data dict is of valid construction, throws AttributeErrors"""    
+        AbstractForm.validate_task_data(task_data)
+        #Test taskform specific fields here
+        
+    @staticmethod    
+    def make_task_dict(actor, *args, **kwargs):
+        """Constructs a task_dict for this taskform using provided params"""
+        task_dict = AbstractForm.make_task_dict("subworkflow", actor, *args, **kwargs) 
+        #Add task specific forms to task_dict
+        Subworkflow.validate_task_data(task_dict)
+        return task_dict
+        
+        
+    def form_request(self, request):
+        """Controller for this task form, handles post and checks validity before completing task"""
+        response = super(Subworkflow, self).form_request(request) #Check authorisation
+        if response is not None: return response #invalid access
+        errors = None
+    
+        if request.method == "POST":
+            for field in form_fields:
+                value = request.POST.get(field, None)
+                #Check validity of posted data 
+                if not valid or (value is None and self.task_dict['fields'][field]['mandatory']):
+                    error = "Error text"
+                else: #place value in task_dict
+                    self.task_dict['fields'][field]['value'] = value
+            if error is None: #All field data was valid, now complete the task
+                return self.complete_task(request)
+        #default response, returns related template with current fields            
+        return render(request, 'digiapproval/taskforms/Subworkflow.html', { 
+            'error': error,
+            'task': self.spiff_task.get_name(),
+            'form_fields': self.task_dict['fields'],
+            'task_info': self.task_dict['data']['task_info']
+        })
+
+    def complete_task(self, request):
+        """Perform post completion tasks, no need to save models as handled by parent class"""
+        return super(Subworkflow, self).complete_task(request)
 
         
 class ExampleTaskForm(AbstractForm):
@@ -648,7 +700,8 @@ form_classes = {
     "check_tally": CheckTally,
     "choose_branch": ChooseBranch,
     "choose_branches": ChooseBranches,
-    "file_upload": FileUpload,  
+    "file_upload": FileUpload,
+    "subworkflow": Subworkflow
 }
 field_types = [
     'checkbox',
