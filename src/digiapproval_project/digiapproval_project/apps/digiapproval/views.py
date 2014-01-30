@@ -233,9 +233,10 @@ def view_workflow(request, workflow_id):
         # should various links be shown?
         result['show_task_link'] = (task.state == task.READY and result['actor'] == actor)
         result['show_data_link'] = (task.state == task.COMPLETED and result['actor'])
-        
-        #Filter non completed/ready tasks from customers
-        if result['state_name'] == 'READY' or result['state_name'] == 'COMPLETED' or actor == 'APPROVER':
+                
+        #Filter( non completed/ready tasks from customers) and task with task_dict
+        if (result['state_name'] == 'READY' or result['state_name'] == 'COMPLETED' or actor == 'APPROVER') \
+            and result['actor'] != '':
             tasks.append(result)
 
     return render(request, 'digiapproval/view_workflow.html', {
