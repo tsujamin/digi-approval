@@ -99,7 +99,7 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    #'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 # Templates
@@ -114,10 +114,10 @@ FIXTURE_DIRS = (
 
 
 # Files
-DEFAULT_FILE_STORAGE='swift.storage.SwiftStorage'
+DEFAULT_FILE_STORAGE = 'swift.storage.SwiftStorage'
 
 # Login
-LOGIN_URL='/digiapproval/login'
+LOGIN_URL = '/digiapproval/login'
 
 # Bootstrap
 BOOTSTRAP3 = {
@@ -125,5 +125,5 @@ BOOTSTRAP3 = {
 }
 
 # Patch in our local settings
-from .local_settings import *
+from .local_settings import *  # noqa
 INSTALLED_APPS += ADDITIONAL_APPS
