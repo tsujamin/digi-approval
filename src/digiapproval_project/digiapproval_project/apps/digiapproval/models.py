@@ -6,8 +6,8 @@ from django.template import Context, loader
 from .fields import WorkflowField, WorkflowSpecField
 from jsonfield import JSONField
 from django.core.exceptions import ObjectDoesNotExist
-import itertools
 import uuid
+
 
 class UserFile(models.Model):
     VIRUS_STATUS_CHOICES = (
@@ -18,11 +18,10 @@ class UserFile(models.Model):
         ('ERROR', "An error occured during virus scanning.")
         )
 
-    
     name = models.CharField(max_length=255)
     _file = models.FileField(upload_to="userfiles")
     virus_status = models.CharField(max_length=16,
-                                    choices=VIRUS_STATUS_CHOICES, 
+                                    choices=VIRUS_STATUS_CHOICES,
                                     default='UNSCANNED')
 
     def save(self, *args, **kwargs):
@@ -40,7 +39,6 @@ class UserFile(models.Model):
         else:
             # otherwise just save
             super(UserFile, self).save(*args, **kwargs)
-        
 
     @property
     def file(self):
@@ -52,128 +50,160 @@ class UserFile(models.Model):
 
         return self._file
 
+
 class CustomerAccount(models.Model):
-    """ End user model. Can either be Customer (single user) or Organisation (User with sub accounts)
-        Related accounts of Organisation must be a list of users. Organisations can add users to this list
-        Related accounts of User are the organisations it is a part of and whose workflows it can use."""
+    """ End user model. Can either be Customer (single user) or Organisation
+    (User with sub accounts).
+
+    Related accounts of Organisation must be a list of users. Organisations can
+    add users to this list.
+
+    Related accounts of User are the organisations it is a part of and whose
+    workflows it can use."""
 
     ACCOUNT_TYPE_CHOICES = (
         ('CUSTOMER', 'Customer account'),
         ('ORGANISATION', 'Organisation account'),
     )
-    
-    user = models.OneToOneField(User) 
+
+    user = models.OneToOneField(User)
     account_type = models.CharField(max_length=16,
-                                    choices=ACCOUNT_TYPE_CHOICES, 
+                                    choices=ACCOUNT_TYPE_CHOICES,
                                     default='CUSTOMER')
     # FIXME: does this allow for multiple levels of parent accounts?
-    parent_accounts = models.ManyToManyField(  'self',
-                                                symmetrical=False,
-                                                related_name='sub_accounts',
-                                                blank = True, null = True)
-        
+    parent_accounts = models.ManyToManyField('self',
+                                             symmetrical=False,
+                                             related_name='sub_accounts',
+                                             blank=True, null=True)
+
     def get_own_workflows(self, *args, **kwargs):
-        """Get workflows owned by this user, takes **kwarg of ['completed'] as filter, otherwise returns all"""
+        """Get workflows owned by this user, takes **kwarg of ['completed'] as
+        filter, otherwise returns all"""
         try:
             if 'completed' in kwargs:
-                result = list(self.workflow_customer.filter(completed=bool(kwargs['completed'])))
+                result = list(self.workflow_customer.filter(
+                    completed=bool(kwargs['completed'])))
             else:
                 result = list(self.workflow_customer.all())
         except ObjectDoesNotExist:
             result = []
         return result
-    
-    
+
     def get_all_workflows(self, *args, **kwargs):
-        """Gets workflows of self and parent accounts, takes **kwarg of ['completed'] as filter, otherwise returns all"""
+        """Gets workflows of self and parent accounts, takes **kwarg of
+        ['completed'] as filter, otherwise returns all"""
         workflow_list = self.get_own_workflows(*args, **kwargs)
         for parent in self.parent_accounts.all():
             workflow_list.extend(parent.get_own_workflows(*args, **kwargs))
         return workflow_list
-            
-        
-    def save(self, *args, **kwargs): ##DOESNT VALIDATE PROPERLY ON THE FIRST DJANGO-ADMIN SAVE, DOES AFTER THAT. MANY TO MANY NOT SAVING?
-        """Saves related auth.User object. Checks types of related accounts for legality (ie customer doesnt have sub accounts)"""
+
+    def save(self, *args, **kwargs):
+        # DOESN'T VALIDATE PROPERLY ON THE FIRST DJANGO-ADMIN SAVE, DOES AFTER
+        # THAT. MANY TO MANY NOT SAVING? TODO FIXME
+        """Saves related auth.User object. Checks types of related accounts for
+        legality (ie customer doesnt have sub accounts)"""
         from exceptions import ValueError
-        if self.id: #already saved
+        if self.id:  # already saved
             if self.account_type == 'CUSTOMER':
                 if self.sub_accounts.count() != 0:
                     raise ValueError("Customers cannot have sub accounts")
-                if self.parent_accounts.filter(account_type='CUSTOMER').count() != 0:
+                if self.parent_accounts.filter(
+                        account_type='CUSTOMER').count() != 0:
                     raise ValueError("Parent Accounts must be Organisations")
-            elif self.account_type  == 'ORGANISATION':
+            elif self.account_type == 'ORGANISATION':
                 if self.parent_accounts.count() != 0:
-                    raise ValueError("Organisations cannot have parent accounts")
-                if self.sub_accounts.filter(account_type='ORGANISATION').count() != 0:
+                    raise ValueError(
+                        "Organisations cannot have parent accounts")
+                if self.sub_accounts.filter(
+                        account_type='ORGANISATION').count() != 0:
                     raise ValueError("Sub accounts must be customers")
-        try: #Save related user, exceptions will be emitted in CustomerAccount.save()
+        try:
+            # Save related user, exceptions will be emitted in
+            # CustomerAccount.save()
             self.user.save()
         finally:
             super(CustomerAccount, self).save(*args, **kwargs)
-            
+
     def __unicode__(self):
         return self.account_type + ": " + self.user.username
 
+
 class WorkflowSpec(models.Model):
-    name = models.CharField(max_length = "64")
+    name = models.CharField(max_length="64")
     description = models.TextField(blank=True)
-    
-    # A WorkflowSpec must have an owner group, but it may not have a delegators or
-    # approvers group - this is to help with initial development/setup of the WfS
+
+    # A WorkflowSpec must have an owner group, but it may not have a delegators
+    # or approvers group - this is to help with initial development/setup of
+    # the WfS
     owner = models.ForeignKey(Group, related_name='workflowspecs_owner')
-    delegators = models.ForeignKey(Group, related_name='workflowspecs_delegators', null=True, blank=True, default=None)
-    approvers = models.ForeignKey(Group, related_name='workflowspecs_approvers', null=True, blank=True, default=None)
-    
+    delegators = models.ForeignKey(Group,
+                                   related_name='workflowspecs_delegators',
+                                   null=True, blank=True, default=None)
+    approvers = models.ForeignKey(Group,
+                                  related_name='workflowspecs_approvers',
+                                  null=True, blank=True, default=None)
+
     public = models.BooleanField(default=False)
     toplevel = models.BooleanField(default=True)
-    spec = WorkflowSpecField(editable=False) # it doesn't render properly in Django admin, and besides we have no need to modify it in the admin interface anyway -- AJD
-    
+
+    # disable editing: it doesn't render properly in Django admin, and besides
+    # we have no need to modify it in the admin interface anyway -- AJD
+    spec = WorkflowSpecField(editable=False)
+
     def start_workflow(self, customer):
         """Returns a workflow object derived from self's spec"""
         from SpiffWorkflow import Workflow as SWorkflow
-        workflow = Workflow(customer = customer,
-                            spec = self,
-                            workflow = SWorkflow(self.spec))
+        workflow = Workflow(customer=customer,
+                            spec=self,
+                            workflow=SWorkflow(self.spec))
         # complete the empty start task
         workflow.workflow.complete_next()
         return workflow
-    
+
     def __unicode__(self):
         return u'%s (%s)' % (self.name, self.owner.name)
 
 
 class Workflow(models.Model):
     STATE_CHOICES = [
-    ('STARTED', "The workflow has been started"),
-    ('CANCELLED', "The workflow was canceled"),
-    ('APPROVED', "The workflow was approved"),
-    ('DENIED', "The workflow was denied approval")
-    ]
-    
-    customer = models.ForeignKey(CustomerAccount, related_name='workflow_customer')
+        ('STARTED', "The workflow has been started"),
+        ('CANCELLED', "The workflow was canceled"),
+        ('APPROVED', "The workflow was approved"),
+        ('DENIED', "The workflow was denied approval")
+        ]
+
+    customer = models.ForeignKey(CustomerAccount,
+                                 related_name='workflow_customer')
     approver = models.ForeignKey(User, related_name='workflow_approver')
-    workflow = WorkflowField(editable=False) # it doesn't render properly in Django admin, and besides we have no need to modify it in the admin interface anyway -- AJD
+    # disable editable: it doesn't render properly in Django admin, and besides
+    # we have no need to modify it in the admin interface anyway -- AJD
+    workflow = WorkflowField(editable=False)
     completed = models.BooleanField(default=False)
     state = models.CharField(max_length=10,
-                             choices=STATE_CHOICES, 
+                             choices=STATE_CHOICES,
                              default='STARTED')
     spec = models.ForeignKey(WorkflowSpec)
     # for reference in emails
-    uuid = models.CharField(max_length=36, editable=False, default=lambda: uuid.uuid4().hex)
-    
+    # TODO FIXME: are we using uuid.hex? no hyphens!
+    uuid = models.CharField(max_length=36, editable=False,
+                            default=lambda: uuid.uuid4().hex)
+
     def assign_approver(self):
-        """Finds the least busy approver (in the approvers group of the Workflows spec), 
-        returns and assigns it to the workflow"""
+        """Finds the least busy approver (in the approvers group of the
+        Workflows spec), returns and assigns it to the workflow"""
         if self.spec is None:
             raise UnboundLocalError("Workflow has no assigned WorkflowSpec")
-        active_approvers = User.objects.filter(groups=self.spec.approvers, 
-                                                is_active=True)
-        #Generates a dict of {Approver: no. current workflows}                                        
-        approver_wf_count = dict(map(   lambda x: (x['approver'], x['approver__count']),
-                                        Workflow.objects.filter(completed=False, spec__owner=self.spec.approvers)
-                                            .values('approver')
-                                            .annotate(models.Count('approver'))))
-        #Find unassigned approver                                    
+        active_approvers = User.objects.filter(groups=self.spec.approvers,
+                                               is_active=True)
+        #Generates a dict of {Approver: no. current workflows}
+        approver_wf_count = dict(
+            map(lambda x: (x['approver'], x['approver__count']),
+                Workflow.objects.filter(completed=False,
+                                        spec__owner=self.spec.approvers)
+                .values('approver').annotate(models.Count('approver'))
+                )
+            )
+        #Find unassigned approver
         for approver in active_approvers:
             if approver.id not in approver_wf_count.keys():
                 self.approver = approver
@@ -183,7 +213,7 @@ class Workflow(models.Model):
         approver = User.objects.get(id=least_wf_approver)
         self.approver = approver
         return approver
- 
+
     def save(self, *args, **kwargs):
         """Auto assigns approver if none provided"""
         from django.core.exceptions import ObjectDoesNotExist
@@ -194,31 +224,33 @@ class Workflow(models.Model):
         if self.workflow.is_completed() and self.completed is False:
             self.completed = True
         super(Workflow, self).save(*args, **kwargs)
-    
+
     def get_ready_task_forms(self, **kwargs):
-        """ Iterates to find ready tasks and returns them as a list of task_forms, results can be filtered by optional argument 'actor'"""
+        """ Iterates to find ready tasks and returns them as a list of
+        task_forms, results can be filtered by optional argument 'actor'"""
         from .taskforms import AbstractForm as Form
-        READY = 16  #From SpiffWorkflow.Task
-        from SpiffWorkflow import Workflow
-        ready_forms = [] 
+        ready_forms = []
         for task in self.workflow.get_tasks():
             form = None
-            if task.state is READY:
+            if task.state is task.READY:
                 form = Form.get_task_form(task, self)
-            if form is not None: #Check that task had form before adding to list
+            # Check that task had form before adding to list
+            if form is not None:
                 ready_forms.append(form)
-        if 'actor' in kwargs: #filter for requested actor
-            ready_forms = [form for form in ready_forms if form.actor == kwargs['actor']]
+        if 'actor' in kwargs:  # filter for requested actor
+            ready_forms = [form for form in ready_forms
+                           if form.actor == kwargs['actor']]
         return ready_forms
-    
+
     def __unicode__(self):
         return u'%s (%s)' % (self.customer.user.username, self.spec.name)
-                        
+
 
 class Task(models.Model):
     workflow = models.ForeignKey(Workflow)
     task = JSONField()
-    uuid = models.CharField(max_length = "36")
+    uuid = models.CharField(max_length="36")
+
 
 class Message(models.Model):
     workflow = models.ForeignKey(Workflow)
@@ -227,20 +259,21 @@ class Message(models.Model):
     message = models.TextField()
     _sent = models.BooleanField(default=False, editable=False)
     last_read_by = models.ManyToManyField(User,
-                                            related_name="last_read")
+                                          related_name="last_read")
 
-    
     def save(self, *args, **kwargs):
-        """Sends an email to other people involved in the workflow if it hasn't been sent already."""
-        
+        """Sends an email to other people involved in the workflow if it hasn't
+        been sent already."""
+
         if not self._sent:
             # construct a list of recipients
             recipients = [self.workflow.customer.user.email,
                           self.workflow.approver.email]
-            recipients.extend(map(lambda custacc: (custacc.user.email), self.workflow.customer.sub_accounts.all()))
+            recipients.extend(map(lambda custacc: (custacc.user.email),
+                                  self.workflow.customer.sub_accounts.all()))
             recipients.remove(self.sender.email)
-            
-            # for now, send a very boring plain text only email via django.
+
+            # for now, send a very boring plain text only email
             template = loader.get_template('digiapproval/emails/message.txt')
             context = Context({'message': self})
             # eww magic data
@@ -249,10 +282,10 @@ class Message(models.Model):
                       template.render(context),
                       'workflow-' + self.workflow.uuid + '@digiactive.com.au',
                       recipients, fail_silently=False)
-            
-            self._sent = True                 
+
+            self._sent = True
         super(Message, self).save(*args, **kwargs)
-        
+
     @staticmethod
     def get_unread_messages(workflow, user):
         """Gets the list of messages the user has not yet read
@@ -263,22 +296,19 @@ class Message(models.Model):
         elif last_read_message.count() is 0:
             message_id = 0
         else:
-            raise ValueError("Only one workflow/user combination should exist in last_read_by)")
+            raise ValueError("Only one workflow/user combination should exist \
+in last_read_by")
         return workflow.message_set.filter(id__gt=message_id)
-    
-        
+
     @staticmethod
     def mark_all_read(workflow, user):
-        """Finds the "last read message" for the workflow/user combination and updates it to the last posted message
+        """Finds the "last read message" for the workflow/user combination and
+        updates it to the last posted message.
         """
         last_read_message = user.last_read.filter(workflow=workflow)
-        for message in last_read_message: #remove all "last read" messages in this workflow/user combination
+        # remove all "last read" messages in this workflow/user combination
+        for message in last_read_message:
             user.last_read.remove(message)
         newest_message = workflow.message_set.last()
         if newest_message is not None:
             user.last_read.add(newest_message)
-            
-        
-        
-        
-            
