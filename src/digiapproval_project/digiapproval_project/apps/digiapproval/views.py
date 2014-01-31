@@ -1,11 +1,9 @@
-from django.shortcuts import render, redirect
-from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse
 from django.forms.formsets import formset_factory
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from django.core.urlresolvers import reverse
-from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
-from django.shortcuts import get_object_or_404
+from django.core.exceptions import PermissionDenied
 from .forms import *
 from .auth_decorators import *
 from .models import *
@@ -45,8 +43,8 @@ def login(request):
         if user is not None:
             auth_login(request, user)
             if request.GET.get('next', None):
-                return HttpResponseRedirect(request.GET.get('next'))
-            return HttpResponseRedirect(reverse('index'))
+                return redirect(request.GET.get('next'))
+            return redirect('index')
         else:
             error = "Bad username/password combination"
     return render(request, 'digiapproval/login.html', {
@@ -59,7 +57,7 @@ def logout(request):
     from django.contrib.auth import logout as auth_logout
     if request.user.is_authenticated():
         auth_logout(request)
-    return HttpResponseRedirect(reverse('index'))
+    return redirect('index')
 
 @login_required
 def settings(request):
@@ -277,7 +275,7 @@ def new_workflow(request, workflowspec_id):
         if wf_customer in permitted_accounts:
             workflow = workflowspec.start_workflow(wf_customer)
             workflow.save()
-            return HttpResponseRedirect(reverse('view_workflow', args=(workflow.id,)))
+            return redirect('view_workflow', workflow_id=workflow.id)
         error = "Please select a valid account"        
     return render(request, 'digiapproval/new_workflow.html', {
         'workflowspec': workflowspec,
@@ -295,7 +293,7 @@ def view_task(request, workflow_id, task_uuid):
         return task_form_list[0].form_request(request)
     else: #either invalid data or hash collision
         # TODO: display completed data if available: redirect to view_task_data
-        return HttpResponseRedirect(reverse('applicant_home'))
+        return redirect('applicant_home')
 
 
 @login_required
@@ -344,7 +342,7 @@ def view_workflow_messages(request, workflow_id):
             message = request.POST.get('new_message', False
         ))
         new_message.save()
-        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+        return redirect(request.META['HTTP_REFERER'])
     else:
         return render(request, 'digiapproval/view_workflow_messages.html', {
                 'messages': workflow.message_set.order_by('id').reverse(),
