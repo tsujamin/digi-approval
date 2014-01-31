@@ -24,11 +24,7 @@
           "swift_base_url": "http://127.0.0.1:8080",
           "swift_temp_url_key": "super sekrit key",
           "django_celery_broker_url": "amqp://guest:guest@localhost//",
-          "email_host": "email-smtp.us-east-1.amazonaws.com",
-          "email_port": "25",
-          "email_user": "AKIAJNLGYKX7763JQQFA",
-          "email_password": "AksccVziVB7AGxXMdAnC2VeKY7C97Br/HJrzh+O+3PWD",
-          "email_tls": true,
+          "email_settings":"EMAIL_BACKEND = 'seacucumber.backend.SESBackend'\nAWS_ACCESS_KEY_ID = 'AKIAIFY6JC43LSSH5R7Q'\nAWS_SECRET_ACCESS_KEY = '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'\nDEFAULT_FROM_EMAIL = 'digiactive.canberra@gmail.com'\n\nADDITIONAL_APPS = ('seacucumber',)",
           "user": "ec2-user",
           "group": "ec2-user"
       },
