@@ -38,3 +38,4 @@ django-bootstrap3==2.5.5
 # seacucmber for mail on aws
 seacucumber==1.5.1
 boto==2.24.0
+dkimpy==0.5.4
