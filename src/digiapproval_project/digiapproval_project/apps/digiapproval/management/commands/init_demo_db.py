@@ -80,6 +80,7 @@ class Command(BaseCommand):
                 DIRECTORATES[0], DIRECTORATES_APPROVER_GROUPS[0], DIRECTORATES_DELEGATOR_GROUPS[0],
                 True, True, workflowspec_realistic_one()),
         ])
+        resolve_backpatches(WORKFLOW_SPECS)
         
         self.stdout.write("creating workflows")
         WORKFLOWS = map(to_workflow, [
@@ -164,16 +165,16 @@ def to_customer_account((account_type, first_name, last_name, username, password
         customer.parent_accounts.add(parent)
     return customer
     
-def to_workflow_spec((name, description, owner, approvers, delegators, public, toplevel, wf_spec)):
+def to_workflow_spec((name, description, owner, approvers, delegators, public, toplevel, wf_spec_with_id)):
     """Returns a WorkflowSpec model from parameter tuple"""
     spec_model = models.WorkflowSpec(name=name, description=description, \
         owner=owner, delegators=delegators, approvers=approvers, \
-            public=public, toplevel=toplevel, spec=wf_spec)
+            public=public, toplevel=toplevel, spec=wf_spec_with_id[1])
     spec_model.save()
-    return spec_model
+    return (wf_spec_with_id[0], spec_model)
     
 def to_workflow((customer, spec, approver)):
-    workflow = spec.start_workflow(customer)
+    workflow = spec[1].start_workflow(customer)
     if approver is not None:
         workflow.approver = approver
     workflow.save()
@@ -190,7 +191,29 @@ def process_workflow((workflow, complete_tasks)):
     workflow.save()
     return workflow
     
+
+backpatches = []
+from functools import partial
+def backpatch(wfs_internal_id, f, param, f2, backpatched_wfs_internal_id):
+    backpatches.append((wfs_internal_id, f, param, f2, backpatched_wfs_internal_id))
+
+# TODO massive hack
+def resolve_backpatches(workflowspec_models):
+    for backpatch in backpatches:
+        # get workflowspec
+        source, target = None, None
+        for workflowspec_model in workflowspec_models:
+            if workflowspec_model[0] == backpatch[0]:
+                source = workflowspec_model
+            if workflowspec_model[0] == backpatch[4]:
+                target = workflowspec_model
+        if source == None or target == None:
+            raise Exception
+        kwargs = {backpatch[2]: backpatch[3](target[1].id)}
+        backpatch[1](**kwargs)
+        source[1].save()
     
+
     
 def workflowspec_one():
     wf_spec = specs.WorkflowSpec()
@@ -198,14 +221,19 @@ def workflowspec_one():
     approver_agreement = specs.Simple(wf_spec, "Approver Agreement")
     agreement_join = specs.Join(wf_spec, "Parties In Agreement")
     
+    # TEST OF SUBWORKFLOW
+    subworkflow = specs.Simple(wf_spec, "Realistic Subworkflow")
+    
     wf_spec.start.connect(cust_agreement)
     wf_spec.start.connect(approver_agreement)
+    wf_spec.start.connect(subworkflow)
     cust_agreement.connect(agreement_join)
     approver_agreement.connect(agreement_join)
     
     cust_agreement.set_data(task_data = AcceptAgreement.make_task_dict(True, lorum_ipsum, 'CUSTOMER'))
     approver_agreement.set_data(task_data = AcceptAgreement.make_task_dict(True, lorum_ipsum, 'APPROVER') )
-    return wf_spec
+    backpatch(1, subworkflow.set_data, 'task_data', partial(Subworkflow.make_task_dict, 'CUSTOMER'), 5)
+    return (1, wf_spec)
     
 def workflowspec_two():
     wf_spec = specs.WorkflowSpec()
@@ -227,7 +255,7 @@ def workflowspec_two():
         ('event_love', 'In 50 words or less, why do you love applying for events: ', 'text', True),)
     )
     approver_agreement.set_data(task_data = AcceptAgreement.make_task_dict(True, lorum_ipsum,'APPROVER'))
-    return wf_spec
+    return (2, wf_spec)
     
 def workflowspec_three():
     
@@ -258,7 +286,7 @@ def workflowspec_three():
         ('like_digiactive', "Do you like DigiACTive", True, 15),)
     )
     
-    return wf_spec
+    return (3, wf_spec)
     
 def workflowspec_four():
     wf_spec = specs.WorkflowSpec()
@@ -305,7 +333,7 @@ def workflowspec_four():
         ('skip', "Skip to next action", 2))
     )
     
-    return wf_spec
+    return (4, wf_spec)
     
 def workflowspec_realistic_one():
     """Workflow spec representative of actual TAMS processes
@@ -428,7 +456,7 @@ A template can be found on the DigiApproval website (<a href=\"link.to/traffic_m
     cust_waste_plan.connect(appr_join2)
     cust_traffic_plan.connect(appr_join2)
     
-    return wf_spec
+    return (5, wf_spec)
 
 #Dummy text for agreements    
 lorum_ipsum = """Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer sollicitudin ultrices elementum. Nam vel luctus tortor. Sed pretium sodales dui. Nullam id ante a metus ultricies sagittis. Vestibulum porttitor pretium imperdiet. Curabitur dolor est, euismod quis tellus a, volutpat scelerisque felis. Sed ac venenatis libero. Fusce quis tortor nec arcu malesuada faucibus sed at tellus. Fusce a consectetur magna. Integer ullamcorper sollicitudin ligula. Donec interdum luctus nisl ac eleifend. Nunc lobortis quam non nisl laoreet, quis fermentum elit sagittis.

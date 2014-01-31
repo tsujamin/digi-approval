@@ -608,9 +608,11 @@ class Subworkflow(AbstractForm):
         #Test taskform specific fields here
         
     @staticmethod    
-    def make_task_dict(actor, *args, **kwargs):
+    def make_task_dict(actor, workflowspec_id, *args, **kwargs):
         """Constructs a task_dict for this taskform using provided params"""
-        task_dict = AbstractForm.make_task_dict("subworkflow", actor, *args, **kwargs) 
+        task_dict = AbstractForm.make_task_dict("subworkflow", actor, *args, **kwargs)
+        task_dict['data']['workflowspec_id'] = workflowspec_id
+        
         #Add task specific forms to task_dict
         Subworkflow.validate_task_data(task_dict)
         return task_dict
@@ -621,24 +623,18 @@ class Subworkflow(AbstractForm):
         response = super(Subworkflow, self).form_request(request) #Check authorisation
         if response is not None: return response #invalid access
         errors = None
-    
-        if request.method == "POST":
-            for field in form_fields:
-                value = request.POST.get(field, None)
-                #Check validity of posted data 
-                if not valid or (value is None and self.task_dict['fields'][field]['mandatory']):
-                    error = "Error text"
-                else: #place value in task_dict
-                    self.task_dict['fields'][field]['value'] = value
-            if error is None: #All field data was valid, now complete the task
-                return self.complete_task(request)
-        #default response, returns related template with current fields            
-        return render(request, 'digiapproval/taskforms/Subworkflow.html', { 
-            'error': error,
-            'task': self.spiff_task.get_name(),
-            'form_fields': self.task_dict['fields'],
-            'task_info': self.task_dict['data']['task_info']
-        })
+        
+        # TODO do it better than this
+        # TODO exceptions
+        if 'workflow_id' not in self.task_dict['data']:
+            workflowspec = models.WorkflowSpec.objects.get(id=self.task_dict['data']['workflowspec_id'])
+            workflow = workflowspec.start_workflow(self.workflow_model.customer)
+            workflow.save()
+            self.task_dict['data']['workflow_id'] = workflow.id
+            self.spiff_task.set_data(task_dict=self.task_dict) # FIXME This doesn't work
+            self.workflow_model.save()
+        return HttpResponseRedirect(reverse('view_workflow', args=(self.task_dict['data']['workflow_id'],)))
+            
 
     def complete_task(self, request):
         """Perform post completion tasks, no need to save models as handled by parent class"""
