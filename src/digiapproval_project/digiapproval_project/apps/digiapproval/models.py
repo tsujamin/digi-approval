@@ -226,6 +226,9 @@ class Message(models.Model):
     posted = models.DateTimeField(auto_now=True)
     message = models.TextField()
     _sent = models.BooleanField(default=False, editable=False)
+    last_read_by = models.ManyToManyField(User,
+                                            related_name="last_read")
+
     
     def save(self, *args, **kwargs):
         """Sends an email to other people involved in the workflow if it hasn't been sent already."""
@@ -247,7 +250,35 @@ class Message(models.Model):
                       'workflow-' + self.workflow.uuid + '@digiactive.com.au',
                       recipients, fail_silently=False)
             
-            self._sent = True
-            
-            
+            self._sent = True                 
         super(Message, self).save(*args, **kwargs)
+        
+    @staticmethod
+    def get_unread_messages(workflow, user):
+        """Gets the list of messages the user has not yet read
+        """
+        last_read_message = user.last_read.filter(workflow=workflow)
+        if last_read_message.count() is 1:
+            message_id = last_read_message.first().id
+        elif last_read_message.count() is 0:
+            message_id = 0
+        else:
+            raise ValueError("Only one workflow/user combination should exist in last_read_by)")
+        return workflow.message_set.filter(id__gt=message_id)
+    
+        
+    @staticmethod
+    def mark_all_read(workflow, user):
+        """Finds the "last read message" for the workflow/user combination and updates it to the last posted message
+        """
+        last_read_message = user.last_read.filter(workflow=workflow)
+        for message in last_read_message: #remove all "last read" messages in this workflow/user combination
+            user.last_read.remove(message)
+        newest_message = workflow.message_set.last()
+        if newest_message is not None:
+            user.last_read.add(newest_message)
+            
+        
+        
+        
+            

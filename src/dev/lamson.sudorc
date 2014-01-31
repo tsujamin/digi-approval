@@ -3,4 +3,6 @@ cd src/digiapproval_project/digimail;
 service postfix stop || echo "Trouble stopping postfix."
 lamson stop || echo "Lamson not running."
 lamson start -uid 500 -gid 500 -FORCE
+# give lamson a sec to actually open the logfiles
+sleep 5;
 tail -f logs/lamson.log
