@@ -349,5 +349,26 @@ def view_workflow_messages(request, workflow_id):
         return render(request, 'digiapproval/view_workflow_messages.html', {
                 'messages': workflow.message_set.order_by('id').reverse(),
                 'workflow': workflow,
-        })    
+        })
+
+@login_required        
+def workflow_state(request, workflow_id):
+    """Controller for modification of workflow state
+        No auth currently"""
+    workflow = get_object_or_404(Workflow, id=workflow_id)
+    new_state = request.POST.get('wf_state', False)
+    elif request.method == 'POST' and new_state in map(lambda (choice, _): (choice), Workflow.STATE_CHOICES):
+        workflow.state = new_state
+        if workflow.state == 'STARTED':
+            workflow.completed = False
+        else:
+            workflow.completed = True
+        workflow.save()
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+    return HttpResponseRedirect(reverse('view_workflow', args=(workflow.id,)))
+     
+        
+        
+        
+        
     
