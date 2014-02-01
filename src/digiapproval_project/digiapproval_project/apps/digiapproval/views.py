@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404
 from .forms import *
 from .auth_decorators import *
 from .models import *
+from .auth_functions import *
 import uuid
 from SpiffWorkflow import Task as SpiffTask
 
@@ -208,17 +209,7 @@ def view_workflow(request, workflow_id):
     # figure out what and who we are
     workflow = get_object_or_404(Workflow, pk=workflow_id)
     
-    try:
-        customer = request.user.customeraccount
-        actor = 'CUSTOMER'
-        # FIXME: this doesn't cope with multiple layers of parent account - but we should probably remove those multiple layers
-        if customer != workflow.customer and \
-            workflow.customer not in customer.parent_accounts.all():
-                raise PermissionDenied
-    except:
-        actor = 'APPROVER'
-        if request.user != workflow.approver:
-            raise PermissionDenied
+    actor = workflow_actor_type(request.user, workflow)
     
     # iterate through the tasks, making a list of actually useful information
     tasks_it = SpiffTask.Iterator(workflow.workflow.task_tree)
@@ -354,18 +345,26 @@ def view_workflow_messages(request, workflow_id):
 
 @login_required        
 def workflow_state(request, workflow_id):
-    """Controller for modification of workflow state
-        No auth currently"""
+    """Controller for modification of workflow state"""
     workflow = get_object_or_404(Workflow, id=workflow_id)
+    actor = workflow_actor_type(request.user, workflow)
+    
     new_state = request.POST.get('wf_state', False)
-    if request.method == 'POST' and new_state in map(lambda (choice, _): (choice), Workflow.STATE_CHOICES):
-        workflow.state = new_state
-        if workflow.state == 'STARTED':
-            workflow.completed = False
-        else:
-            workflow.completed = True
+    if actor == 'APPROVER':
+        if request.method == 'POST' and new_state in map(lambda (choice, _): (choice), Workflow.STATE_CHOICES):
+            workflow.state = new_state
+            if workflow.state == 'STARTED':
+                workflow.completed = False
+            else:
+                workflow.completed = True
+            workflow.save()
+            return HttpResponseRedirect(request.META['HTTP_REFERER'])
+    elif actor == "CUSTOMER":
+        if new_state != 'CANCELLED': raise PermissionDenied
+        workflow.state = 'CANCELLED'
+        workflow.completed = True
         workflow.save()
-        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+        return HttpResponseRedirect(reverse('applicant_home'))
     return HttpResponseRedirect(reverse('view_workflow', args=(workflow.id,)))
      
         
