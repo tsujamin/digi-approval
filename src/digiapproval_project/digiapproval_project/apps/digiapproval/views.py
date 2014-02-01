@@ -349,26 +349,22 @@ def workflow_state(request, workflow_id):
     actor = workflow_actor_type(request.user, workflow)
     
     new_state = request.POST.get('wf_state', False)
-    if actor == 'APPROVER':
-        if request.method == 'POST' and new_state in map(lambda (choice, _): (choice), Workflow.STATE_CHOICES):
-            workflow.state = new_state
-            if workflow.state == 'STARTED':
-                workflow.completed = False
-            else:
-                workflow.completed = True
-            workflow.save()
-            Message(workflow = workflow, sender = request.user, message="Workflow entered " + new_state + " state").save()
-            Message.mark_all_read(workflow, request.user)
-            
-            return HttpResponseRedirect(request.META['HTTP_REFERER'])
-    elif actor == "CUSTOMER":
-        if new_state != 'CANCELLED': raise PermissionDenied
-        workflow.state = 'CANCELLED'
-        workflow.completed = True
+    
+    if request.method == 'POST' and new_state in map(lambda (choice, _): (choice), Workflow.STATE_CHOICES):
+        (_, nice_new_state) = filter(lambda (short, long): (short == new_state), Workflow.STATE_CHOICES)[0]
+        if actor == 'CUSTOMER' and new_state != 'CANCELLED': raise PermissionDenied
+        workflow.state = new_state
+        if workflow.state == 'STARTED':
+            workflow.completed = False
+        else:
+            workflow.completed = True
         workflow.save()
-        Message(workflow = workflow, sender = request.user, message="Workflow entered " + new_state + " state").save()
+        Message(workflow = workflow, sender = request.user, message=nice_new_state).save()
         Message.mark_all_read(workflow, request.user)
-        return HttpResponseRedirect(reverse('applicant_home'))
+        if actor == 'CUSTOMER':
+            return HttpResponseRedirect(reverse('applicant_home'))
+        else:
+             return HttpResponseRedirect(request.META['HTTP_REFERER'])
     return HttpResponseRedirect(reverse('view_workflow', args=(workflow.id,)))
      
         
