@@ -264,7 +264,6 @@ def new_workflow(request, workflowspec_id):
         permitted_accounts.append(account)
         
     if request.method == 'POST' and request.POST.get('create_workflow', False):
-        print request.POST
         wf_customer = get_object_or_404(CustomerAccount, id=int(request.POST.get('account', None)))
         if wf_customer in permitted_accounts:
             workflow = workflowspec.start_workflow(wf_customer)
@@ -358,12 +357,17 @@ def workflow_state(request, workflow_id):
             else:
                 workflow.completed = True
             workflow.save()
+            Message(workflow = workflow, sender = request.user, message="Workflow entered " + new_state + " state").save()
+            Message.mark_all_read(workflow, request.user)
+            
             return HttpResponseRedirect(request.META['HTTP_REFERER'])
     elif actor == "CUSTOMER":
         if new_state != 'CANCELLED': raise PermissionDenied
         workflow.state = 'CANCELLED'
         workflow.completed = True
         workflow.save()
+        Message(workflow = workflow, sender = request.user, message="Workflow entered " + new_state + " state").save()
+        Message.mark_all_read(workflow, request.user)
         return HttpResponseRedirect(reverse('applicant_home'))
     return HttpResponseRedirect(reverse('view_workflow', args=(workflow.id,)))
      
