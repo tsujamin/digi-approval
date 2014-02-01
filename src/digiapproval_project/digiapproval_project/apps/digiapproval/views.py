@@ -373,9 +373,9 @@ def workflow_state(request, workflow_id):
 @login_required_customer
 def workflow_label(request, workflow_id):
     workflow = get_object_or_404(Workflow, id=workflow_id)
-    if not workflow_authorised_customer(request.user, workflow): raise PermissionDenied()
+    if not workflow_authorised_customer(request.user.customeraccount, workflow): raise PermissionDenied()
     
-    new_label = resuest.POST.get('wf_label', False)
+    new_label = request.POST.get('label', False)
     if request.method == 'POST' and new_label:
         workflow.label = new_label
         workflow.save()    
