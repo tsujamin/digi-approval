@@ -1,5 +1,5 @@
 {% extends "digiapproval/base.tpl.html" %}
-{% block title %}{{workflow.spec.name}}{% endblock %}
+{% block title %}{{workflow.label}} - {{workflow.spec.name}}{% endblock %}
 {% block content %}
 <p class="muted">Customer: {{workflow.customer.user.get_full_name}}<br/>
 Approver: {{workflow.approver.get_full_name}}</p>

@@ -267,6 +267,9 @@ def new_workflow(request, workflowspec_id):
         wf_customer = get_object_or_404(CustomerAccount, id=int(request.POST.get('account', None)))
         if wf_customer in permitted_accounts:
             workflow = workflowspec.start_workflow(wf_customer)
+            label = request.POST.get('label', False)
+            if label and len(label) > 0:
+                workflow.label = label
             workflow.save()
             return HttpResponseRedirect(reverse('view_workflow', args=(workflow.id,)))
         error = "Please select a valid account"        
@@ -366,6 +369,17 @@ def workflow_state(request, workflow_id):
         else:
              return HttpResponseRedirect(request.META['HTTP_REFERER'])
     return HttpResponseRedirect(reverse('view_workflow', args=(workflow.id,)))
+    
+@login_required_customer
+def workflow_label(request, workflow_id):
+    workflow = get_object_or_404(Workflow, id=workflow_id)
+    if not workflow_authorised_customer(request.user, workflow): raise PermissionDenied()
+    
+    new_label = resuest.POST.get('wf_label', False)
+    if request.method == 'POST' and new_label:
+        workflow.label = new_label
+        workflow.save()    
+    return HttpResponseRedirect(request.META['HTTP_REFERER'])
      
         
         
