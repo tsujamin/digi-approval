@@ -250,6 +250,7 @@ def view_workflow(request, workflow_id):
         'workflow': workflow,
         'tasks': tasks,
         'messages': workflow.message_set.order_by('id').reverse()[0:5],
+        'user_type': actor
         })
 
 
@@ -357,7 +358,7 @@ def workflow_state(request, workflow_id):
         No auth currently"""
     workflow = get_object_or_404(Workflow, id=workflow_id)
     new_state = request.POST.get('wf_state', False)
-    elif request.method == 'POST' and new_state in map(lambda (choice, _): (choice), Workflow.STATE_CHOICES):
+    if request.method == 'POST' and new_state in map(lambda (choice, _): (choice), Workflow.STATE_CHOICES):
         workflow.state = new_state
         if workflow.state == 'STARTED':
             workflow.completed = False
