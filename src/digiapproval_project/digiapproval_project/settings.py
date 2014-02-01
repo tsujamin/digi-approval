@@ -42,7 +42,7 @@ INSTALLED_APPS = (
     'django.contrib.flatpages',
     'digiapproval_project.apps.digiapproval',
     'south',
-    'bootstrap3'
+    'bootstrap3',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -99,7 +99,7 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    #'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 # Templates
@@ -114,9 +114,10 @@ FIXTURE_DIRS = (
 
 
 # Files
-DEFAULT_FILE_STORAGE='swift.storage.SwiftStorage'
+DEFAULT_FILE_STORAGE = 'swift.storage.SwiftStorage'
 
-LOGIN_URL='/digiapproval/login'
+# Login
+LOGIN_URL = '/digiapproval/login'
 
 # Bootstrap
 BOOTSTRAP3 = {
@@ -124,4 +125,5 @@ BOOTSTRAP3 = {
 }
 
 # Patch in our local settings
-from .local_settings import *
+from .local_settings import *  # noqa
+INSTALLED_APPS += ADDITIONAL_APPS

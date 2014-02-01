@@ -98,7 +98,7 @@ def do_macro(parser, token):
         tag_name, macro_name, args = args[0], args[1], args[2:]
     except IndexError:
         m = ("'%s' tag requires at least one argument (macro name)"
-            % token.contents.split()[0])
+             % token.contents.split()[0])
         raise template.TemplateSyntaxError, m
     # TODO: could do some validations here,
     # for now, "blow your head clean off"
@@ -125,7 +125,7 @@ def do_loadmacros(parser, token):
         tag_name, filename = token.split_contents()
     except IndexError:
         m = ("'%s' tag requires at least one argument (macro name)"
-            % token.contents.split()[0])
+             % token.contents.split()[0])
         raise template.TemplateSyntaxError, m
     if filename[0] in ('"', "'") and filename[-1] == filename[0]:
         filename = filename[1:-1]

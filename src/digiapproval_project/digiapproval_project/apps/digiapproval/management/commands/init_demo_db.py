@@ -1,3 +1,6 @@
+# It doesn't make sense to Flake8 this file: it's loads demo data
+# flake8: noqa
+
 from django.core.management.base import BaseCommand, CommandError
 from digiapproval_project.apps.digiapproval import models
 from digiapproval_project.apps.digiapproval.taskforms import *
