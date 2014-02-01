@@ -332,9 +332,7 @@ def view_workflow_messages(request, workflow_id):
     workflow = get_object_or_404(Workflow, id=workflow_id)
     
     #Check auth
-    if  request.user != workflow.customer.user and \
-        request.user not in map(lambda custacc: (custacc.user), workflow.customer.sub_accounts.all()) and \
-        request.user != workflow.approver:
+    if not request.user in workflow.get_involved_users():
         raise PermissionDenied
     
     Message.mark_all_read(workflow, request.user)    
