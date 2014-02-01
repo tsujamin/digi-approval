@@ -386,14 +386,14 @@ def view_workflow_messages(request, workflow_id):
 
     Message.mark_all_read(workflow, request.user)
     if request.method == 'POST' and request.POST.get('new_message', False):
-        new_message = Message(workflow = workflow,
-            sender = request.user,
-            message = request.POST.get('new_message', False
-        ))
+        new_message = Message(workflow=workflow,
+                              sender=request.user,
+                              message=request.POST.get('new_message', False)
+                              )
         new_message.save()
         return redirect(request.META['HTTP_REFERER'])
     else:
         return render(request, 'digiapproval/view_workflow_messages.html', {
-                'messages': workflow.message_set.order_by('id').reverse(),
-                'workflow': workflow,
+            'messages': workflow.message_set.order_by('id').reverse(),
+            'workflow': workflow,
         })
