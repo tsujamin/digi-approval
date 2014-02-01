@@ -60,4 +60,6 @@ urlpatterns = patterns(
         views.view_workflow_messages, name='view_workflow_messages'),
     url(r'^workflow_state/(?P<workflow_id>\d+)/$', views.workflow_state,
         name='update_workflow_state'),
+    url(r'^workflow_label/(?P<workflow_id>\d+)/$', views.workflow_label,
+        name='update_workflow_label'),
 )

@@ -1,5 +1,5 @@
 {% extends "digiapproval/base.tpl.html" %}
-{% block title %}{{workflow.spec.name}}{% endblock %}
+{% block title %}{{workflow.label}} - {{workflow.spec.name}}{% endblock %}
 {% block content %}
 <p class="muted">Customer: {{workflow.customer.user.get_full_name}}<br/>
 Approver: {{workflow.approver.get_full_name}}</p>
@@ -23,13 +23,26 @@ Approver: {{workflow.approver.get_full_name}}</p>
       </li>
       {% endfor %}
     </ul>
-    {% ifequal user_type 'CUSTOMER' %}{% ifequal workflow.state 'STARTED' %}
-      <form action="{% url 'update_workflow_state' workflow.id %}" method="POST" role="form">  
-        {% csrf_token %}
-        <input type="hidden" name="wf_state" value="CANCELLED"/>
-        <button type="submit" name="submit" class="btn btn-default">Withdraw Application</button>
-      </form>
-    {%endifequal %}{% endifequal %}
+    <h2>Options</h2>
+    {% ifequal user_type 'CUSTOMER' %}
+      {% ifequal workflow.state 'STARTED' %}
+        <form action="{% url 'update_workflow_label' workflow.id %}" method="POST" role="form" class="form-inline">
+          {% csrf_token %}
+          <div class="form-group">
+            <label for="label" class="sr-only">Workflow Title</label>
+            <input type="text" name="label" value="{{workflow.label}}" class="form-control" max_length="50"/>
+          </div>
+          <button type="submit" name="submit" class="btn btn-default">Update Title</button>
+        </form>
+        <form action="{% url 'update_workflow_state' workflow.id %}" method="POST" role="form">  
+          {% csrf_token %}
+          <input type="hidden" name="wf_state" value="CANCELLED"/>
+          <button type="submit" name="submit" class="btn btn-default">Withdraw Application</button>
+        </form>
+      {%endifequal %}
+    {% else %}
+      {% include 'digiapproval/workflow_state.html' %}
+    {% endifequal %}
     
 {% comment %}
     <h2>Debug Info</h2>
@@ -42,10 +55,7 @@ Approver: {{workflow.approver.get_full_name}}</p>
 {% endcomment %}
   </div>
   
-  <div class="col-md-5">
-    {% ifequal user_type 'APPROVER' %}
-      {% include 'digiapproval/workflow_state.html' %}
-    {% else %}{% endifequal %}      
+  <div class="col-md-5">     
     <h2>Recent Messages</h2>
     <form action="{% url 'view_workflow_messages' workflow.id %}" method="POST" role="form">
       {% csrf_token %}

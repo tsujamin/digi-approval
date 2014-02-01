@@ -8,7 +8,7 @@ from .forms import RegisterCustomerForm, LoginForm, DelegatorBaseFormSet,\
     DelegatorForm
 from .auth_decorators import login_required_organisation,\
     login_required_customer, login_required_approver, login_required_delegator
-from .auth_functions import workflow_actor_type
+from .auth_functions import workflow_actor_type, workflow_authorised_customer
 from .models import WorkflowSpec, Workflow, Task, Message, CustomerAccount,\
     UserFile
 import uuid
@@ -304,6 +304,9 @@ def new_workflow(request, workflowspec_id):
         wf_customer = get_object_or_404(CustomerAccount, id=acct_id)
         if wf_customer in permitted_accounts:
             workflow = workflowspec.start_workflow(wf_customer)
+            label = request.POST.get('label', False)
+            if label and len(label) > 0:
+                workflow.label = label
             workflow.save()
             return redirect('view_workflow', workflow_id=workflow.id)
         error = "Please select a valid account"
@@ -422,3 +425,17 @@ def workflow_state(request, workflow_id):
         else:
             return redirect(request.META['HTTP_REFERER'])
     return redirect('view_workflow', workflow_id=workflow.id)
+
+
+@login_required_customer
+def workflow_label(request, workflow_id):
+    workflow = get_object_or_404(Workflow, id=workflow_id)
+    if not workflow_authorised_customer(request.user.customeraccount,
+                                        workflow):
+        raise PermissionDenied()
+
+    new_label = request.POST.get('label', False)
+    if request.method == 'POST' and new_label:
+        workflow.label = new_label
+        workflow.save()
+    return redirect(request.META['HTTP_REFERER'])

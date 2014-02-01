@@ -188,6 +188,8 @@ class Workflow(models.Model):
     uuid = models.CharField(max_length=36, editable=False,
                             default=lambda: uuid.uuid4().hex)
 
+    label = models.CharField(max_length=50, default="Untitled Application")
+
     def assign_approver(self):
         """Finds the least busy approver (in the approvers group of the
         Workflows spec), returns and assigns it to the workflow"""
