@@ -618,9 +618,10 @@ class ExampleTaskForm(AbstractForm):
         errors = None
     
         if request.method == "POST":
-            for field in form_fields:
+            for field in self.task_dict['fields']:
                 value = request.POST.get(field, None)
                 #Check validity of posted data 
+                valid = True and hasattr(self.task_dict['fields'], field) #Define validity for POSTed data
                 if not valid or (value is None and self.task_dict['fields'][field]['mandatory']):
                     error = "Error text"
                 else: #place value in task_dict
