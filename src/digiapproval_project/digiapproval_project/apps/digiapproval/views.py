@@ -8,7 +8,6 @@ from .forms import RegisterCustomerForm, LoginForm, DelegatorBaseFormSet,\
     DelegatorForm
 from .auth_decorators import login_required_organisation,\
     login_required_customer, login_required_approver, login_required_delegator
-from .auth_functions import workflow_actor_type, workflow_authorised_customer
 from .models import WorkflowSpec, Workflow, Task, Message, CustomerAccount,\
     UserFile
 import uuid
@@ -236,7 +235,9 @@ def view_workflow(request, workflow_id):
     # figure out what and who we are
     workflow = get_object_or_404(Workflow, pk=workflow_id)
 
-    actor = workflow_actor_type(request.user, workflow)
+    actor = workflow.actor_type(request.user)
+    if actor is None:
+        return PermissionDenied
 
     # iterate through the tasks, making a list of actually useful information
     tasks_it = SpiffTask.Iterator(workflow.workflow.task_tree)
@@ -397,7 +398,9 @@ def view_workflow_messages(request, workflow_id):
 def workflow_state(request, workflow_id):
     """Controller for modification of workflow state"""
     workflow = get_object_or_404(Workflow, id=workflow_id)
-    actor = workflow_actor_type(request.user, workflow)
+    actor = workflow.actor_type(request.user)
+    if actor is None:
+        raise PermissionDenied
     new_state = request.POST.get('wf_state', False)
     states = map(lambda (choice, _): (choice), Workflow.STATE_CHOICES)
 
@@ -430,8 +433,8 @@ def workflow_state(request, workflow_id):
 @login_required_customer
 def workflow_label(request, workflow_id):
     workflow = get_object_or_404(Workflow, id=workflow_id)
-    if not workflow_authorised_customer(request.user.customeraccount,
-                                        workflow):
+    if not workflow.is_authorised_customer(request.user.customeraccount,
+                                           workflow):
         raise PermissionDenied()
 
     new_label = request.POST.get('label', False)
