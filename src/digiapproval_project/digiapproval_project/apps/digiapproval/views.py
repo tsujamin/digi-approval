@@ -131,7 +131,7 @@ def approver_worklist(request):
     
     workflows = request.user.workflow_approver.filter(completed=False)
     running_workflows_and_tasks = map(
-        lambda wf: (wf, wf.get_ready_task_forms(actor = 'APPROVER'), Message.get_unread_messages(wf, request.user)),
+        lambda wf: (wf, wf.get_ready_task_forms(actor = 'APPROVER'), Message.get_unread_messages(wf, request.user).count()),
                                       workflows)
     
     return render(request, 'digiapproval/approver_worklist.html', {
