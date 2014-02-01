@@ -1,5 +1,13 @@
 # Getting started
 
+## Flake8 ##
+Before doing anything, set up a Flake8 git hook.
+
+```sh
+sudo pip install flake8 || sudo easy_install flake8
+cp git/hooks/pre-commit .git/hooks/pre-commit
+```
+
 ## Submodules ##
 
 Do this the first time you check out the repository:

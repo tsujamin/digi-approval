@@ -10,29 +10,30 @@ for root, dirs, files in os.walk('.'):
             continue
 
         name = os.path.splitext(page)[0]
+        url = os.path.normpath('/%s/%s' % (root, name)).lower() + '/'
         result = {'pk': count,
-                  "model": "flatpages.flatpage", 
+                  "model": "flatpages.flatpage",
                   "fields": {
-                      "registration_required": False, 
-                      "title": name.replace('_', ' '), 
-                      "url": os.path.normpath('/' + root + '/' + name).lower() + '/',
-                      "template_name": "", 
-                      "sites": [1], 
+                      "registration_required": False,
+                      "title": name.replace('_', ' '),
+                      "url": url,
+                      "template_name": "",
+                      "sites": [1],
                       "enable_comments": False
-                    }
-                  }
+                      }}
 
         count = count + 1
 
-        generated_content = subprocess.check_output(['markdown', root + '/' + page],
-                                                    stderr=subprocess.STDOUT)
+        generated_content = subprocess.check_output(
+            ['markdown', root + '/' + page], stderr=subprocess.STDOUT)
 
-        content = ("<!-- generated from %s/%s by makedocs.py. Don't edit me in flatpages! -->\n" % (root, page)) + \
-          generated_content
+        content = (("<!-- generated from %s/%s by makedocs.py. Don't edit me" +
+                   "in flatpages! -->\n") % (root, page)) + generated_content
 
-        result['fields']['content']=content
+        result['fields']['content'] = content
 
         pages.append(result)
 
-with open('../../src/digiapproval_project/digiapproval_project/fixtures/initial_data.json', 'w') as f:
+with open('../../src/digiapproval_project/digiapproval_project/fixtures' +
+          '/initial_data.json', 'w') as f:
     f.write(json.dumps(pages))
