@@ -1,9 +1,8 @@
 from __future__ import absolute_import
-
 import pyclamd
-
 from celery import shared_task
 from .models import UserFile
+
 
 @shared_task
 def virus_scan(userfile_pk):

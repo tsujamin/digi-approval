@@ -1,13 +1,14 @@
-import os, sys
+import os
+import sys
+
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'digiapproval_project.settings'
 # allow us to import digiapproval_project
 # digimail/config/../..
-sys.path.append(os.path.join(os.path.dirname(__file__),'..','..'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
 
-# This file contains python variables that configure Lamson for email processing.
-import logging
-
+# This file contains python variables that configure Lamson for email
+# processing.
 
 # You may add additional parameters such as `username' and `password' if your
 # relay server requires authentication, `starttls' (boolean) or `ssl' (boolean)
