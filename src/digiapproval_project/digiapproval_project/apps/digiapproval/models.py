@@ -242,6 +242,22 @@ class Workflow(models.Model):
                            if form.actor == kwargs['actor']]
         return ready_forms
 
+    def get_involved_users(self):
+        """Returns a list of users: everyone involved in the workflow - the
+        customer (as a User, not a CustomerAccount), the approver, and if the
+        customer is an organisation, all the associated users (as Users, not
+        CustomerAccounts)"""
+        users = [self.customer.user, self.approver]
+        users.extend(map(lambda custacc: (custacc.user),
+                         self.customer.sub_accounts.all()))
+        return users
+
+    def get_involved_users_emails(self):
+        """Returns a list of emails addresses of everyone involved in the
+        workflow - the customer's email, the approver's email, and if the
+        customer is an organisation, all the associated users' emails"""
+        return [user.email for user in self.get_involved_users()]
+
     def __unicode__(self):
         return u'%s (%s)' % (self.customer.user.username, self.spec.name)
 
@@ -267,10 +283,7 @@ class Message(models.Model):
 
         if not self._sent:
             # construct a list of recipients
-            recipients = [self.workflow.customer.user.email,
-                          self.workflow.approver.email]
-            recipients.extend(map(lambda custacc: (custacc.user.email),
-                                  self.workflow.customer.sub_accounts.all()))
+            recipients = self.workflow.get_involved_users_emails()
             recipients.remove(self.sender.email)
 
             # for now, send a very boring plain text only email

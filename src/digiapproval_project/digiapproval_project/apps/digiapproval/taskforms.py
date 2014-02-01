@@ -154,10 +154,7 @@ class AbstractForm(object):
         sender = (self.workflow_model.approver if self.actor == 'APPROVER'
                   else self.workflow_model.customer.user)
         # construct a list of recipients
-        recipients = [self.workflow_model.customer.user.email,
-                      self.workflow_model.approver.email]
-        recipients.extend(map(lambda custacc: (custacc.user.email),
-                              self.workflow_model.customer.sub_accounts.all()))
+        recipients = self.workflow_model.get_involved_users_emails()
         recipients.remove(sender.email)
 
         # for now, send a very boring plain text only email via django.
