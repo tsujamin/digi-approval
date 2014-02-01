@@ -45,5 +45,7 @@ urlpatterns = patterns('',
     url(r'^view_task/(?P<workflow_id>\d+)/(?P<task_uuid>.+)/$', views.view_task, name='view_task'),
     url(r'^view_task_data/(?P<task_uuid>.+)/$', views.view_task_data, name='view_task_data'),
     url(r'^view_workflow_messages/(?P<workflow_id>\d+)/$', views.view_workflow_messages, name='view_workflow_messages'),
-    url(r'^workflow_state/(?P<workflow_id>\d+)/$', views.workflow_state, name='update_workflow_state'),    
+    url(r'^workflow_state/(?P<workflow_id>\d+)/$', views.workflow_state, name='update_workflow_state'),
+    url(r'^workflow_label/(?P<workflow_id>\d+)/$', views.workflow_label, name='update_workflow_label'),
+       
 )
