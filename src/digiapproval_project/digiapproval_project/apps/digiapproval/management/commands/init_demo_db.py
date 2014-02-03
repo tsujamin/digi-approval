@@ -5,6 +5,7 @@ from django.core.management.base import BaseCommand, CommandError
 from digiapproval_project.apps.digiapproval import models
 from digiapproval_project.apps.digiapproval.taskforms import *
 from django.contrib.auth.models import User, Group
+from django.contrib.sites.models import Site
 from SpiffWorkflow import specs
 
 class Command(BaseCommand):
@@ -17,6 +18,12 @@ class Command(BaseCommand):
         """Clears current models from tables, creates demo directorates, approvers, orginisations and customers"""
         self.stdout.write("Clearing current models")   
         clear_data()
+        
+        self.stdout.write("Creating sites (django.contrib.sites)")
+        site = Site.objects.get_or_create(pk=1)[0]
+        site.domain = "demo.digiactive.com.au:8000"
+        site.name = "DigiACTive Demo"
+        site.save()
         
         self.stdout.write("Creating directorate groups (django.contrib.auth)")   
         DIRECTORATES = map(directorate_to_group, [ 
