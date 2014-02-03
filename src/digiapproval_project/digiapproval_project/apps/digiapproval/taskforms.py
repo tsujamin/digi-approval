@@ -194,7 +194,7 @@ class AcceptAgreement(AbstractForm):
         AbstractForm.validate_task_data(task_data)
         if task_data['data']['agreement'] is None:
             raise AttributeError("data->agreement must exist")
-        if not (hasattr(task_data['fields'], 'acceptance')):
+        if not 'acceptance' in task_data['fields']:
             raise AttributeError("must have an acceptance field")
 
     @staticmethod
@@ -343,7 +343,6 @@ class CheckTally(AbstractForm):
         for item in task_data['fields'].values():
             if item['type'] != 'checkbox' or \
                     not isinstance(item['score'], int):
-                print item
                 raise AttributeError("fields must have score and be checkbox")
 
     @staticmethod
@@ -525,13 +524,14 @@ class ChooseBranches(AbstractForm):
         """Validates that provided task_data dict is of valid construction,
         throws AttributeErrors"""
         AbstractForm.validate_task_data(task_data)
-        for field in task_data['fields']:
-            if not hasattr(field, 'number') or \
+        for field in task_data['fields'].values():
+            if not 'number' in field or \
                     field['type'] != 'checkbox':
+                print field
                 raise AttributeError("fields must have number and be of type" +
                                      " checkbox")
-        if not hasattr(task_data['options'], 'minimum_choices') or \
-                not isinstance(task_data['options']['minimum_chioices'], int):
+        if not 'minimum_choices' in task_data['options'] or \
+                not isinstance(task_data['options']['minimum_choices'], int):
             raise AttributeError("must have an integer minimum_choices option")
 
     @staticmethod
