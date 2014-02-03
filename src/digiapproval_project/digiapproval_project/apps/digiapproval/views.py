@@ -263,9 +263,12 @@ def view_workflow(request, workflow_id):
         # task_dict
         if ((result['state_name'] == 'READY' or
              result['state_name'] == 'COMPLETED' or
-             actor == 'APPROVER') and
-                result['actor']):
+             actor == 'APPROVER') and result['actor']):
+            
+            #Remove duplicates and add current task
+            tasks = list(filter(lambda entry:(entry['name'] != result['name']), tasks))
             tasks.append(result)
+            
 
     # mark all messages read
     Message.mark_all_read(workflow, request.user)
