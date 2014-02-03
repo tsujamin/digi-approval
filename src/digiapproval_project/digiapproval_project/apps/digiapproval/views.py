@@ -217,8 +217,8 @@ def delegator_worklist(request):
                  'approver': workflow.approver.username
                  } for workflow in wfspec.workflow_set.filter(completed=False)]
             ),
-        'spec_name': spec.name,
-        'spec_id': spec.id
+        'spec_name': wfspec.name,
+        'spec_id': wfspec.id
         }
         for wfspec in workflowspecs]
 

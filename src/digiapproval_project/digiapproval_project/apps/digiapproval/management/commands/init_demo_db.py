@@ -376,7 +376,7 @@ def workflowspec_realistic_one():
                                                             
     cust_insurance_req = ChooseBranch.create_exclusive_task(wf_spec, "Event insurance requirement",
         (1, cust_upload_insure),
-        (2, appr_join1)
+        (2, cust_insure_review)
     )
     
     appr_review1 = ChooseBranches.create_multichoice_task(wf_spec, 'Review and Assign Tasks',
@@ -394,6 +394,7 @@ def workflowspec_realistic_one():
     cust_event_attendance_start.connect(cust_event_attendance)
     cust_event_info.connect(cust_insurance_start)
     cust_insurance_start.connect(cust_insurance_req)
+    cust_upload_insure.connect(cust_insure_review)
     cust_upload_ramp.connect(cust_ramp_review)
     appr_join1.connect(appr_review1)
     appr_join1.connect(appr_join2)

@@ -7,6 +7,7 @@ from django.template import Context, loader
 from exceptions import TypeError, AttributeError
 import uuid
 from SpiffWorkflow.specs import ExclusiveChoice, MultiChoice
+from .auth_functions import *
 
 
 class AbstractForm(object):
@@ -132,10 +133,8 @@ class AbstractForm(object):
         is_authenticated = request.user.is_authenticated()
         is_approver = request.user.id is self.workflow_model.approver.id
         is_customer_and_actor = (self.actor == 'CUSTOMER') and \
-            (request.user.customeraccount.id is
-             self.workflow_model.customer.id) or \
-            (self.workflow_model.customer in
-             request.user.customeraccount.parent_accounts.all())
+            hasattr(request.user, 'customeraccount') and \
+            workflow_authorised_customer(request.user.customeraccount, self.workflow_model)
 
         if not (is_authenticated and (is_approver or is_customer_and_actor)):
             return HttpResponseRedirect(reverse('applicant_home'))
@@ -194,7 +193,7 @@ class AcceptAgreement(AbstractForm):
         AbstractForm.validate_task_data(task_data)
         if task_data['data']['agreement'] is None:
             raise AttributeError("data->agreement must exist")
-        if not (hasattr(task_data['fields'], 'acceptance')):
+        if not 'acceptance' in task_data['fields']:
             raise AttributeError("must have an acceptance field")
 
     @staticmethod
@@ -343,7 +342,6 @@ class CheckTally(AbstractForm):
         for item in task_data['fields'].values():
             if item['type'] != 'checkbox' or \
                     not isinstance(item['score'], int):
-                print item
                 raise AttributeError("fields must have score and be checkbox")
 
     @staticmethod
@@ -525,13 +523,14 @@ class ChooseBranches(AbstractForm):
         """Validates that provided task_data dict is of valid construction,
         throws AttributeErrors"""
         AbstractForm.validate_task_data(task_data)
-        for field in task_data['fields']:
-            if not hasattr(field, 'number') or \
+        for field in task_data['fields'].values():
+            if not 'number' in field or \
                     field['type'] != 'checkbox':
+                print field
                 raise AttributeError("fields must have number and be of type" +
                                      " checkbox")
-        if not hasattr(task_data['options'], 'minimum_choices') or \
-                not isinstance(task_data['options']['minimum_chioices'], int):
+        if not 'minimum_choices' in task_data['options'] or \
+                not isinstance(task_data['options']['minimum_choices'], int):
             raise AttributeError("must have an integer minimum_choices option")
 
     @staticmethod
