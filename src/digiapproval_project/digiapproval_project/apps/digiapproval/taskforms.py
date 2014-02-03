@@ -7,6 +7,7 @@ from django.template import Context, loader
 from exceptions import TypeError, AttributeError
 import uuid
 from SpiffWorkflow.specs import ExclusiveChoice, MultiChoice
+from .auth_functions import *
 
 
 class AbstractForm(object):
@@ -132,10 +133,8 @@ class AbstractForm(object):
         is_authenticated = request.user.is_authenticated()
         is_approver = request.user.id is self.workflow_model.approver.id
         is_customer_and_actor = (self.actor == 'CUSTOMER') and \
-            (request.user.customeraccount.id is
-             self.workflow_model.customer.id) or \
-            (self.workflow_model.customer in
-             request.user.customeraccount.parent_accounts.all())
+            hasattr(request.user, 'customeraccount') and \
+            workflow_authorised_customer(request.user.customeraccount, self.workflow_model)
 
         if not (is_authenticated and (is_approver or is_customer_and_actor)):
             return HttpResponseRedirect(reverse('applicant_home'))
