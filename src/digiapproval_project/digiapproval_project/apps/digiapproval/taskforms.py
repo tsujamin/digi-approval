@@ -681,7 +681,7 @@ class Subworkflow(AbstractForm):
     
     def __init__(self, spiff_task, workflow_model, *args, **kwargs):
         """Task form initialisation and validation"""
-        super(Subworkflow,self).__init__(spiff_task, workflow_model, *args, **kwargs)
+        super(Subworkflow, self).__init__(spiff_task, workflow_model, *args, **kwargs)
         #Task specific init/validation here
 
         
@@ -715,7 +715,7 @@ class Subworkflow(AbstractForm):
             workflow = workflowspec.start_workflow(self.workflow_model.customer)
             workflow.save()
             self.task_dict['data']['workflow_id'] = workflow.id
-            self.spiff_task.set_data(task_dict=self.task_dict) # FIXME This doesn't work
+            self.task_model.save()
             self.workflow_model.save()
         return HttpResponseRedirect(reverse('view_workflow', args=(self.task_dict['data']['workflow_id'],)))
             
