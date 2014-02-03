@@ -250,7 +250,9 @@ def view_workflow(request, workflow_id):
             'state_name': task.state_names[task.state],
             'actor': (task.task_spec.get_data('task_data')['actor']
                       if task.task_spec.get_data('task_data') else ''),
-            'uuid': task.id['__uuid__']
+            'uuid': task.id['__uuid__'],
+            'repeatable': (task.task_spec.get_data('task_data')['options']['repeatable']
+                if task.task_spec.get_data('task_data') else False)
             }
 
         # should various links be shown?
@@ -266,7 +268,9 @@ def view_workflow(request, workflow_id):
              actor == 'APPROVER') and result['actor']):
             
             #Remove duplicates and add current task
-            tasks = list(filter(lambda entry:(entry['name'] != result['name']), tasks))
+            tasks = list(filter(
+                lambda entry:((entry['name'] != result['name']) or entry['repeatable']), 
+                tasks))
             tasks.append(result)
             
 

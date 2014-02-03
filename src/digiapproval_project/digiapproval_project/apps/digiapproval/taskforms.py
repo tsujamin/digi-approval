@@ -108,21 +108,20 @@ class AbstractForm(object):
 
     @staticmethod
     def make_task_dict(form, actor, *args, **kwargs):
-        """Build valid task dictionary, takes kwarg of task_info that is
-        displayed alongside the task"""
+        """Build valid task dictionary. kwargs are: 
+            task_info: data to show alongside task
+            repeatable: should multiple occurances of event be displayed?"""
         if actor not in ['CUSTOMER', 'APPROVER']:
             raise AttributeError("actor of task must be customer or approver")
         elif form not in form_classes:
             raise AttributeError("form must be key of form_classes")
-        if 'task_info' in kwargs:
-            task_info = kwargs['task_info']
-        else:
-            task_info = ""
+        task_info = kwargs.get('task_info', "")
+        repeatable = kwargs.get('repeatable', False)
         return {'form': form,
                 'actor': actor,
                 'fields': {},
                 'data': {'task_info': task_info},
-                'options': {}
+                'options': {'repeatable': repeatable}
                 }
 
     def form_request(self, request):
