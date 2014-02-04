@@ -409,12 +409,16 @@ def workflow_state(request, workflow_id):
         # a customer can only cancel an application
         if actor == 'CUSTOMER' and new_state != 'CANCELLED':
             raise PermissionDenied
-
-        workflow.state = new_state
-        if workflow.state == 'STARTED':
-            workflow.completed = False
-        else:
-            workflow.completed = True
+            
+        if workflow.state not in ['DENIED','CANCELLED']: #not allowed to change from canceled wf states
+            workflow.state = new_state #assign new state
+            if workflow.state == 'STARTED':
+                workflow.completed = False
+            elif workflow.state in ['DENIED','CANCELLED']:
+                workflow.workflow.cancel()
+                workflow.completed = True
+            else:
+                workflow.completed = True
         workflow.save()
         Message(workflow=workflow, sender=request.user,
                 message=nice_new_state).save()
