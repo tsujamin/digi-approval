@@ -8,7 +8,7 @@ services:
 install:
   - "sudo apt-get update"
   - "sudo apt-get install clamav"
-  - "pip install -r src/digiapproval_project/requirements.txt"
+  - "pip install -r src/requirements.txt"
   - "gem install erubis json"
   - "ruby src/dev/init_travis.rb"
 before_script:

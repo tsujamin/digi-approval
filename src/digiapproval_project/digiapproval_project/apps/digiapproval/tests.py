@@ -11,12 +11,13 @@ from django.contrib.auth.models import User
 # class UserFileTestCase(djangoTestCase):
 
 #     TIMEOUT = 10
-    
+
 #     def test_good_file_scans_clean(self):
-#         """Test that a known good file scans clean"""        
+#         """Test that a known good file scans clean"""
 #         uf = models.UserFile()
 #         uf.name = "Test File"
-#         clean_file = open(os.path.join(os.path.dirname(__file__), 'models.py'))
+#         clean_file = open(os.path.join(os.path.dirname(__file__),
+# 'models.py'))
 #         uf._file = File(clean_file)
 #         uf.save()
 #         clean_file.close()
@@ -33,7 +34,7 @@ from django.contrib.auth.models import User
 #         """Test that a known bad file scans bad."""
 #         uf = models.UserFile()
 #         uf.name = "Test Bad"
-        
+
 #         bad_file = open('/tmp/eicar', 'w')
 #         bad_file.write('X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-' +
 #                        'ANTIVIRUS-TEST-FILE!$H+H*')
@@ -42,11 +43,12 @@ from django.contrib.auth.models import User
 #         uf._file = File(bad_file)
 #         uf.save()
 #         bad_file.close()
-#         self.assertTrue(uf.virus_status == 'THREATFOUND', msg=uf.virus_status)
+#         self.assertTrue(uf.virus_status == 'THREATFOUND',
+# msg=uf.virus_status)
 #         self.assertIsNone(uf.file)
 #         uf.delete()
 #         os.unlink('/tmp/eicar')
-        
+
 #     # TODO: try to force an error case? (known to not work!)
 
 class CustomerUnitTest(TestCase):
@@ -63,14 +65,13 @@ class CustomerUnitTest(TestCase):
         self.approver = User.objects.create_user('approver',
                                                  'approver@digiactive.com.au',
                                                  'password')
-        
+
     def test_new_customers_have_no_workflows(self):
         """Check new users have no workflows"""
         self.assertEqual(self.customer.get_own_workflows(), [])
         self.assertEqual(self.customer.get_all_workflows(), [])
 
-# 
+#
 # give them a workflow, check they have it
 # create an organisation, and another user
 # check get_all_workflows transmits through orgs as expected.
-
