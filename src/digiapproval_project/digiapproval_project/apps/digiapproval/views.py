@@ -413,6 +413,9 @@ def workflow_state(request, workflow_id):
         workflow.state = new_state
         if workflow.state == 'STARTED':
             workflow.completed = False
+        else.state in ['DENIED','CANCELLED']:
+            workflow.workflow.cancel()
+            workflow.completed = True
         else:
             workflow.completed = True
         workflow.save()
