@@ -18,6 +18,7 @@ before_script:
   - cd digimail
   - lamson log
   - cd ..
+  - psql -c 'create database django;' -U postgres
 script:
   - python manage.py test digiapproval_project.apps.digiapproval
 after_script:
