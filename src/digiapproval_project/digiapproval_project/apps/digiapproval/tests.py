@@ -1,6 +1,5 @@
-from django.test import TestCase as TestCase
-from . import models
-from django.contrib.auth.models import User
+from django.test import TestCase
+from .test_data import TestData, to_workflow
 #from django.core.files import File
 #from django.core.files.base import ContentFile
 #import os
@@ -54,24 +53,43 @@ from django.contrib.auth.models import User
 class CustomerUnitTest(TestCase):
 
     def setUp(self):
-        """Create a customer and approver."""
-        # todo: fixture?
-        self.customer = models.CustomerAccount()
-        user = User.objects.create_user('customer',
-                                        'customer@digiactive.com.au',
-                                        'password')
-        self.customer.user = user
-        self.customer.save()
-        self.approver = User.objects.create_user('approver',
-                                                 'approver@digiactive.com.au',
-                                                 'password')
+        """Load in test data, minus workflows."""
+        self.data = TestData()
+        self.data.create_groups()
+        self.data.create_approvers()
+        self.data.create_organisations()
+        self.data.create_customers()
 
     def test_new_customers_have_no_workflows(self):
         """Check new users have no workflows"""
-        self.assertEqual(self.customer.get_own_workflows(), [])
-        self.assertEqual(self.customer.get_all_workflows(), [])
+        self.assertEqual(self.data.CUSTOMERS[0].get_own_workflows(), [])
+        self.assertEqual(self.data.CUSTOMERS[0].get_all_workflows(), [])
 
-#
-# give them a workflow, check they have it
-# create an organisation, and another user
-# check get_all_workflows transmits through orgs as expected.
+    def test_customer_gets_workflow(self):
+        """Test that when we create a workflow, the customer gets it."""
+        self.data.create_workflow_specs()
+        w = to_workflow((self.data.CUSTOMERS[0], self.data.WORKFLOW_SPECS[0],
+                         None))
+        self.assertEqual(self.data.CUSTOMERS[0].get_own_workflows(), [w])
+        self.assertEqual(self.data.CUSTOMERS[0].get_own_workflows(
+            completed=False), [w])
+        self.assertEqual(self.data.CUSTOMERS[0].get_own_workflows(
+            completed=True), [])
+
+    def test_organisation_workflow_propagation(self):
+        """Verify that workflows propagate around organisations as expected."""
+        self.data.create_workflow_specs()
+        w = to_workflow((self.data.ORGANISATIONS[0],
+                         self.data.WORKFLOW_SPECS[0], None))
+        self.assertEqual(self.data.ORGANISATIONS[0].get_own_workflows(), [w])
+        self.assertEqual(self.data.CUSTOMERS[1].get_own_workflows(), [])
+        self.assertEqual(self.data.CUSTOMERS[1].get_all_workflows(), [w])
+        w2 = to_workflow((self.data.CUSTOMERS[1], self.data.WORKFLOW_SPECS[0],
+                         None))
+
+        # organisations don't get to peek into their members!
+        self.assertEqual(self.data.ORGANISATIONS[0].get_all_workflows(), [w])
+
+        self.assertEqual(self.data.CUSTOMERS[1].get_own_workflows(), [w2])
+        self.assertEqual(set(self.data.CUSTOMERS[1].get_all_workflows()),
+                         set([w, w2]))
