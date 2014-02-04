@@ -31,7 +31,7 @@
       "postgresql": { "password": {"postgres": "Shut up and take my paperwork!"},
                       "config": {"port": "5432"} },
       "clamav": { "clamd": {"enabled": true,
-                            "local_socket": "/var/run/clamav/clamd"} }
+                            "local_socket": "/var/run/clamav/clamd.ctl"} }
 
   },
   "override_attributes": {
