@@ -1,0 +1,20 @@
+language: "python"
+python:
+  - "2.7"
+addons:
+  postgresql: 9.3
+services:
+  - rabbitmq
+install:
+  - "sudo apt-get update"
+  - "sudo apt-get install clamav"
+  - "pip install -r src/digiapproval_project/requirements.txt"
+  - "gem install erubis json"
+  - "ruby src/dev/init_travis.rb"
+before_script:
+  - cd src/digiapproval_project
+  - lamson log
+script:
+  - python manage.py test digiapproval_project.apps.digiapproval
+after_script:
+  - cat digimail/logs/logger.log
