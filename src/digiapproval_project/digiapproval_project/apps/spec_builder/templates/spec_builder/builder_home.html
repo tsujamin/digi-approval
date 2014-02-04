@@ -1,0 +1,13 @@
+{% extends "digiapproval/base.tpl.html" %}
+{% block title %} Workflow Spec Builder {% endblock %}
+
+{%block content %}
+{% for owner, specs in spec_list.items %}
+  <h2>{{ owner }}</h2>
+  <list>
+    {% for spec in specs %}
+     - {{ spec }} 
+    {% endfor %}
+  </list>
+{% endfor %}
+{% endblock %}
