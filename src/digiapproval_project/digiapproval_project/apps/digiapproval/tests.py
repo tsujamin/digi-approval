@@ -8,7 +8,6 @@ from . import models
 #import os
 #import time
 
-
 # BROKEN
 # class UserFileTestCase(djangoTestCase):
 
@@ -52,6 +51,7 @@ from . import models
 #         os.unlink('/tmp/eicar')
 
 #     # TODO: try to force an error case? (known to not work!)
+
 
 class CustomerUnitTest(TestCase):
 
@@ -181,6 +181,34 @@ class WorkflowViewsUnitTests(TestCase):
         self.assertEqual(response.status_code, 403)
         workflow = models.Workflow.objects.get(pk=workflow.pk)
         self.assertEqual(workflow.label, 'Untitled Application')
+
+    def test_view_task_authorised(self):
+        """Test if Cleaver can view his first ready task"""
+        w = self.data.WORKFLOWS[0]
+        tf = w.get_ready_task_forms(actor='CUSTOMER')[0]
+        t_uuid = tf.task_model.uuid
+
+        self.client.login(username='cleaver_g', password='fubar')
+        response = self.client.get(
+            reverse('view_task',
+                    kwargs={'workflow_id': w.id,
+                            'task_uuid': str(t_uuid)}))
+        self.assertEqual(response.status_code, 200)
+        # TODO: test more?
+
+    def test_view_task_unauthorised(self):
+        """Test if Missy can view Cleaver's first ready task"""
+        w = self.data.WORKFLOWS[0]
+        tf = w.get_ready_task_forms(actor='CUSTOMER')[0]
+        t_uuid = tf.task_model.uuid
+
+        self.client.login(username='missy_tanner', password='harrysorryjoshua')
+        response = self.client.get(
+            reverse('view_task',
+                    kwargs={'workflow_id': w.id,
+                            'task_uuid': str(t_uuid)}))
+        self.assertEqual(response.status_code, 302)
+        # TODO: test more?
 
 
 class LoggedInViewsUnitTests(TestCase):
