@@ -4,8 +4,7 @@ from django.forms.formsets import formset_factory
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from .forms import RegisterCustomerForm, LoginForm, DelegatorBaseFormSet,\
-    DelegatorForm
+from .forms import DelegatorBaseFormSet, DelegatorForm
 from .auth_decorators import login_required_organisation,\
     login_required_customer, login_required_approver, login_required_delegator
 from .auth_functions import workflow_actor_type, workflow_authorised_customer
@@ -21,50 +20,30 @@ def index(request):
     return render(request, 'digiapproval/index.html')
 
 
-## AUTHENTICATION / USER SETTINGS
+@login_required
+def profile(request):
+    """Handler for accounts/profile - which is where users are redirected after
+    logging in. Redirect them onwards to somewhere more useful."""
 
-def register_customer(request):
-    """Creates CustomerUser and corresponding User if RegisterUserForm
-    is valid"""
-    if request.method == 'POST':
-        form = RegisterCustomerForm(request.POST)
-        if form.is_valid():
-            account = form.create_customer()
-            if account is not None:
-                return HttpResponse("Account Successfully Created")
-    else:
-        form = RegisterCustomerForm()
-    return render(request, 'digiapproval/register_customer.html', {
-        'form': form,
-    })
-
-
-def login(request):
-    """Login controller for customer accounts."""
-    from django.contrib.auth import login as auth_login
-    error = None
-    if request.method == 'POST':
-        login_form = LoginForm(request.POST)
-        user = login_form.is_valid()
-        if user is not None:
-            auth_login(request, user)
-            if request.GET.get('next', None):
-                return redirect(request.GET.get('next'))
-            return redirect('index')
+    if hasattr(request.user, 'customeraccount'):
+        if request.user.customeraccount.account_type == 'CUSTOMER':
+            return redirect('applicant_home')
         else:
-            error = "Bad username/password combination"
-    return render(request, 'digiapproval/login.html', {
-        'form':  LoginForm(),
-        'error': error
-    })
+            return redirect('modify_subaccounts')
 
+    # for user who is approver and delegator, default to approver_worklist
+    if any([hasattr(g, 'workflowspecs_approvers')
+            for g in request.user.groups.all()]):
+        return redirect('approver_worklist')
 
-def logout(request):
-    """Logs out any currently logged in user"""
-    from django.contrib.auth import logout as auth_logout
-    if request.user.is_authenticated():
-        auth_logout(request)
-    return redirect('index')
+    # for user who is approver and delegator, default to approver_worklist
+    if any([hasattr(g, 'workflowspecs_delegators')
+            for g in request.user.groups.all()]):
+        return redirect('delegator_worklist')
+
+    return HttpResponse("""You don't have a role in the DigiApproval system.
+                        This is probably a bug, and we're very sorry - please
+                        contact us.""")
 
 
 @login_required
@@ -409,12 +388,13 @@ def workflow_state(request, workflow_id):
         # a customer can only cancel an application
         if actor == 'CUSTOMER' and new_state != 'CANCELLED':
             raise PermissionDenied
-            
-        if workflow.state not in ['DENIED','CANCELLED']: #not allowed to change from canceled wf states
-            workflow.state = new_state #assign new state
+
+        # users are not allowed to change from canceled wf states
+        if workflow.state not in ['DENIED', 'CANCELLED']:
+            workflow.state = new_state  # assign new state
             if workflow.state == 'STARTED':
                 workflow.completed = False
-            elif workflow.state in ['DENIED','CANCELLED']:
+            elif workflow.state in ['DENIED', 'CANCELLED']:
                 workflow.workflow.cancel()
                 workflow.completed = True
             else:

@@ -1,0 +1,10 @@
+Hi,
+
+Thank you for registering with DigiApproval.
+
+To complete your registration, please either click on the following link, or copy and paste it into your browser.
+
+http://{{ site.domain }}{% url 'registration_activate' activation_key=activation_key %}
+
+Yours,
+DigiApproval

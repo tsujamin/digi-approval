@@ -43,6 +43,7 @@ INSTALLED_APPS = (
     'digiapproval_project.apps.digiapproval',
     'south',
     'bootstrap3',
+    'registration',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -116,13 +117,13 @@ FIXTURE_DIRS = (
 # Files
 DEFAULT_FILE_STORAGE = 'swift.storage.SwiftStorage'
 
-# Login
-LOGIN_URL = '/digiapproval/login'
-
 # Bootstrap
 BOOTSTRAP3 = {
     'base_url': '/static/bootstrap/dist/'
 }
+
+# Registration
+ACCOUNT_ACTIVATION_DAYS = 7  # One-week activation window
 
 # Patch in our local settings
 from .local_settings import *  # noqa

@@ -1,0 +1,9 @@
+{% extends "page.tpl.html" %}
+{% load bootstrap3 %}
+
+{% block title %}Logged out{% endblock title %}
+
+{% block content %}
+<p>Successfully logged out.<p>
+<p><a href="{% url 'auth_login' %}">Log in</a></p>
+{% endblock content %}
