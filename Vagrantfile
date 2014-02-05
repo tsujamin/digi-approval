@@ -64,7 +64,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     aws.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
 
     # make this a little less painful
-    aws.vm.synced_folder ".", "/vagrant", :rsync_excludes=>["env", # no point in syncing that, it'll be built at that end
+    aws.vm.synced_folder ".", "/vagrant", :rsync_excludes=>["env", "staticfiles", # no point in syncing that, it'll be built at that end
                                                             "chef-repo", # this is synced elsewhere
                                                             "design", "casestudy", "pitch", "scope", # unnecessary & big
                                                             "vagrant", "cookbooks", # vestigal
@@ -98,7 +98,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     aws.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
 
     # make this a little less painful
-    aws.vm.synced_folder ".", "/vagrant", :rsync_excludes=>["env", # no point in syncing that, it'll be built at that end
+    aws.vm.synced_folder ".", "/vagrant", :rsync_excludes=>["env", "staticfiles", # no point in syncing that, it'll be built at that end
                                                             "chef-repo", # this is synced elsewhere
                                                             "design", "casestudy", "pitch", "scope", # unnecessary & big
                                                             "vagrant", "cookbooks", # vestigal
@@ -130,7 +130,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     aws.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
 
     # make this a little less painful
-    aws.vm.synced_folder ".", "/vagrant", :rsync_excludes=>["env", # no point in syncing that, it'll be built at that end
+    aws.vm.synced_folder ".", "/vagrant", :rsync_excludes=>["env", "staticfiles", # no point in syncing that, it'll be built at that end
                                                             "chef-repo", # this is synced elsewhere
                                                             "design", "casestudy", "pitch", "scope", # unnecessary & big
                                                             "vagrant", "cookbooks", # vestigal
