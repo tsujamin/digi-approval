@@ -14,7 +14,7 @@ for lessfile in $(find . -name "*.less"); do
     lessname=`basename $lessfile .less`
     lessdir=`dirname $lessfile`
     echo "Converting $lessdir/$lessname.less"
-    lessc $lessdir/$lessname > ../css/$lessdir/$lessname.css
+    lessc $lessdir/$lessname.less > ../css/$lessdir/$lessname.css
 done
 echo "done"
 echo "Don't forget to collectstatic if deploying with uWSGI."
