@@ -1,9 +1,9 @@
-{% extends "page.tpl.html" %}
+{% extends "digiapproval/base.tpl.html" %}
 {% block title %}{{task.workflow.spec.name}}: {{spiff_task.get_name}}{% endblock %}
 
 {% block content %}
-<p class="muted">Customer: {{task.workflow.customer.user.get_full_name}}.</p>
-<p class="muted">Approver: {{task.workflow.approver.get_full_name}}.</p>
+<p class="muted">Customer: {{task.workflow.customer.user.get_full_name}}<br/>
+Approver: {{task.workflow.approver.get_full_name}}</p>
 
 <p class="lead">Entered data</p>
 <dl>
