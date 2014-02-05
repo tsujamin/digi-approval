@@ -50,8 +50,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       # get this out of the way first, so we use it consistently
       # throughout the process
       chef.add_recipe("yum-epel")
-      # web role is useless atm
-      #chef.add_role("web")
+      chef.add_role("web")
       chef.add_role("database")
       chef.add_role("app")
       chef.add_recipe("storage")
@@ -65,7 +64,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     aws.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
 
     # make this a little less painful
-    aws.vm.synced_folder ".", "/vagrant", :rsync_excludes=>["env", # no point in syncing that, it'll be built at that end
+    aws.vm.synced_folder ".", "/vagrant", :rsync_excludes=>["env", "staticfiles", # no point in syncing that, it'll be built at that end
                                                             "chef-repo", # this is synced elsewhere
                                                             "design", "casestudy", "pitch", "scope", # unnecessary & big
                                                             "vagrant", "cookbooks", # vestigal
@@ -85,8 +84,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       # get this out of the way first, so we use it consistently
       # throughout the process
       chef.add_recipe("yum-epel")
-      # web role is useless atm
-      #chef.add_role("web")
+      chef.add_role("web")
       chef.add_role("database")
       chef.add_role("app")
       chef.add_recipe("storage")
@@ -100,7 +98,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     aws.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
 
     # make this a little less painful
-    aws.vm.synced_folder ".", "/vagrant", :rsync_excludes=>["env", # no point in syncing that, it'll be built at that end
+    aws.vm.synced_folder ".", "/vagrant", :rsync_excludes=>["env", "staticfiles", # no point in syncing that, it'll be built at that end
                                                             "chef-repo", # this is synced elsewhere
                                                             "design", "casestudy", "pitch", "scope", # unnecessary & big
                                                             "vagrant", "cookbooks", # vestigal
@@ -120,8 +118,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       # get this out of the way first, so we use it consistently
       # throughout the process
       chef.add_recipe("yum-epel")
-      # web role is useless atm
-      #chef.add_role("web")
+      chef.add_role("web")
       chef.add_role("database")
       chef.add_role("app")
       chef.add_recipe("broker")
@@ -135,7 +132,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     aws.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
 
     # make this a little less painful
-    aws.vm.synced_folder ".", "/vagrant", :rsync_excludes=>["env", # no point in syncing that, it'll be built at that end
+    aws.vm.synced_folder ".", "/vagrant", :rsync_excludes=>["env", "staticfiles", # no point in syncing that, it'll be built at that end
                                                             "chef-repo", # this is synced elsewhere
                                                             "design", "casestudy", "pitch", "scope", # unnecessary & big
                                                             "vagrant", "cookbooks", # vestigal
@@ -155,8 +152,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       # get this out of the way first, so we use it consistently
       # throughout the process
       chef.add_recipe("yum-epel")
-      # web role is useless atm
-      #chef.add_role("web")
       chef.add_recipe("storage")
     end
   end

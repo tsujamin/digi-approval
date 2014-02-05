@@ -13,3 +13,6 @@ user = User.objects.filter(username__exact="<%= @django_superuser %>")[0]
 user.set_password("<%= @django_superuser_password %>")
 user.save()
 EOF
+
+# collect the files for nginx/uWSGI
+python manage.py collectstatic --noinput
