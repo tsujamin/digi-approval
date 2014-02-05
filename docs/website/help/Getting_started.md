@@ -6,7 +6,7 @@ A **user** account represents an individual person - an actual human being.
 
 An **organisation** account, on the other hand, represents a group, such as a company or a community group.
 
-Both types of account can be created from the [registration page][register]. You will need to specify a user name, email and password.
+Both types of account can be created from the [registration page][register]. You will need to specify a user name, email and password, as well as your full name.
 
 Organisations can choose which users can make applications on their behalf. These users are called "members", and can be added or removed at any time. Users can be members to any number of organisations - or no organisations at all - and this can leave organisations at any time.
 
@@ -38,5 +38,5 @@ Once logged in, a user can change the organisations they're a member of from the
 
 [Back to the main help](/pages/help/)
 
-[register]: /digiapproval/register/
-[login]: /digiapproval/login
+[register]: /accounts/register/
+[login]: /accounts/login/
