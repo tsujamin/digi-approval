@@ -7,10 +7,13 @@ admin.autodiscover()
 urlpatterns = patterns(
     '',
     # hook in our profile and registration override
-    url(r'accounts/profile/$', views.profile, name='profile'),
-    url(r'accounts/register/$',
+    url(r'^accounts/profile/$', views.profile, name='profile'),
+    url(r'^accounts/register/$',
         RegistrationView.as_view(form_class=forms.CustomerRegistrationForm),
         name='registration_register'),
+
+    # make / work
+    url(r'^$', views.index),
 
     # apps
     url(r'^digiapproval/',
