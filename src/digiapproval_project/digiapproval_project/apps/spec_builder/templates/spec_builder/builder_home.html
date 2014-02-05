@@ -4,10 +4,18 @@
 {%block content %}
 {% for owner, specs in spec_list.items %}
   <h2>{{ owner }}</h2>
-  <list>
+  <ul>
     {% for spec in specs %}
-     - {{ spec }} 
+    <li><form action="" method="POST" role"form">
+      {% csrf_token %}
+      {{ spec.name }}
+      <input type="hidden" name="spec" value="{{spec.id}}"/>
+      <button type="submit" name="toggle_public" value="toggle_public" class="btn btn-default">
+        {% if spec.public %} Public {% else %} Private {% endif %}
+      </button>
+      <button type="submit" name="edit" value="edit" class="btn btn-default">Edit Workflow</button>
+   </form></li>
     {% endfor %}
-  </list>
+  </ul>
 {% endfor %}
 {% endblock %}
