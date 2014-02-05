@@ -44,6 +44,7 @@ INSTALLED_APPS = (
     'south',
     'bootstrap3',
     'registration',
+    'breadcrumbs',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -53,6 +54,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'breadcrumbs.middleware.BreadcrumbsMiddleware',
+    'breadcrumbs.middleware.FlatpageFallbackMiddleware',
 )
 
 ROOT_URLCONF = 'digiapproval_project.urls'
@@ -124,6 +127,12 @@ BOOTSTRAP3 = {
 
 # Registration
 ACCOUNT_ACTIVATION_DAYS = 7  # One-week activation window
+
+# breadcrumbs
+from django.conf import global_settings
+TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
+    'django.core.context_processors.request',
+)
 
 # Patch in our local settings
 from .local_settings import *  # noqa

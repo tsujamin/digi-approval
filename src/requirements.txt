@@ -43,3 +43,5 @@ dkimpy==0.5.4
 hg+https://daxtens@bitbucket.org/daxtens/django-registration/#egg=django-registration
 # uwsgi
 uWSGI==2.0
+# breadcrumbs
+django-breadcrumbs==1.1.3

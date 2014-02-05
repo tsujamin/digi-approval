@@ -207,8 +207,7 @@ class WorkflowViewsUnitTests(TestCase):
             reverse('view_task',
                     kwargs={'workflow_id': w.id,
                             'task_uuid': str(t_uuid)}))
-        self.assertEqual(response.status_code, 302)
-        # TODO: test more?
+        self.assertEqual(response.status_code, 403)
 
 
 class LoggedInViewsUnitTests(TestCase):

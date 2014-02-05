@@ -75,6 +75,17 @@
 
       <!-- Begin page content -->
       <div class="container">
+      {% if request.breadcrumbs.0 %}
+      <ul class="breadcrumb">
+        {% for breadcrumb in request.breadcrumbs %}
+          <li>{% if not forloop.last %}
+            <a href="{{ breadcrumb.url }}">{{ breadcrumb.name }}</a> <span class="divider"></span>
+          {% else %}
+            {{ breadcrumb.name }}  
+          {% endif %}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
       <h1>{% usemacro title %}</h1>
         {% block content %}{% endblock %}
 

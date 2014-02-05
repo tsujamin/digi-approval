@@ -12,6 +12,7 @@ from .models import WorkflowSpec, Workflow, Task, Message, CustomerAccount,\
 import uuid
 from SpiffWorkflow import Task as SpiffTask
 import itertools
+from django.core.urlresolvers import reverse
 
 
 ## MAIN PAGES
@@ -218,6 +219,10 @@ def view_workflow(request, workflow_id):
     if actor is None:
         raise PermissionDenied
 
+    # breadcrumb it
+    request.breadcrumbs([portal_breadcrumb(workflow, request.user),
+                         workflow_breadcrumb(workflow)])
+
     # iterate through the tasks, making a list of actually useful information
     tasks_it = SpiffTask.Iterator(workflow.workflow.task_tree)
     # ... skip the root
@@ -279,6 +284,11 @@ def new_workflow(request, workflowspec_id):
     for account in customer.parent_accounts.all():
         permitted_accounts.append(account)
 
+    request.breadcrumbs([
+        ('Applicant Portal', reverse('applicant_home')),
+        ('New Workflow', request.path_info)
+        ])
+
     if request.method == 'POST' and request.POST.get('create_workflow', False):
         acct_id = int(request.POST.get('account', None))
         wf_customer = get_object_or_404(CustomerAccount, id=acct_id)
@@ -306,7 +316,13 @@ def view_task(request, workflow_id, task_uuid):
     task_form_list = [task for task in workflow.get_ready_task_forms()
                       if task.uuid == uuid.UUID(task_uuid)]
     if len(task_form_list) is 1:
-        return task_form_list[0].form_request(request)
+        task_form = task_form_list[0]
+        request.breadcrumbs([
+            portal_breadcrumb(workflow, request.user),
+            workflow_breadcrumb(workflow),
+            (task_form.spiff_task.get_name(), request.path_info)
+            ])
+        return task_form.form_request(request)
     else:  # either invalid data or hash collision
         # TODO: display completed data if available: redirect to view_task_data
         return redirect('applicant_home')
@@ -318,8 +334,7 @@ def view_task_data(request, task_uuid):
 
     # figure out what and who we are
     task = get_object_or_404(Task, uuid=uuid.UUID(task_uuid))
-    if request.user != task.workflow.customer.user and \
-       request.user != task.workflow.approver:
+    if not request.user in task.workflow.get_involved_users():
         raise PermissionDenied
 
     # TODO verify uuid.hex is what we want.
@@ -330,6 +345,12 @@ def view_task_data(request, task_uuid):
         # TODO: throw some sort of error
         return HttpResponse("You can't view the data of a task that hasn't" +
                             " been completed.")
+
+    request.breadcrumbs([
+        portal_breadcrumb(task.workflow, request.user),
+        workflow_breadcrumb(task.workflow),
+        (spiff_task.get_name(), request.path_info)
+        ])
 
     #iterates and replaces values of file fields with link
     for field in task.task['fields']:
@@ -357,6 +378,12 @@ def view_workflow_messages(request, workflow_id):
     #Check auth
     if not request.user in workflow.get_involved_users():
         raise PermissionDenied
+
+    request.breadcrumbs([
+        portal_breadcrumb(workflow, request.user),
+        workflow_breadcrumb(workflow),
+        ('Messages', request.path_info)
+        ])
 
     Message.mark_all_read(workflow, request.user)
     if request.method == 'POST' and request.POST.get('new_message', False):
@@ -429,3 +456,18 @@ def workflow_label(request, workflow_id):
         return redirect(request.META['HTTP_REFERER'])
     else:
         return redirect('view_workflow', workflow_id=workflow_id)
+
+
+def portal_breadcrumb(workflow, user):
+    actor = workflow.actor_type(user)
+    if actor == 'CUSTOMER':
+        return ('Applicant Portal', reverse('applicant_home'))
+    elif actor == 'APPROVER':
+        return ('Approver Worklist', reverse('approver_worklist'))
+    else:
+        raise PermissionDenied
+
+
+def workflow_breadcrumb(workflow):
+    return (workflow.label,
+            reverse('view_workflow', kwargs={'workflow_id': workflow.id}))
