@@ -4,8 +4,7 @@ from django.forms.formsets import formset_factory
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from .forms import RegisterCustomerForm, LoginForm, DelegatorBaseFormSet,\
-    DelegatorForm
+from .forms import DelegatorBaseFormSet, DelegatorForm
 from .auth_decorators import login_required_organisation,\
     login_required_customer, login_required_approver, login_required_delegator
 from .auth_functions import workflow_actor_type, workflow_authorised_customer
@@ -19,52 +18,6 @@ import itertools
 ## MAIN PAGES
 def index(request):
     return render(request, 'digiapproval/index.html')
-
-
-## AUTHENTICATION / USER SETTINGS
-
-def register_customer(request):
-    """Creates CustomerUser and corresponding User if RegisterUserForm
-    is valid"""
-    if request.method == 'POST':
-        form = RegisterCustomerForm(request.POST)
-        if form.is_valid():
-            account = form.create_customer()
-            if account is not None:
-                return HttpResponse("Account Successfully Created")
-    else:
-        form = RegisterCustomerForm()
-    return render(request, 'digiapproval/register_customer.html', {
-        'form': form,
-    })
-
-
-def login(request):
-    """Login controller for customer accounts."""
-    from django.contrib.auth import login as auth_login
-    error = None
-    if request.method == 'POST':
-        login_form = LoginForm(request.POST)
-        user = login_form.is_valid()
-        if user is not None:
-            auth_login(request, user)
-            if request.GET.get('next', None):
-                return redirect(request.GET.get('next'))
-            return redirect('index')
-        else:
-            error = "Bad username/password combination"
-    return render(request, 'digiapproval/login.html', {
-        'form':  LoginForm(),
-        'error': error
-    })
-
-
-def logout(request):
-    """Logs out any currently logged in user"""
-    from django.contrib.auth import logout as auth_logout
-    if request.user.is_authenticated():
-        auth_logout(request)
-    return redirect('index')
 
 
 @login_required
