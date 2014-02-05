@@ -422,4 +422,8 @@ def workflow_label(request, workflow_id):
     if request.method == 'POST' and new_label:
         workflow.label = new_label
         workflow.save()
-    return redirect(request.META['HTTP_REFERER'])
+
+    if hasattr(request.META, 'HTTP_REFERER'):
+        return redirect(request.META['HTTP_REFERER'])
+    else:
+        return redirect('view_workflow', workflow_id=workflow_id)

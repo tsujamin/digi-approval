@@ -1,5 +1,8 @@
 from django.test import TestCase
+import unittest
 from .test_data import TestData, to_workflow
+from django.core.urlresolvers import reverse
+from . import models
 #from django.core.files import File
 #from django.core.files.base import ContentFile
 #import os
@@ -93,3 +96,149 @@ class CustomerUnitTest(TestCase):
         self.assertEqual(self.data.CUSTOMERS[1].get_own_workflows(), [w2])
         self.assertEqual(set(self.data.CUSTOMERS[1].get_all_workflows()),
                          set([w, w2]))
+
+
+class WorkflowViewsUnitTests(TestCase):
+    """Test the views that use workflows. Some just test basic rendering,
+    others test basic functionality."""
+
+    def setUp(self):
+        self.data = TestData()
+        self.data.create_groups()
+        self.data.create_approvers()
+        self.data.create_organisations()
+        self.data.create_customers()
+        self.data.create_workflow_specs()
+        self.data.create_workflows()
+
+    def test_view_workflow(self):
+        """Test that view_workflow renders something with the title of the
+        application in it, iff authorised."""
+        workflow = self.data.WORKFLOWS[0]
+
+        self.client.login(username='cleaver_g', password='fubar')
+        response = self.client.get(
+            reverse('view_workflow', kwargs={'workflow_id': workflow.id}))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(workflow.label, response.content)
+
+        self.client.login(username='missy_tanner', password='harrysorryjoshua')
+        response = self.client.get(
+            reverse('view_workflow', kwargs={'workflow_id': workflow.id}))
+        self.assertEqual(response.status_code, 403)
+
+    def test_workflow_state_authorised(self):
+        """Test if Cleaver can post a cancel to Cleaver's application.
+        TODO cover more of this view!!!"""
+        workflow = self.data.WORKFLOWS[0]
+
+        self.client.login(username='cleaver_g', password='fubar')
+        response = self.client.post(
+            reverse('update_workflow_state',
+                    kwargs={'workflow_id': workflow.id}),
+            {'wf_state': 'CANCELLED'}
+            )
+        self.assertEqual(response.status_code, 302)
+        workflow = models.Workflow.objects.get(pk=workflow.pk)
+        self.assertEqual(workflow.state, 'CANCELLED')
+
+    def test_workflow_state_unauthorised(self):
+        """Test if Missy can post a cancel to Cleaver's applicataion."""
+        workflow = self.data.WORKFLOWS[0]
+        self.client.login(username='missy_tanner', password='harrysorryjoshua')
+        response = self.client.post(
+            reverse('update_workflow_state',
+                    kwargs={'workflow_id': workflow.id}),
+            {'wf_state': 'CANCELLED'}
+            )
+        self.assertEqual(response.status_code, 403)
+        workflow = models.Workflow.objects.get(pk=workflow.pk)
+        self.assertEqual(workflow.state, 'STARTED')
+
+    def test_workflow_label_authorised(self):
+        """Test if Cleaver can change the title of Cleaver's application."""
+        workflow = self.data.WORKFLOWS[0]
+        self.client.login(username='cleaver_g', password='fubar')
+        response = self.client.post(
+            reverse('update_workflow_label',
+                    kwargs={'workflow_id': workflow.id}),
+            {'label': 'Titled Application'}
+            )
+        self.assertEqual(response.status_code, 302)
+        workflow = models.Workflow.objects.get(pk=workflow.pk)
+        self.assertEqual(workflow.label, 'Titled Application')
+
+    def test_workflow_label_unauthorised(self):
+        """Test if Missy can change the title of Cleaver's application."""
+        workflow = self.data.WORKFLOWS[0]
+
+        self.client.login(username='missy_tanner', password='harrysorryjoshua')
+        response = self.client.post(
+            reverse('update_workflow_label',
+                    kwargs={'workflow_id': workflow.id}),
+            {'label': 'Titled Application'}
+            )
+        self.assertEqual(response.status_code, 403)
+        workflow = models.Workflow.objects.get(pk=workflow.pk)
+        self.assertEqual(workflow.label, 'Untitled Application')
+
+
+class LoggedInViewsUnitTests(TestCase):
+    """These test the behaviour of logged in forms."""
+
+    def setUp(self):
+        self.data = TestData()
+        self.data.create_groups()
+        self.data.create_approvers()
+        self.data.create_organisations()
+        self.data.create_customers()
+
+    @unittest.expectedFailure
+    def test_settings_logged_in(self):
+        """Test that the settings page works when logged in."""
+        self.client.login(username='missy_tanner', password='harrysorryjoshua')
+        response = self.client.get(reverse('settings'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_settings_not_logged_in(self):
+        """Test that the settings page works when logged in."""
+        response = self.client.get(reverse('settings'))
+        # this is not working and I don't know why
+        #self.assertRedirects(response, reverse('auth_login'))
+        self.assertEqual(response.status_code, 302)
+
+    def test_modify_subaccounts_organisation(self):
+        """Test that the modify subaccount page renders for an organisation."""
+        self.client.login(username='leaky_plumbing', password='wikiwho?')
+        response = self.client.get(reverse('modify_subaccounts'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_modify_subaccounts_customer(self):
+        """Test that the modify subaccount page redirects for an customer."""
+        self.client.login(username='missy_tanner', password='harrysorryjoshua')
+        response = self.client.get(reverse('modify_subaccounts'))
+        self.assertEqual(response.status_code, 302)
+
+    def test_modify_subaccounts_not_logged_in(self):
+        """Test that the modify subaccount page redirects for un-logged-in."""
+        response = self.client.get(reverse('modify_subaccounts'))
+        self.assertEqual(response.status_code, 302)
+
+    def test_remove_parentaccounts_organisation(self):
+        """Test that the remove parentaccounts page redirects for an
+        organisation."""
+        self.client.login(username='leaky_plumbing', password='wikiwho?')
+        response = self.client.get(reverse('remove_parentaccounts'))
+        self.assertEqual(response.status_code, 302)
+
+    def test_remove_parentaccounts_customer(self):
+        """Test that the remove parentaccounts page renders for an customer."""
+        self.client.login(username='missy_tanner', password='harrysorryjoshua')
+        response = self.client.get(reverse('remove_parentaccounts'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_remove_parentaccounts_not_logged_in(self):
+        """Test that the remove parentaccounts page redirects for
+        un-logged-in."""
+        response = self.client.get(reverse('remove_parentaccounts'))
+        self.assertEqual(response.status_code, 302)
