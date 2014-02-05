@@ -43,8 +43,9 @@ execute "scl enable python27 'virtualenv /vagrant/env'" do
 end
 
 # install packages
-# (make sure git is around for our own versions of packages)
+# (make sure git and hg are around for our own versions of packages)
 include_recipe 'git'
+yum_package "mercurial"
 
 Chef::Log.info("Installing packages from requirements.txt")
 # interestingly using the absolute path to virtualenv pip will make

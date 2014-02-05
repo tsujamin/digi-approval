@@ -1,0 +1,10 @@
+{% extends "page.tpl.html" %}
+{% load bootstrap3 %}
+{% block title %}Registration Complete{% endblock %}
+
+{% block content %}
+
+<p>Thank you for registering. Your registration has been successfully
+processed. You may now <a href="{% url 'auth_login' %}">log in</a>.</p>
+
+{% endblock %}

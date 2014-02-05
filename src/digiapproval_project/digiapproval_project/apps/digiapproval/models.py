@@ -6,6 +6,7 @@ from django.template import Context, loader
 from .fields import WorkflowField, WorkflowSpecField
 from jsonfield import JSONField
 from django.core.exceptions import ObjectDoesNotExist
+from registration.signals import user_registered
 import uuid
 
 
@@ -327,3 +328,15 @@ in last_read_by")
         newest_message = workflow.message_set.last()
         if newest_message is not None:
             user.last_read.add(newest_message)
+
+
+# Hook into django-registration to make use of our extended form
+def user_registered_callback(sender, user, request, **kwargs):
+    # hoping that django-registration verifies this form for us.
+    user.first_name = request.POST["first_name"]
+    user.last_name = request.POST["last_name"]
+    profile = CustomerAccount(user=user)
+    profile.account_type = request.POST["type"]
+    profile.save()
+
+user_registered.connect(user_registered_callback)

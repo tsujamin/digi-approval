@@ -68,6 +68,32 @@ def logout(request):
 
 
 @login_required
+def profile(request):
+    """Handler for accounts/profile - which is where users are redirected after
+    logging in. Redirect them onwards to somewhere more useful."""
+
+    if hasattr(request.user, 'customeraccount'):
+        if request.user.customeraccount.account_type == 'CUSTOMER':
+            return redirect('applicant_home')
+        else:
+            return redirect('modify_subaccounts')
+
+    # for user who is approver and delegator, default to approver_worklist
+    if any([hasattr(g, 'workflowspecs_approvers')
+            for g in request.user.groups.all()]):
+        return redirect('approver_worklist')
+
+    # for user who is approver and delegator, default to approver_worklist
+    if any([hasattr(g, 'workflowspecs_delegators')
+            for g in request.user.groups.all()]):
+        return redirect('delegator_worklist')
+
+    return HttpResponse("""You don't have a role in the DigiApproval system.
+                        This is probably a bug, and we're very sorry - please
+                        contact us.""")
+
+
+@login_required
 def settings(request):
     raise NotImplementedError
 
@@ -409,12 +435,13 @@ def workflow_state(request, workflow_id):
         # a customer can only cancel an application
         if actor == 'CUSTOMER' and new_state != 'CANCELLED':
             raise PermissionDenied
-            
-        if workflow.state not in ['DENIED','CANCELLED']: #not allowed to change from canceled wf states
-            workflow.state = new_state #assign new state
+
+        # users are not allowed to change from canceled wf states
+        if workflow.state not in ['DENIED', 'CANCELLED']:
+            workflow.state = new_state  # assign new state
             if workflow.state == 'STARTED':
                 workflow.completed = False
-            elif workflow.state in ['DENIED','CANCELLED']:
+            elif workflow.state in ['DENIED', 'CANCELLED']:
                 workflow.workflow.cancel()
                 workflow.completed = True
             else:
