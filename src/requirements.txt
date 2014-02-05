@@ -39,3 +39,5 @@ django-bootstrap3==2.5.5
 seacucumber==1.5.1
 boto==2.24.0
 dkimpy==0.5.4
+# uwsgi
+uWSGI==2.0
