@@ -216,7 +216,7 @@ def view_workflow(request, workflow_id):
 
     actor = workflow.actor_type(request.user)
     if actor is None:
-        return PermissionDenied
+        raise PermissionDenied
 
     # iterate through the tasks, making a list of actually useful information
     tasks_it = SpiffTask.Iterator(workflow.workflow.task_tree)
@@ -417,8 +417,7 @@ def workflow_state(request, workflow_id):
 @login_required_customer
 def workflow_label(request, workflow_id):
     workflow = get_object_or_404(Workflow, id=workflow_id)
-    if not workflow.is_authorised_customer(request.user.customeraccount,
-                                           workflow):
+    if not workflow.is_authorised_customer(request.user.customeraccount):
         raise PermissionDenied()
 
     new_label = request.POST.get('label', False)
