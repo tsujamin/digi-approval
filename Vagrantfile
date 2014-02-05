@@ -104,7 +104,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                                                             "chef-repo", # this is synced elsewhere
                                                             "design", "casestudy", "pitch", "scope", # unnecessary & big
                                                             "vagrant", "cookbooks", # vestigal
-                                                            ".git", "*.pyc", "__pycache__", "node_modules" # sigh
+                                                            ".git", "*.pyc", "__pycache__", "node_modules", # sigh
+                                                            "logs/*", "run/*", # lamson
+                                                            "local_settings.py" # don't overwrite!
                                                            ]
 
     
@@ -137,7 +139,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                                                             "chef-repo", # this is synced elsewhere
                                                             "design", "casestudy", "pitch", "scope", # unnecessary & big
                                                             "vagrant", "cookbooks", # vestigal
-                                                            ".git", "*.pyc", "__pycache__", "node_modules" # sigh
+                                                            ".git", "*.pyc", "__pycache__", "node_modules", # sigh
+                                                            "logs/*", "run/*", # lamson
+                                                            "local_settings.py" # don't overwrite!
                                                            ]
 
     
