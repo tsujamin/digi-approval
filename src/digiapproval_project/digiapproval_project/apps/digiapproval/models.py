@@ -261,6 +261,31 @@ class Workflow(models.Model):
         customer is an organisation, all the associated users' emails"""
         return [user.email for user in self.get_involved_users()]
 
+    def is_authorised_customer(self, customer_account):
+        """Checks if customer is authorised to modify workflow"""
+        if not (customer_account == self.customer or
+                customer_account in self.customer.sub_accounts.all()):
+            return False
+        return True
+
+    def actor_type(self, user):
+        """Identifies if the user account is the CUSTOMER or APPROVER
+        of this workflow. Returns None if the user is neither."""
+
+        try:
+            customer = user.customeraccount
+            actor = 'CUSTOMER'
+            # FIXME: this doesn't cope with multiple layers of parent account -
+            # but we should probably remove those multiple layers
+            if customer != self.customer and \
+                    self.customer not in self.customer.parent_accounts.all():
+                return None
+        except:
+            actor = 'APPROVER'
+            if user != self.approver:
+                return None
+        return actor
+
     def __unicode__(self):
         return u'%s (%s)' % (self.customer.user.username, self.spec.name)
 
