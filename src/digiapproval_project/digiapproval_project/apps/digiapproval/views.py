@@ -13,6 +13,7 @@ import uuid
 from SpiffWorkflow import Task as SpiffTask
 import itertools
 from django.core.urlresolvers import reverse
+from .utils import never_cache
 
 
 ## MAIN PAGES
@@ -96,6 +97,7 @@ def remove_parentaccounts(request):
 ## APPLICANT-ONLY PAGES
 
 @login_required_customer
+@never_cache
 def applicant_home(request):
     """Controller for applicant home page. Displays the applicant's current
     applications, as well as a list of workflow specs to start new
@@ -121,6 +123,7 @@ def applicant_home(request):
 ## STAFF-ONLY PAGES
 
 @login_required_approver
+@never_cache
 def approver_worklist(request):
     """Controller for approver worklist. Displays the approver's worklist
 
@@ -140,6 +143,7 @@ def approver_worklist(request):
 
 
 @login_required_delegator
+@never_cache
 def delegator_worklist(request):
     """Controller for delegator worklist. Displays... TODO Finish description
 
@@ -209,6 +213,7 @@ def delegator_worklist(request):
 
 ## WORKFLOWS / TASKS
 @login_required
+@never_cache
 def view_workflow(request, workflow_id):
     """Controller for viewing workflows. TODO finish description
     """
@@ -308,6 +313,7 @@ def new_workflow(request, workflowspec_id):
 
 
 @login_required
+@never_cache
 def view_task(request, workflow_id, task_uuid):
     """Transient controller for returning appropriate taskform controller,
     authentication is handled by taskform
@@ -370,6 +376,7 @@ def view_task_data(request, task_uuid):
 
 
 @login_required
+@never_cache
 def view_workflow_messages(request, workflow_id):
     """Controller for workflow_messages view. Creates new messages and renders
     current ones"""
