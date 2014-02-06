@@ -4,6 +4,6 @@ Workflow: {{taskform.workflow_model.spec.name}}
 Step: {{taskform.spiff_task.task_spec.name}}
 Completed by: {{taskform.actor | title}}
 
-You can access the entered data at: http://demo.digiactive.com.au:8000{% url 'view_task_data' taskform.task_model.uuid %}
+You can access the entered data at: http://demo.digiactive.com.au{% url 'view_task_data' taskform.task_model.uuid %}
 
 Replying to this message will send a message to those involved in this workflow.
