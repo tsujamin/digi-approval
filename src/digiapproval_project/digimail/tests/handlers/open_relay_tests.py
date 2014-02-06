@@ -1,3 +1,7 @@
+# we didn't write this, nor do we particularly need to maintain it.
+# DJA 1/2/14
+# flake8: noqa
+
 from nose.tools import *
 from lamson.testing import *
 import os

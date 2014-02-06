@@ -42,7 +42,9 @@ INSTALLED_APPS = (
     'django.contrib.flatpages',
     'digiapproval_project.apps.digiapproval',
     'south',
-    'bootstrap3'
+    'bootstrap3',
+    'registration',
+    'breadcrumbs',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -52,6 +54,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'breadcrumbs.middleware.BreadcrumbsMiddleware',
+    'breadcrumbs.middleware.FlatpageFallbackMiddleware',
 )
 
 ROOT_URLCONF = 'digiapproval_project.urls'
@@ -99,7 +103,7 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    #'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 # Templates
@@ -114,14 +118,22 @@ FIXTURE_DIRS = (
 
 
 # Files
-DEFAULT_FILE_STORAGE='swift.storage.SwiftStorage'
-
-LOGIN_URL='/digiapproval/login'
+DEFAULT_FILE_STORAGE = 'swift.storage.SwiftStorage'
 
 # Bootstrap
 BOOTSTRAP3 = {
     'base_url': '/static/bootstrap/dist/'
 }
 
+# Registration
+ACCOUNT_ACTIVATION_DAYS = 7  # One-week activation window
+
+# breadcrumbs
+from django.conf import global_settings
+TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
+    'django.core.context_processors.request',
+)
+
 # Patch in our local settings
-from .local_settings import *
+from .local_settings import *  # noqa
+INSTALLED_APPS += ADDITIONAL_APPS
