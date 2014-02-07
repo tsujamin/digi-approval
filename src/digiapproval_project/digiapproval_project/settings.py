@@ -44,6 +44,8 @@ INSTALLED_APPS = (
     'digiapproval_project.apps.spec_builder',
     'south',
     'bootstrap3',
+    'registration',
+    'breadcrumbs',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -53,6 +55,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'breadcrumbs.middleware.BreadcrumbsMiddleware',
+    'breadcrumbs.middleware.FlatpageFallbackMiddleware',
 )
 
 ROOT_URLCONF = 'digiapproval_project.urls'
@@ -117,13 +121,19 @@ FIXTURE_DIRS = (
 # Files
 DEFAULT_FILE_STORAGE = 'swift.storage.SwiftStorage'
 
-# Login
-LOGIN_URL = '/digiapproval/login'
-
 # Bootstrap
 BOOTSTRAP3 = {
     'base_url': '/static/bootstrap/dist/'
 }
+
+# Registration
+ACCOUNT_ACTIVATION_DAYS = 7  # One-week activation window
+
+# breadcrumbs
+from django.conf import global_settings
+TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
+    'django.core.context_processors.request',
+)
 
 # Patch in our local settings
 from .local_settings import *  # noqa

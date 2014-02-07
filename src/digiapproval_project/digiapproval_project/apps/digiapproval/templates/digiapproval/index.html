@@ -13,8 +13,8 @@
     <li><a href="{% url 'approver_worklist' %}">Approver Worklist</a></li>
     {% endif %}
   {% else %}
-    <li><a href="{% url 'login' %}">Log in</a></li>
-    <li><a href="{% url 'register' %}">Register</a></li>
+    <li><a href="{% url 'auth_login' %}">Log in</a></li>
+    <li><a href="{% url 'registration_register' %}">Register</a></li>
   {% endif %}
 </ul>
 

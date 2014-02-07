@@ -83,7 +83,7 @@ Files are put on AWS with Rsync. However, things are only rsynced (rsunk?) on `u
 If you want to manually do it, you're looking at something like:
 
 ```shell
-/usr/bin/rsync --verbose --archive -z --exclude .vagrant/ --exclude Vagrantfile --exclude env --exclude chef-repo --exclude design --exclude casestudy --exclude pitch --exclude scope --exclude vagrant --exclude cookbooks --exclude .git --exclude "*.pyc" --exclude __pycache__ --exclude node_modules -e "ssh -p 22 -o StrictHostKeyChecking=no -i '/HOMEPATH/YOU/.ssh/digiawspem.pem'" /path/to/digi-approval/ ec2-user@THE_IP_ADDRESS:/vagrant
+/usr/bin/rsync --verbose --archive -z --exclude .vagrant/ --exclude Vagrantfile --exclude env --exclude chef-repo --exclude design --exclude casestudy --exclude pitch --exclude scope --exclude vagrant --exclude cookbooks --exclude .git --exclude "*.pyc" --exclude __pycache__ --exclude node_modules --exclude run --exclude logs --exclude local_settings.py -e "ssh -p 22 -o StrictHostKeyChecking=no -i '/HOMEPATH/YOU/.ssh/digiawspem.pem'" /path/to/digi-approval/ ec2-user@THE_IP_ADDRESS:/vagrant/
 ```
 
 ## Hacking on chef ##
@@ -219,8 +219,11 @@ Because I don't hate myself, I'm not writing raw CSS, but rather using LESS. Unf
 
 If you're using node from homebrew on a mac, you may need to use `/usr/local/share/npm/bin/lessc`
 
+
 # Frequently Encountered Problems #
 
 + **I've lost network access in the guest**: have you moved networks? Do a ```vagrant reload``` and try again.
 
 + **I've lost my storage layer**: it doesn't start on boot. Do a ```vagrant provision``` to get it back.
+
++ **I'm not seeing changes to my static assets in nginx**: `python manage.py collectstatic` - they're not served dynamically.

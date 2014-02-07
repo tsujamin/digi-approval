@@ -39,3 +39,9 @@ django-bootstrap3==2.5.5
 seacucumber==1.5.1
 boto==2.24.0
 dkimpy==0.5.4
+# registration
+hg+https://daxtens@bitbucket.org/daxtens/django-registration/#egg=django-registration
+# uwsgi
+uWSGI==2.0
+# breadcrumbs
+django-breadcrumbs==1.1.3

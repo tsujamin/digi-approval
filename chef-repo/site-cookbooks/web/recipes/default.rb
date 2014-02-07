@@ -7,32 +7,20 @@
 # All rights reserved - Do Not Redistribute
 #
 
-# Reject packets other than those explicitly allowed
-simple_iptables_policy "INPUT" do
-  policy "DROP"
+# drop in a more useful http config file
+execute "nxdissite default"
+
+file "/etc/nginx/conf.d/default.conf" do
+  action :delete
 end
 
-# The following rules define a "system" chain; chains
-# are used as a convenient way of grouping rules together,
-# for logical organization.
-
-# Allow all traffic on the loopback device
-simple_iptables_rule "system" do
-  rule "--in-interface lo"
-  jump "ACCEPT"
+cookbook_file "uwsgi.conf" do
+  path "/etc/nginx/sites-available/uwsgi"
+  action :create
 end
 
-# Allow any established connections to continue, even
-# if they would be in violation of other rules.
-simple_iptables_rule "system" do
-  rule "-m conntrack --ctstate ESTABLISHED,RELATED"
-  jump "ACCEPT"
-end
-
-# Allow SSH
-simple_iptables_rule "system" do
-  rule "--proto tcp --dport 22"
-  jump "ACCEPT"
+execute "nxensite uwsgi" do
+  notifies :reload, resources(:service => "nginx")
 end
 
 # Allow HTTP, HTTPS
