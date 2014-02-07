@@ -392,7 +392,6 @@ def workflowspec_realistic_one():
     cust_event_info.set_data(task_data = FieldEntry.make_task_dict('CUSTOMER',
         ('event_name', "What is the name of your proposed event", 'text', True),
         ('event_description', "Please describe the nature of your event", 'text', True),
-        ('event_public_land', "Is your event planned on Public Unleased Land?", 'checkbox', False),
         ('info_first_event', "Is this the first time you've organised an event?" , 'checkbox', False),
         ('event_other', "Please enter any relevant comments about your event", 'text', False),
         task_info="""Welcome to the <b>DigiApproval</b> system. 
@@ -400,11 +399,10 @@ If you have any concern during your application process please contact your assi
     ))
     cust_event_attendance.set_data(task_data = ChooseBranch.make_task_dict('CUSTOMER',
         ('need_ramp', "Over 50 participants are expected to attend", 1),
-        ('assess_ramp', "Less than 50 participants are expected to attend ", 2),
+        ('assess_ramp', "Fewer than 50 participants are expected to attend ", 2),
         task_info="""In order to assess your need for a <b>Risk Assessment Management Plan</b> (RAMP) we require some information on the number of expected attendies."""
     ))
     cust_ramp_tally.set_data(task_data = CheckTally.make_task_dict('CUSTOMER',
-        ('public_land', "Is the event held on public land", False, 41),
         ('large_structures', "Will there be large structures at your event", False, 10),
         ('electircal_equipment', "Will there be electrical cabling", False, 20),
         ('water_hazards', "Will there be bodies of water at your event", False, 15),

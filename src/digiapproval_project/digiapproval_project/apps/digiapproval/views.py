@@ -426,6 +426,13 @@ def workflow_state(request, workflow_id):
         if actor == 'CUSTOMER' and new_state != 'CANCELLED':
             raise PermissionDenied
 
+        # a change other than approval requires confirmation
+        if not (new_state == "APPROVED" or request.POST.get('confirm', False)):
+            return render(request, "digiapproval/confirm_workflow_state.html",
+                          {'workflow': workflow,
+                           'new_state': new_state
+                           })
+
         # users are not allowed to change from canceled wf states
         if workflow.state not in ['DENIED', 'CANCELLED']:
             workflow.state = new_state  # assign new state
