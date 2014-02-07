@@ -20,6 +20,9 @@
     {% for task in spec_model.spec.task_specs %}
     <li>
       {{task}}
+      <ul>
+        <li><a href="{% url 'connect_task' spec_id=spec_model.id task_name=task %}">Connect a task</a></li>
+      </ul>
     </li>
     {% endfor %}
   </ul>

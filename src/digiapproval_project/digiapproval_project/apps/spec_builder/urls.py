@@ -9,4 +9,5 @@ urlpatterns = patterns(
     url(r'^builder_home/$', views.builder_home, name="home"),
     url(r'^new_spec/$', views.new_spec, name="new_spec"),
     url(r'^view_spec/(?P<spec_id>\d+)/$', views.view_spec, name="view_spec"),
+    url(r'^connect_task/(?P<spec_id>\d+)/(?P<task_name>.+)/$', views.connect_task, name="connect_task")
 )

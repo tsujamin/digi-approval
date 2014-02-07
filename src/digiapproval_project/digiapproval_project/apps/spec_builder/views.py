@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.contrib.auth.models import User, Group
 from digiapproval_project.apps.digiapproval.auth_decorators import login_required_super
 from digiapproval_project.apps.digiapproval import models as approval_models
 from SpiffWorkflow.specs import WorkflowSpec
+from SpiffWorkflow import specs as taskspecs
 
 def index(request):
     return redirect('home')
@@ -72,6 +73,27 @@ def view_spec(request, spec_id):
         'spec_model': spec,
         'groups': Group.objects.all()
     })
+    
+@login_required_super
+def connect_task(request, spec_id, task_name):
+    spec_model = get_object_or_404(approval_models.WorkflowSpec,
+                                id=spec_id)
+    origin_task = spec_model.spec.task_specs.get(task_name)
+    if origin_task is None:
+        raise Http404
+    if request.method == "POST":
+        pass
+    
+    return render(request, 'spec_builder/connect_task.html', {
+        'spec_model': spec_model,
+        'origin_task': origin_task
+    })
+                                
+
+CONNECTABLE_TASKS = {
+    'simple': taskspecs.Simple,
+    'join': taskspecs.Join
+}                                
             
     
  
