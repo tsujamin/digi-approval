@@ -1,3 +1,13 @@
+"""
+Basic tests for our app.
+
+We deliberately do not test the following types of authentication here:
+ * @login_required: it's is core Django
+ * @login_required_*: they are tested in test_auth_decorators.py. We do,
+                      however, assume that those tests are opaque, so we retest
+                      some views used there to test the decorators.
+"""
+
 from django.test import TestCase
 import unittest
 from .test_data import TestData, to_workflow
@@ -98,9 +108,89 @@ class CustomerUnitTest(TestCase):
                          set([w, w2]))
 
 
+class LoggedInCustomerViewsUnitTests(TestCase):
+    """Test forms requiring a customer login but no data."""
+
+    def setUp(self):
+        self.data = TestData()
+        self.data.create_organisations()
+        self.data.create_customers()
+        self.client.login(username='missy_tanner', password='harrysorryjoshua')
+
+    @unittest.expectedFailure
+    def test_settings_logged_in(self):
+        """Test that the settings page works when logged in."""
+        response = self.client.get(reverse('settings'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_remove_parentaccounts_customer(self):
+        """Test that the remove parentaccounts page renders for an customer."""
+        response = self.client.get(reverse('remove_parentaccounts'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_applicant_home_customer(self):
+        """Test that the applicant home renders for an applicant/customer."""
+        response = self.client.get(reverse('applicant_home'))
+        self.assertEqual(response.status_code, 200)
+
+
+class LoggedInOrganisationViewsUnitTests(TestCase):
+    """Test forms requiring an organisation login but no data."""
+
+    def setUp(self):
+        self.data = TestData()
+        self.data.create_organisations()
+        self.data.create_customers()
+        self.client.login(username='leaky_plumbing', password='wikiwho?')
+
+    def test_modify_subaccounts_organisation(self):
+        """Test that the modify subaccount page renders for an organisation."""
+        response = self.client.get(reverse('modify_subaccounts'))
+        self.assertEqual(response.status_code, 200)
+
+
+class LoggedInApproverViewsUnitTests(TestCase):
+    """Test forms requiring an approver login but no data."""
+
+    def setUp(self):
+        self.data = TestData()
+        self.data.create_groups()
+        self.data.create_approvers()
+        self.data.create_organisations()
+        self.data.create_customers()
+        self.data.create_workflow_specs()
+        self.client.login(username='Cal.McGregor',
+                          password='alwaystheminister')
+
+    def test_approver_worklist(self):
+        """Test that the approver worklist renders for an approver."""
+        response = self.client.get(reverse('approver_worklist'))
+        self.assertEqual(response.status_code, 200)
+
+
+class LoggedInDelgatorViewsUnitTests(TestCase):
+    """Test forms requiring a delegator login but no data."""
+
+    def setUp(self):
+        self.data = TestData()
+        self.data.create_groups()
+        self.data.create_approvers()
+        self.data.create_organisations()
+        self.data.create_customers()
+        self.data.create_workflow_specs()
+        self.client.login(username='David.Potter',
+                          password='harrysorrydavid')
+
+    def test_delegator_worklist(self):
+        """Test that the delegator worklist renders for a delegator."""
+        response = self.client.get(reverse('delegator_worklist'))
+        self.assertEqual(response.status_code, 200)
+
+
 class WorkflowViewsUnitTests(TestCase):
     """Test the views that use workflows. Some just test basic rendering,
-    others test basic functionality."""
+    others test basic functionality.
+    """
 
     def setUp(self):
         self.data = TestData()
@@ -226,64 +316,3 @@ class WorkflowViewsUnitTests(TestCase):
                     kwargs={'workflow_id': w.id,
                             'task_uuid': str(t_uuid)}))
         self.assertEqual(response.status_code, 403)
-
-
-class LoggedInViewsUnitTests(TestCase):
-    """These test the behaviour of logged in forms."""
-
-    def setUp(self):
-        self.data = TestData()
-        self.data.create_groups()
-        self.data.create_approvers()
-        self.data.create_organisations()
-        self.data.create_customers()
-
-    @unittest.expectedFailure
-    def test_settings_logged_in(self):
-        """Test that the settings page works when logged in."""
-        self.client.login(username='missy_tanner', password='harrysorryjoshua')
-        response = self.client.get(reverse('settings'))
-        self.assertEqual(response.status_code, 200)
-
-    def test_settings_not_logged_in(self):
-        """Test that the settings page works when logged in."""
-        response = self.client.get(reverse('settings'))
-        # this is not working and I don't know why
-        #self.assertRedirects(response, reverse('auth_login'))
-        self.assertEqual(response.status_code, 302)
-
-    def test_modify_subaccounts_organisation(self):
-        """Test that the modify subaccount page renders for an organisation."""
-        self.client.login(username='leaky_plumbing', password='wikiwho?')
-        response = self.client.get(reverse('modify_subaccounts'))
-        self.assertEqual(response.status_code, 200)
-
-    def test_modify_subaccounts_customer(self):
-        """Test that the modify subaccount page redirects for an customer."""
-        self.client.login(username='missy_tanner', password='harrysorryjoshua')
-        response = self.client.get(reverse('modify_subaccounts'))
-        self.assertEqual(response.status_code, 302)
-
-    def test_modify_subaccounts_not_logged_in(self):
-        """Test that the modify subaccount page redirects for un-logged-in."""
-        response = self.client.get(reverse('modify_subaccounts'))
-        self.assertEqual(response.status_code, 302)
-
-    def test_remove_parentaccounts_organisation(self):
-        """Test that the remove parentaccounts page redirects for an
-        organisation."""
-        self.client.login(username='leaky_plumbing', password='wikiwho?')
-        response = self.client.get(reverse('remove_parentaccounts'))
-        self.assertEqual(response.status_code, 302)
-
-    def test_remove_parentaccounts_customer(self):
-        """Test that the remove parentaccounts page renders for an customer."""
-        self.client.login(username='missy_tanner', password='harrysorryjoshua')
-        response = self.client.get(reverse('remove_parentaccounts'))
-        self.assertEqual(response.status_code, 200)
-
-    def test_remove_parentaccounts_not_logged_in(self):
-        """Test that the remove parentaccounts page redirects for
-        un-logged-in."""
-        response = self.client.get(reverse('remove_parentaccounts'))
-        self.assertEqual(response.status_code, 302)
