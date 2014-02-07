@@ -1,21 +1,29 @@
 {% extends "digiapproval/base.tpl.html" %}
-{% block title %} Workflow Spec Builder {% endblock %}
+{% block title %} Workflow Specs{% endblock %}
 
 {%block content %}
-{% for owner, specs in spec_list.items %}
-  <h2>{{ owner }}</h2>
+<div class="col-md-7">
+  {% for owner, specs in spec_list.items %}
+    <h3>{{ owner }}</h3>
+    <ul>
+      {% for spec in specs %}
+      <li><form action="" method="POST" role"form">
+        {% csrf_token %}
+        {{ spec.name }}
+        <input type="hidden" name="spec" value="{{spec.id}}"/>
+        <button type="submit" name="toggle_public" value="toggle_public" class="btn btn-default">
+          {% if spec.public %} Public {% else %} Private {% endif %}
+        </button>
+        <button type="submit" name="edit" value="edit" class="btn btn-default">Edit Workflow</button>
+     </form></li>
+      {% endfor %}
+    </ul>
+  {% endfor %}
+</div>
+<div class="col-md-5">
+  <h3>Tasks:</h3>
   <ul>
-    {% for spec in specs %}
-    <li><form action="" method="POST" role"form">
-      {% csrf_token %}
-      {{ spec.name }}
-      <input type="hidden" name="spec" value="{{spec.id}}"/>
-      <button type="submit" name="toggle_public" value="toggle_public" class="btn btn-default">
-        {% if spec.public %} Public {% else %} Private {% endif %}
-      </button>
-      <button type="submit" name="edit" value="edit" class="btn btn-default">Edit Workflow</button>
-   </form></li>
-    {% endfor %}
+    <li><a href="{% url 'new_spec' %}">Start a new workflow spec</a></li>
   </ul>
-{% endfor %}
+</div>
 {% endblock %}

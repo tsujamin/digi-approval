@@ -1,11 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from digiapproval_project.apps.digiapproval.auth_decorators import login_required_super
 from digiapproval_project.apps.digiapproval import models as approval_models
+from SpiffWorkflow.specs import WorkflowSpec
 
 def index(request):
-    raise NotImplementedError
+    return redirect('home')
 
 @login_required_super
 def builder_home(request):
@@ -17,7 +18,7 @@ def builder_home(request):
             spec.public = not spec.public
             spec.save()
         elif 'edit' in request.POST:
-            raise NotImplementedError
+            return redirect('view_spec', spec_id=spec.id)
     wf_spec_ordered = {} #{owner: [specs],...}
     for spec in approval_models.WorkflowSpec.objects.all():
         if spec.owner.name not in wf_spec_ordered: wf_spec_ordered[spec.owner.name] = []
@@ -26,6 +27,25 @@ def builder_home(request):
     return render(request, 'spec_builder/builder_home.html', {
         'spec_list': wf_spec_ordered,
     })
+    
+@login_required_super
+def new_spec(request):
+    if request.method == "POST":
+        group = get_object_or_404(Group,
+                                id=request.POST.get('spec_owner', -1))
+        name = request.POST.get('spec_name', False)
+        if name:
+            spec_model = approval_models.WorkflowSpec(owner=group, name=name, public=False,
+                                                      spec=WorkflowSpec(name))
+            spec_model.save()
+            return redirect('view_spec', spec_id=spec_model.id)
+    return render(request, 'spec_builder/new_spec.html', {
+        'groups': Group.objects.all()
+    })
+    
+@login_required_super
+def view_spec(request, spec_id):
+    raise NotImplementedError
             
     
  
