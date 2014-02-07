@@ -79,6 +79,8 @@ def connect_task(request, spec_id, task_name):
     spec_model = get_object_or_404(approval_models.WorkflowSpec,
                                 id=spec_id)
     origin_task = spec_model.spec.task_specs.get(task_name)
+    
+    existing_error = new_error = None
     if origin_task is None:
         raise Http404
     if request.method == "POST":
@@ -86,13 +88,17 @@ def connect_task(request, spec_id, task_name):
     
     return render(request, 'spec_builder/connect_task.html', {
         'spec_model': spec_model,
-        'origin_task': origin_task
+        'origin_task': origin_task,
+        'existing_tasks': {k: type(v).__name__ for k, v in spec_model.spec.task_specs.items()},
+        'legal_tasks': {k: (v[0],v[1].__name__) for k, v in CONNECTABLE_TASKS.items()},
+        'existing_error': existing_error,
+        'new_error': new_error,
     })
                                 
 
 CONNECTABLE_TASKS = {
-    'simple': taskspecs.Simple,
-    'join': taskspecs.Join
+    'simple': ('Simple Task Node', taskspecs.Simple),
+    'join': ('Blocking Join Node', taskspecs.Join)
 }                                
             
     
