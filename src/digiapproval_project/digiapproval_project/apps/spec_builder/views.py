@@ -34,9 +34,14 @@ def new_spec(request):
         group = get_object_or_404(Group,
                                 id=request.POST.get('spec_owner', -1))
         name = request.POST.get('spec_name', False)
+        
+        if len(request.POST.get('spec_desc', '')) is 0: desc = "No description provided"
+        else: desc = request.POST.get('spec_desc', '')
+        
         if name:
             spec_model = approval_models.WorkflowSpec(owner=group, name=name, public=False,
-                                                      spec=WorkflowSpec(name))
+                                                      spec=WorkflowSpec(name), 
+                                                      description=desc)
             spec_model.save()
             return redirect('view_spec', spec_id=spec_model.id)
     return render(request, 'spec_builder/new_spec.html', {
