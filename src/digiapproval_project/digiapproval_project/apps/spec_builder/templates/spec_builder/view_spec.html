@@ -1,0 +1,74 @@
+{% extends "digiapproval/base.tpl.html" %}
+{% block title %} 
+<form action="" method="POST" role="form" class="form-inline">
+  {% csrf_token %}
+  {{spec_model.name}} ({{spec_model.owner.name}})
+  <button type="submit" name="toggle_public" value="toggle_public" class="btn btn-default">
+    {% if spec_model.public %} Public {% else %} Private {% endif %}
+  </button>
+</form>
+{% endblock %}
+
+{%block content %}
+<!-- task list -->
+<div class="col-md-6">
+  <h3>Tasks</h3>
+  <ul>
+    {% for task in spec_model.spec.task_specs %}
+    <li>
+      {{task}}
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+
+<!-- input form -->
+<div class="col-md-6">
+  <h3>Options</h3>
+  <form action="" method="POST" role="form">
+    {% csrf_token %}
+    <!-- spec name-->
+    <div class="form-group">
+      <label for="label">Spec Name</label>
+      <input type="text" name="spec_name" value="{{spec_model.name}}" class="form-control" max_length="64"/>
+    </div>
+    <!-- spec-desc -->
+    <div class="form-group">
+      <label for="spec_description">Description</label>
+      <textarea name="spec_description" class="form-control" rows="4">{{spec_model.description}}</textarea>
+    </div>
+    <!-- edit groups -->
+    <div class="form-group">
+      <label for="owner-group">Owner Group</label>
+      <select name="owner-group">
+        {% for group in groups %}
+        <option value="{{group.id}}" {% ifequal group.id spec_model.owner.id %}selected{% endifequal %}>
+          {{group.name}}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="approvers-group">Approver Group</label>
+      <select name="approvers-group">
+        {% for group in groups %}
+        <option value="{{group.id}}" {% ifequal group.id spec_model.approvers.id %}selected{% endifequal %}>
+          {{group.name}}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="delegators-group">Delegator Group</label>
+      <select name="delegators-group">
+        {% for group in groups %}
+        <option value="{{group.id}}" {% ifequal group.id spec_model.delegators.id %}selected{% endifequal %}>
+          {{group.name}}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit" name="edit_name" class="btn btn-default">Update Workflow Spec</button>
+  </form>
+</div>
+{% endblock %}

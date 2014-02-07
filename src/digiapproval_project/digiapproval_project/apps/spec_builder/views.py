@@ -39,9 +39,13 @@ def new_spec(request):
         else: desc = request.POST.get('spec_desc', '')
         
         if name:
-            spec_model = approval_models.WorkflowSpec(owner=group, name=name, public=False,
-                                                      spec=WorkflowSpec(name), 
-                                                      description=desc)
+            spec_model = approval_models.WorkflowSpec(owner=group, 
+                                                        approvers=group, 
+                                                        delegators=group, 
+                                                        name=name, 
+                                                        public=False,
+                                                        spec=WorkflowSpec(name), 
+                                                        description=desc)
             spec_model.save()
             return redirect('view_spec', spec_id=spec_model.id)
     return render(request, 'spec_builder/new_spec.html', {
@@ -50,7 +54,24 @@ def new_spec(request):
     
 @login_required_super
 def view_spec(request, spec_id):
-    raise NotImplementedError
+    spec = get_object_or_404(approval_models.WorkflowSpec,
+                                id=spec_id)
+    if request.method == "POST":
+        print request.POST
+        if 'toggle_public' in request.POST:
+            spec.public = not spec.public
+            spec.save()
+            print spec.public
+        else:
+            for field in ['owner', 'approvers', 'delegators']:
+                spec.__setattr__(field, get_object_or_404(Group, id=request.POST.get(field+'-group', -1)))
+            for field in ['name', 'description']:
+                spec.__setattr__(field, request.POST.get('spec_'+field, spec.__getattribute__(field)))
+        spec.save()
+    return render(request, 'spec_builder/view_spec.html', {
+        'spec_model': spec,
+        'groups': Group.objects.all()
+    })
             
     
  
