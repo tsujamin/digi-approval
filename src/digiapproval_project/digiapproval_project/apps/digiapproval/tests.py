@@ -127,7 +127,25 @@ class WorkflowViewsUnitTests(TestCase):
             reverse('view_workflow', kwargs={'workflow_id': workflow.id}))
         self.assertEqual(response.status_code, 403)
 
-    def test_workflow_state_authorised(self):
+    def test_workflow_state_authorised_unconfirmed(self):
+        """Test if Cleaver is asked to confirm a cancel to Cleaver's
+        application.
+
+        TODO cover more of this view!!!
+        """
+        workflow = self.data.WORKFLOWS[0]
+
+        self.client.login(username='cleaver_g', password='fubar')
+        response = self.client.post(
+            reverse('update_workflow_state',
+                    kwargs={'workflow_id': workflow.id}),
+            {'wf_state': 'CANCELLED'}
+            )
+        self.assertEqual(response.status_code, 200)
+        workflow = models.Workflow.objects.get(pk=workflow.pk)
+        self.assertEqual(workflow.state, 'STARTED')
+
+    def test_workflow_state_authorised_confirmed(self):
         """Test if Cleaver can post a cancel to Cleaver's application.
         TODO cover more of this view!!!"""
         workflow = self.data.WORKFLOWS[0]
@@ -136,7 +154,7 @@ class WorkflowViewsUnitTests(TestCase):
         response = self.client.post(
             reverse('update_workflow_state',
                     kwargs={'workflow_id': workflow.id}),
-            {'wf_state': 'CANCELLED'}
+            {'wf_state': 'CANCELLED', 'confirm': 'True'}
             )
         self.assertEqual(response.status_code, 302)
         workflow = models.Workflow.objects.get(pk=workflow.pk)
@@ -149,7 +167,7 @@ class WorkflowViewsUnitTests(TestCase):
         response = self.client.post(
             reverse('update_workflow_state',
                     kwargs={'workflow_id': workflow.id}),
-            {'wf_state': 'CANCELLED'}
+            {'wf_state': 'CANCELLED', 'confirm': 'True'}
             )
         self.assertEqual(response.status_code, 403)
         workflow = models.Workflow.objects.get(pk=workflow.pk)

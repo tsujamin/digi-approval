@@ -1,0 +1,21 @@
+{% extends "digiapproval/base.tpl.html" %}
+{% block title %}Confirm change of state to {{new_state|lower}}{% endblock %}
+{% block content %}
+<p class="muted">Customer: {{workflow.customer.user.get_full_name}}<br/>
+Approver: {{workflow.approver.get_full_name}}</p>
+
+<p class="lead">Changing state is permanent. There is no 'undo'.</p>
+{% ifequal new_state 'DENIED' %}
+<p>Denying a workflow is a final refusal of the entire application.<p>
+<p>It is not the same as requiring an applicant to resubmit a document. If you are trying to require an applicant to resubmit a document, use the relevant task from the <a href="{% url 'view_workflow' workflow.id %}">workflow</a>.</p>
+{% endifequal %}
+<h2>Are you sure?</h2>
+<p>Do you want to change the state of this application to {{new_state|lower}}?</p>
+        <form action="{% url 'update_workflow_state' workflow.id %}" method="POST" role="form">  
+          {% csrf_token %}
+          <input type="hidden" name="wf_state" value="{{new_state}}"/>
+          <input type="hidden" name="confirm" value="True" />
+          <button type="submit" name="submit" class="btn btn-danger">Yes</button>
+          <a href="{% url 'view_workflow' workflow.id %}" class="btn btn-default">No</a>
+        </form>
+{% endblock content %}
