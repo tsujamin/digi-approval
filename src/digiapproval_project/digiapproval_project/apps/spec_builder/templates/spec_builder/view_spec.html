@@ -1,5 +1,7 @@
 {% extends "digiapproval/base.tpl.html" %}
-{% block title %} 
+{% block title %} {{spec_model.name}} ({{spec_model.owner.name}}) {% endblock %}
+
+{% block header %} 
 <form action="" method="POST" role="form" class="form-inline">
   {% csrf_token %}
   {{spec_model.name}} ({{spec_model.owner.name}})
@@ -8,6 +10,7 @@
   </button>
 </form>
 {% endblock %}
+
 
 {%block content %}
 <!-- task list -->
@@ -20,6 +23,10 @@
     </li>
     {% endfor %}
   </ul>
+  <h3>Workflow</h3>
+  <pre>
+    {{spec_model.spec.get_dump}}
+  </pre>
 </div>
 
 <!-- input form -->
