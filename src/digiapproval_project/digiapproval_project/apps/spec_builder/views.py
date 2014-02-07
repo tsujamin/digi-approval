@@ -82,9 +82,29 @@ def connect_task(request, spec_id, task_name):
     
     existing_error = new_error = None
     if origin_task is None:
-        raise Http404
+        raise Http404('Unknown or Illegal origin task')
     if request.method == "POST":
-        pass
+        if 'connect' in request.POST:
+            next_task = spec_model.spec.task_specs.get(
+                            request.POST.get('existing_task', "0xD161AC71VE"), False)
+            if next_task and next_task.name != "Start": 
+                origin_task.connect(next_task)
+                spec_model.save()
+                return redirect('view_spec', spec_id)
+            else:
+                existing_error="Illegal or incorrect connecting task"
+        elif 'create' in request.POST:
+            next_task = CONNECTABLE_TASKS.get(request.POST.get('new_task', False), False)
+            task_label = request.POST.get('task_label', False)
+            if next_task and task_label and len(task_label) is not 0 \
+                    and task_label not in spec_model.spec.task_specs:
+                
+                next_task = next_task[1](spec_model.spec, task_label)
+                origin_task.connect(next_task)
+                spec_model.save()
+                return redirect('view_spec', spec_id)
+            else:
+                new_error = "Illegal new task or invalid task name"
     
     return render(request, 'spec_builder/connect_task.html', {
         'spec_model': spec_model,
