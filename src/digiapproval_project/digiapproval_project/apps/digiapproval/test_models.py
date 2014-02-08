@@ -4,6 +4,8 @@ Basic tests for our app models.
 
 from django.test import TestCase
 from .test_data import TestData, to_workflow
+from django.core.exceptions import PermissionDenied
+from .models import Workflow
 #from django.core.files import File
 #from django.core.files.base import ContentFile
 #import os
@@ -97,3 +99,59 @@ class CustomerUnitTest(TestCase):
         self.assertEqual(self.data.CUSTOMERS[1].get_own_workflows(), [w2])
         self.assertEqual(set(self.data.CUSTOMERS[1].get_all_workflows()),
                          set([w, w2]))
+
+
+class WorkflowUnitTests(TestCase):
+
+    def setUp(self):
+        self.data = TestData()
+        self.data.create_groups()
+        self.data.create_approvers()
+        self.data.create_organisations()
+        self.data.create_customers()
+        self.data.create_workflow_specs()
+        self.data.create_workflows()
+
+    def test_change_state_by_user_unauthorised(self):
+        """Test that an unauthorised user cannot cancel a workflow."""
+        workflow = self.data.WORKFLOWS[0]
+        user = self.data.CUSTOMERS[1]  # missy
+        with self.assertRaises(PermissionDenied):
+            workflow.change_state_by_user(new_state='CANCELLED',
+                                          user=user)
+
+    def test_change_state_by_user_invalid_state(self):
+        """Test that a workflow cannot be put in an invalid state."""
+        workflow = self.data.WORKFLOWS[0]
+        user = self.data.CUSTOMERS[0]
+        with self.assertRaises(ValueError):
+            workflow.change_state_by_user(new_state='xyzzy',
+                                          user=user)
+
+    def test_change_state_by_user_authorised_customer_cancel(self):
+        """Test that a customer can cancel their workflow."""
+        workflow = self.data.WORKFLOWS[0]
+        user = self.data.CUSTOMERS[0].user
+        workflow.change_state_by_user(new_state='CANCELLED',
+                                      user=user)
+        workflow = Workflow.objects.get(pk=workflow.pk)
+        self.assertEqual(workflow.state, 'CANCELLED')
+
+    def test_change_state_by_user_invalid_transition(self):
+        """Test that a cancelled workflow cannot be restarted."""
+        # cancel workflow[0]
+        self.test_change_state_by_user_authorised_customer_cancel()
+        # have the approver attempt to resusicate it
+        workflow = Workflow.objects.get(pk=self.data.WORKFLOWS[0].pk)
+        user = self.data.APPROVERS[0]
+        with self.assertRaises(ValueError):
+            workflow.change_state_by_user(new_state='STARTED',
+                                          user=user)
+
+    def test_change_state_by_user_unauthorised_customer_approval(self):
+        """Test that a customer cannot approve their workflow."""
+        workflow = self.data.WORKFLOWS[0]
+        user = self.data.CUSTOMERS[0].user
+        with self.assertRaises(PermissionDenied):
+            workflow.change_state_by_user(new_state='APPROVED',
+                                          user=user)
