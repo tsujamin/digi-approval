@@ -1,0 +1,3 @@
+[run]
+omit = */templatetags/macros*,*/migrations/*,*/management/*,*/test_*
+
