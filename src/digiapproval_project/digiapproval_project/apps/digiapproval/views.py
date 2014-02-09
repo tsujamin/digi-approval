@@ -229,15 +229,11 @@ def delegator_worklist(request):
 
 
 ## WORKFLOWS / TASKS
-@login_required
-def view_workflow(request, workflow_id):
-    """Controller for viewing workflows. TODO finish description
-    """
-    # figure out what and who we are
-    workflow = get_object_or_404(Workflow, pk=workflow_id)
 
-    actor = workflow_actor_type(request.user, workflow)
-
+def workflow_taskdata(workflow_id, actor):
+    """Extracts task metadata from a workflow, for display in view_workflow"""
+    workflow = Workflow.objects.get(pk=workflow_id)
+    
     # iterate through the tasks, making a list of actually useful information
     tasks_it = SpiffTask.Iterator(workflow.workflow.task_tree)
     # ... skip the root
@@ -250,9 +246,15 @@ def view_workflow(request, workflow_id):
             'state_name': task.state_names[task.state],
             'actor': (task.task_spec.get_data('task_data')['actor']
                       if task.task_spec.get_data('task_data') else ''),
-            'uuid': task.id['__uuid__']
+            'form': (task.task_spec.get_data('task_data')['form']
+                      if task.task_spec.get_data('task_data') else ''),
+            'uuid': task.id['__uuid__'],
+            'workflow_id': workflow_id, # we need this in the result dict to deal
+                                        # with links to subworkflows - AJD
+            'indent': False, # if True, indent list AFTER printing current task
+            'dedent': False, # if True, dedent list AFTER printing current task
             }
-
+        
         # should various links be shown?
         result['show_task_link'] = (task.state == task.READY and
                                     result['actor'] == actor)
@@ -266,7 +268,34 @@ def view_workflow(request, workflow_id):
              actor == 'APPROVER') and
                 result['actor']):
             tasks.append(result)
+        
+            # Subworkflows
+            if result['form'] == 'subworkflow':
+                subworkflow_id = None
+                try:
+                    task_model = Task.objects.get(uuid=uuid.UUID(result['uuid']))
+                    subworkflow_id = task_model.task['data']['workflow_id']
+                except:
+                    pass
+                
+                if subworkflow_id:
+                    tasks[-1]['indent'] = True
+                    tasks.extend(workflow_taskdata(subworkflow_id, actor))
+                    tasks[-1]['dedent'] = True
+                
+    return tasks
+    
 
+@login_required
+def view_workflow(request, workflow_id):
+    """Controller for viewing workflows. TODO finish description
+    """
+    # figure out what and who we are
+    workflow = get_object_or_404(Workflow, pk=workflow_id)
+    actor = workflow_actor_type(request.user, workflow)
+
+    tasks = workflow_taskdata(workflow_id, actor)
+    
     # mark all messages read
     Message.mark_all_read(workflow, request.user)
 

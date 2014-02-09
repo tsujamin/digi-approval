@@ -1,13 +1,16 @@
 from __future__ import absolute_import
+
+import uuid
+
 from django.db import models
 from django.contrib.auth.models import Group, User
 from django.core.mail import send_mail
 from django.template import Context, loader
-from .fields import WorkflowField, WorkflowSpecField
-from jsonfield import JSONField
 from django.core.exceptions import ObjectDoesNotExist
-import uuid
 
+from jsonfield import JSONField
+
+from .fields import WorkflowField, WorkflowSpecField
 
 class UserFile(models.Model):
     VIRUS_STATUS_CHOICES = (
@@ -187,7 +190,14 @@ class Workflow(models.Model):
     # TODO FIXME: are we using uuid.hex? no hyphens!
     uuid = models.CharField(max_length=36, editable=False,
                             default=lambda: uuid.uuid4().hex)
-
+    
+    # Parent information for subworkflows
+    parent_workflow = models.ForeignKey('Workflow', null=True, blank=True, default=None,
+                                        related_name='subworkflows')
+    parent_task = models.ForeignKey('Task', null=True, blank=True, default=None,
+                                    related_name='subworkflows')
+    
+    # Descriptive information
     label = models.CharField(max_length=50, default="Untitled Application")
 
     def assign_approver(self):
@@ -225,6 +235,17 @@ class Workflow(models.Model):
             self.assign_approver()
         if self.workflow.is_completed() and self.completed is False:
             self.completed = True
+            
+            # If we're a subworkflow, complete the relevant Subworkflow task
+            # TODO: not yet tested
+            if self.parent_workflow and self.parent_task:
+                parent_task = self.parent_workflow.workflow.get_task(
+                    {'__uuid__': uuid.UUID(self.parent_task.uuid).hex})
+                
+                parent_task.complete()
+                self.parent_task.save()
+                self.parent_workflow.save()
+                # TODO: Doesn't send emails like AbstractForm.complete_task() does
         super(Workflow, self).save(*args, **kwargs)
 
     def get_ready_task_forms(self, **kwargs):

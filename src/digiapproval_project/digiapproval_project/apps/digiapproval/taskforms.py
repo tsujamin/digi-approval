@@ -148,6 +148,7 @@ class AbstractForm(object):
         self.spiff_task.complete()
         self.task_model.save()
         self.workflow_model.save()
+        
         # send email. don't use the message class: we don't want it
         # displayed/stored
         sender = (self.workflow_model.approver if self.actor == 'APPROVER'
@@ -713,6 +714,8 @@ class Subworkflow(AbstractForm):
         if 'workflow_id' not in self.task_dict['data']:
             workflowspec = models.WorkflowSpec.objects.get(id=self.task_dict['data']['workflowspec_id'])
             workflow = workflowspec.start_workflow(self.workflow_model.customer)
+            workflow.parent_workflow = self.workflow_model
+            workflow.parent_task = self.task_model
             workflow.save()
             self.task_dict['data']['workflow_id'] = workflow.id
             self.task_model.save()
