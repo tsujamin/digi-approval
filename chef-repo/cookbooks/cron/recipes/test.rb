@@ -1,14 +1,14 @@
 #
-# Cookbook Name:: clamav
-# Spec:: default
+# Cookbook Name:: cron
+# Recipe:: test
 #
-# Copyright 2012-2013, Jonathan Hartman
+# Copyright:: (c) 2012, Opscode, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#   http://www.apache.org/licenses/LICENSE-2.0
+#    http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,9 +17,11 @@
 # limitations under the License.
 #
 
-#require "minitest/spec"
-#require File.expand_path("../support/helpers.rb", __FILE__)
+include_recipe "cron"
 
-# All the operations are in the recipes included by default.rb
-
-# vim: ai et ts=2 sts=2 sw=2 ft=ruby fdm=marker
+cron_d "daily-usage-report" do
+  minute 0
+  hour 23
+  command "/srv/app/scripts/daily_report"
+  user "appuser"
+end

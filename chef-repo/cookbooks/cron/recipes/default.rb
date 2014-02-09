@@ -1,14 +1,14 @@
 #
-# Cookbook Name:: clamav
-# Spec:: helpers
+# Cookbook Name:: cron
+# Recipe:: default
 #
-# Copyright 2012-2013, Jonathan Hartman
+# Copyright 2010-2013, Opscode, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#   http://www.apache.org/licenses/LICENSE-2.0
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,14 +17,14 @@
 # limitations under the License.
 #
 
-require "minitest/spec"
-
-module Helpers
-  module ClamAV
-    include MiniTest::Chef::Assertions
-    include MiniTest::Chef::Context
-    include MiniTest::Chef::Resources
-  end
+package 'cron' do
+  package_name case node['platform_family']
+               when 'rhel', 'fedora'
+                 node['platform_version'].to_f >= 6.0 ? 'cronie' : 'vixie-cron'
+               end
 end
 
-# vim: ai et ts=2 sts=2 sw=2 ft=ruby fdm=marker
+service 'cron' do
+  service_name 'crond' if platform_family?('rhel', 'fedora')
+  action [:enable, :start]
+end

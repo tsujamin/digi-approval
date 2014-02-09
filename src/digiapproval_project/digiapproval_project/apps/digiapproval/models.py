@@ -8,6 +8,7 @@ from django.core.mail import send_mail
 from django.template import Context, loader
 from django.core.exceptions import ObjectDoesNotExist
 
+from registration.signals import user_registered
 from jsonfield import JSONField
 
 from .fields import WorkflowField, WorkflowSpecField
@@ -281,6 +282,31 @@ class Workflow(models.Model):
         customer is an organisation, all the associated users' emails"""
         return [user.email for user in self.get_involved_users()]
 
+    def is_authorised_customer(self, customer_account):
+        """Checks if customer is authorised to modify workflow"""
+        if not (customer_account == self.customer or
+                customer_account in self.customer.sub_accounts.all()):
+            return False
+        return True
+
+    def actor_type(self, user):
+        """Identifies if the user account is the CUSTOMER or APPROVER
+        of this workflow. Returns None if the user is neither."""
+
+        try:
+            customer = user.customeraccount
+            actor = 'CUSTOMER'
+            # FIXME: this doesn't cope with multiple layers of parent account -
+            # but we should probably remove those multiple layers
+            if customer != self.customer and \
+                    self.customer not in self.customer.parent_accounts.all():
+                return None
+        except:
+            actor = 'APPROVER'
+            if user != self.approver:
+                return None
+        return actor
+
     def __unicode__(self):
         return u'%s (%s)' % (self.customer.user.username, self.spec.name)
 
@@ -348,3 +374,15 @@ in last_read_by")
         newest_message = workflow.message_set.last()
         if newest_message is not None:
             user.last_read.add(newest_message)
+
+
+# Hook into django-registration to make use of our extended form
+def user_registered_callback(sender, user, request, **kwargs):
+    # hoping that django-registration verifies this form for us.
+    user.first_name = request.POST["first_name"]
+    user.last_name = request.POST["last_name"]
+    profile = CustomerAccount(user=user)
+    profile.account_type = request.POST["type"]
+    profile.save()
+
+user_registered.connect(user_registered_callback)

@@ -1,7 +1,7 @@
 {% extends "page.tpl.html" %}
 {% load bootstrap3 %}
 
-{% block title %}Reset password{% endblock title %}
+{% block title %}Login{% endblock title %}
 
 {% block content %}
 {%if error %} {{error}} {%endif%}
@@ -10,8 +10,9 @@
         <form method="post" role="form">
             {% csrf_token %}
             {% bootstrap_form form %}
-            <button type="submit" name="submit" class="btn btn-default">Reset</button>
+            <button type="submit" name="submit" class="btn btn-default">Login</button>
         </form>
+        <a href="{% url 'auth_password_reset' %}">I forgot my password</a>
     </div>
 </div>
 {% endblock content %}

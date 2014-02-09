@@ -4,16 +4,16 @@ from django.forms.formsets import formset_factory
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from .forms import RegisterCustomerForm, LoginForm, DelegatorBaseFormSet,\
-    DelegatorForm
+from .forms import DelegatorBaseFormSet, DelegatorForm
 from .auth_decorators import login_required_organisation,\
     login_required_customer, login_required_approver, login_required_delegator
-from .auth_functions import workflow_actor_type, workflow_authorised_customer
 from .models import WorkflowSpec, Workflow, Task, Message, CustomerAccount,\
     UserFile
 import uuid
 from SpiffWorkflow import Task as SpiffTask
 import itertools
+from django.core.urlresolvers import reverse
+from .utils import never_cache
 
 
 ## MAIN PAGES
@@ -21,50 +21,30 @@ def index(request):
     return render(request, 'digiapproval/index.html')
 
 
-## AUTHENTICATION / USER SETTINGS
+@login_required
+def profile(request):
+    """Handler for accounts/profile - which is where users are redirected after
+    logging in. Redirect them onwards to somewhere more useful."""
 
-def register_customer(request):
-    """Creates CustomerUser and corresponding User if RegisterUserForm
-    is valid"""
-    if request.method == 'POST':
-        form = RegisterCustomerForm(request.POST)
-        if form.is_valid():
-            account = form.create_customer()
-            if account is not None:
-                return HttpResponse("Account Successfully Created")
-    else:
-        form = RegisterCustomerForm()
-    return render(request, 'digiapproval/register_customer.html', {
-        'form': form,
-    })
-
-
-def login(request):
-    """Login controller for customer accounts."""
-    from django.contrib.auth import login as auth_login
-    error = None
-    if request.method == 'POST':
-        login_form = LoginForm(request.POST)
-        user = login_form.is_valid()
-        if user is not None:
-            auth_login(request, user)
-            if request.GET.get('next', None):
-                return redirect(request.GET.get('next'))
-            return redirect('index')
+    if hasattr(request.user, 'customeraccount'):
+        if request.user.customeraccount.account_type == 'CUSTOMER':
+            return redirect('applicant_home')
         else:
-            error = "Bad username/password combination"
-    return render(request, 'digiapproval/login.html', {
-        'form':  LoginForm(),
-        'error': error
-    })
+            return redirect('modify_subaccounts')
 
+    # for user who is approver and delegator, default to approver_worklist
+    if any([hasattr(g, 'workflowspecs_approvers')
+            for g in request.user.groups.all()]):
+        return redirect('approver_worklist')
 
-def logout(request):
-    """Logs out any currently logged in user"""
-    from django.contrib.auth import logout as auth_logout
-    if request.user.is_authenticated():
-        auth_logout(request)
-    return redirect('index')
+    # for user who is approver and delegator, default to approver_worklist
+    if any([hasattr(g, 'workflowspecs_delegators')
+            for g in request.user.groups.all()]):
+        return redirect('delegator_worklist')
+
+    return HttpResponse("""You don't have a role in the DigiApproval system.
+                        This is probably a bug, and we're very sorry - please
+                        contact us.""")
 
 
 @login_required
@@ -117,6 +97,7 @@ def remove_parentaccounts(request):
 ## APPLICANT-ONLY PAGES
 
 @login_required_customer
+@never_cache
 def applicant_home(request):
     """Controller for applicant home page. Displays the applicant's current
     applications, as well as a list of workflow specs to start new
@@ -142,6 +123,7 @@ def applicant_home(request):
 ## STAFF-ONLY PAGES
 
 @login_required_approver
+@never_cache
 def approver_worklist(request):
     """Controller for approver worklist. Displays the approver's worklist
 
@@ -161,6 +143,7 @@ def approver_worklist(request):
 
 
 @login_required_delegator
+@never_cache
 def delegator_worklist(request):
     """Controller for delegator worklist. Displays... TODO Finish description
 
@@ -285,15 +268,21 @@ def workflow_taskdata(workflow_id, actor):
                 
     return tasks
     
-
+@never_cache
 @login_required
 def view_workflow(request, workflow_id):
     """Controller for viewing workflows. TODO finish description
     """
     # figure out what and who we are
     workflow = get_object_or_404(Workflow, pk=workflow_id)
-    actor = workflow_actor_type(request.user, workflow)
 
+    actor = workflow.actor_type(request.user)
+    if actor is None:
+        raise PermissionDenied
+
+    # breadcrumb it
+    request.breadcrumbs([portal_breadcrumb(workflow, request.user),
+                         workflow_breadcrumb(workflow)])
     tasks = workflow_taskdata(workflow_id, actor)
     
     # mark all messages read
@@ -328,6 +317,11 @@ def new_workflow(request, workflowspec_id):
     for account in customer.parent_accounts.all():
         permitted_accounts.append(account)
 
+    request.breadcrumbs([
+        ('Applicant Portal', reverse('applicant_home')),
+        ('New Workflow', request.path_info)
+        ])
+
     if request.method == 'POST' and request.POST.get('create_workflow', False):
         acct_id = int(request.POST.get('account', None))
         wf_customer = get_object_or_404(CustomerAccount, id=acct_id)
@@ -347,6 +341,7 @@ def new_workflow(request, workflowspec_id):
 
 
 @login_required
+@never_cache
 def view_task(request, workflow_id, task_uuid):
     """Transient controller for returning appropriate taskform controller,
     authentication is handled by taskform
@@ -355,7 +350,13 @@ def view_task(request, workflow_id, task_uuid):
     task_form_list = [task for task in workflow.get_ready_task_forms()
                       if task.uuid == uuid.UUID(task_uuid)]
     if len(task_form_list) is 1:
-        return task_form_list[0].form_request(request)
+        task_form = task_form_list[0]
+        request.breadcrumbs([
+            portal_breadcrumb(workflow, request.user),
+            workflow_breadcrumb(workflow),
+            (task_form.spiff_task.get_name(), request.path_info)
+            ])
+        return task_form.form_request(request)
     else:  # either invalid data or hash collision
         # TODO: display completed data if available: redirect to view_task_data
         return redirect('applicant_home')
@@ -367,8 +368,7 @@ def view_task_data(request, task_uuid):
 
     # figure out what and who we are
     task = get_object_or_404(Task, uuid=uuid.UUID(task_uuid))
-    if request.user != task.workflow.customer.user and \
-       request.user != task.workflow.approver:
+    if not request.user in task.workflow.get_involved_users():
         raise PermissionDenied
 
     # TODO verify uuid.hex is what we want.
@@ -379,6 +379,12 @@ def view_task_data(request, task_uuid):
         # TODO: throw some sort of error
         return HttpResponse("You can't view the data of a task that hasn't" +
                             " been completed.")
+
+    request.breadcrumbs([
+        portal_breadcrumb(task.workflow, request.user),
+        workflow_breadcrumb(task.workflow),
+        (spiff_task.get_name(), request.path_info)
+        ])
 
     #iterates and replaces values of file fields with link
     for field in task.task['fields']:
@@ -398,6 +404,7 @@ def view_task_data(request, task_uuid):
 
 
 @login_required
+@never_cache
 def view_workflow_messages(request, workflow_id):
     """Controller for workflow_messages view. Creates new messages and renders
     current ones"""
@@ -406,6 +413,12 @@ def view_workflow_messages(request, workflow_id):
     #Check auth
     if not request.user in workflow.get_involved_users():
         raise PermissionDenied
+
+    request.breadcrumbs([
+        portal_breadcrumb(workflow, request.user),
+        workflow_breadcrumb(workflow),
+        ('Messages', request.path_info)
+        ])
 
     Message.mark_all_read(workflow, request.user)
     if request.method == 'POST' and request.POST.get('new_message', False):
@@ -426,7 +439,9 @@ def view_workflow_messages(request, workflow_id):
 def workflow_state(request, workflow_id):
     """Controller for modification of workflow state"""
     workflow = get_object_or_404(Workflow, id=workflow_id)
-    actor = workflow_actor_type(request.user, workflow)
+    actor = workflow.actor_type(request.user)
+    if actor is None:
+        raise PermissionDenied
     new_state = request.POST.get('wf_state', False)
     states = map(lambda (choice, _): (choice), Workflow.STATE_CHOICES)
 
@@ -438,12 +453,20 @@ def workflow_state(request, workflow_id):
         # a customer can only cancel an application
         if actor == 'CUSTOMER' and new_state != 'CANCELLED':
             raise PermissionDenied
-            
-        if workflow.state not in ['DENIED','CANCELLED']: #not allowed to change from canceled wf states
-            workflow.state = new_state #assign new state
+
+        # a change other than approval requires confirmation
+        if not (new_state == "APPROVED" or request.POST.get('confirm', False)):
+            return render(request, "digiapproval/confirm_workflow_state.html",
+                          {'workflow': workflow,
+                           'new_state': new_state
+                           })
+
+        # users are not allowed to change from canceled wf states
+        if workflow.state not in ['DENIED', 'CANCELLED']:
+            workflow.state = new_state  # assign new state
             if workflow.state == 'STARTED':
                 workflow.completed = False
-            elif workflow.state in ['DENIED','CANCELLED']:
+            elif workflow.state in ['DENIED', 'CANCELLED']:
                 workflow.workflow.cancel()
                 workflow.completed = True
             else:
@@ -463,12 +486,30 @@ def workflow_state(request, workflow_id):
 @login_required_customer
 def workflow_label(request, workflow_id):
     workflow = get_object_or_404(Workflow, id=workflow_id)
-    if not workflow_authorised_customer(request.user.customeraccount,
-                                        workflow):
+    if not workflow.is_authorised_customer(request.user.customeraccount):
         raise PermissionDenied()
 
     new_label = request.POST.get('label', False)
     if request.method == 'POST' and new_label:
         workflow.label = new_label
         workflow.save()
-    return redirect(request.META['HTTP_REFERER'])
+
+    if hasattr(request.META, 'HTTP_REFERER'):
+        return redirect(request.META['HTTP_REFERER'])
+    else:
+        return redirect('view_workflow', workflow_id=workflow_id)
+
+
+def portal_breadcrumb(workflow, user):
+    actor = workflow.actor_type(user)
+    if actor == 'CUSTOMER':
+        return ('Applicant Portal', reverse('applicant_home'))
+    elif actor == 'APPROVER':
+        return ('Approver Worklist', reverse('approver_worklist'))
+    else:
+        raise PermissionDenied
+
+
+def workflow_breadcrumb(workflow):
+    return (workflow.label,
+            reverse('view_workflow', kwargs={'workflow_id': workflow.id}))
