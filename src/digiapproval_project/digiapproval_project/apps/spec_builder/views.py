@@ -204,9 +204,7 @@ def field_entry_dict(request, spec_model, task_spec):
                     fields[field]['type'] = request.POST.get(field+'_type')
         task_spec.get_data('task_data')['fields'] = fields
         spec_model.save()
-    #{
-    #            'label': label, 'mandatory': mandatory,
-    #            'type': ftype, 'value': False
+
     return render(request, 'spec_builder/taskforms/FieldEntryDict.html', {
         'spec_model': spec_model,
         'task': task_spec,
@@ -215,8 +213,28 @@ def field_entry_dict(request, spec_model, task_spec):
     })
     
 def file_upload_dict(request, spec_model, task_spec):
-    pass
-
+    file_name_field = task_spec.get_data('task_data')['fields'].get('file_name', {
+                                                        'label': 'Name of File: ', 'mandatory': True,
+                                                        'type': 'text', 'value': "",})
+    file_field = task_spec.get_data('task_data')['fields'].get('file', {
+                                                        'label': 'Upload File:', 'mandatory': True,
+                                                        'type': 'file', 'value': None, })
+                                                        
+    if 'mandatory' in request.POST: file_field['mandatory'] = file_name_field['mandatory'] = True
+    else: file_field['mandatory'] = file_name_field['mandatory'] = False
+    
+    task_spec.get_data('task_data')['fields']['file'] = file_field
+    task_spec.get_data('task_data')['fields']['file_name'] = file_name_field
+    spec_model.save()
+    print task_spec.get_data('task_data')
+    
+    return render(request, 'spec_builder/taskforms/FileUploadDict.html', {
+        'spec_model': spec_model,
+        'task': task_spec,
+        'mandatory': file_field['mandatory']
+    })
+    
+    
 CONNECTABLE_TASKS = {
     'simple': ('Simple Task Node', taskspecs.Simple),
     'join': ('Blocking Join Node', taskspecs.Join)
