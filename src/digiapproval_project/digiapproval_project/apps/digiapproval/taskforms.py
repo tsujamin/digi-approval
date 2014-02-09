@@ -121,7 +121,8 @@ class AbstractForm(object):
                 'actor': actor,
                 'fields': {},
                 'data': {'task_info': task_info},
-                'options': {}
+                'options': {},
+                'nice_name': form_classes[form].__name__
                 }
 
     def form_request(self, request):
@@ -526,7 +527,6 @@ class ChooseBranches(AbstractForm):
         for field in task_data['fields'].values():
             if not 'number' in field or \
                     field['type'] != 'checkbox':
-                print field
                 raise AttributeError("fields must have number and be of type" +
                                      " checkbox")
         if not 'minimum_choices' in task_data['options'] or \
@@ -562,7 +562,6 @@ class ChooseBranches(AbstractForm):
         count = 0
         if request.method == "POST":
             for field in form_fields:
-                print request.POST
                 value = request.POST.get(field, None)
                 if value is not None:
                     form_fields[field]['value'] = True
