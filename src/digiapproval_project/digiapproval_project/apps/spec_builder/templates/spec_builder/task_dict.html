@@ -3,7 +3,12 @@
 
 {% block content %}
 <div class="col-md-6">
-  <h3>Options</h3>
+  <h3>Task Specific Configuration</h3>
+  {% block taskdict_fields %}No task configuration available{% endblock %}
+  <div class="form-group">
+    <button type="submit" name="submit" class="btn btn-default">Save Changes</button>
+  </div>
+  <h3>Generic Configuration</h3>
   <form action="{% url 'task_dict' spec_id=spec_model.id task_name=task.name %}" method="POST" role="form">
     {% csrf_token %}
     <div class="form-group">
@@ -18,16 +23,14 @@
     <div class="form-group">
       <button type="submit" name="delete_dict" class="btn btn-default">Delete Task Dictionary</button>
     </div>
-    {% block taskdict_fields %}Task Specific fields{% endblock %}
-    <div class="form-group">
-      <button type="submit" name="submit" class="btn btn-default">Save Changes</button>
-    </div>
+
   </form>
 </div>
 
 <div class="col-md-6">
   <h3>Placeholder</h3>
   Information on creating task_dicts
-  {% block task_info %}Task Dict Specific Information{% endblock %}
+  <br>
+  {% block task_info %}No task specific information available{% endblock %}
 </div>
 {% endblock %}
