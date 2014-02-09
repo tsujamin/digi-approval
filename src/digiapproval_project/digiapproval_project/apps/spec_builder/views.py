@@ -3,6 +3,7 @@ from django.http import HttpResponse, Http404
 from django.contrib.auth.models import User, Group
 from digiapproval_project.apps.digiapproval.auth_decorators import login_required_super
 from digiapproval_project.apps.digiapproval import models as approval_models
+from digiapproval_project.apps.digiapproval.taskforms import AbstractForm
 from SpiffWorkflow.specs import WorkflowSpec
 from SpiffWorkflow import specs as taskspecs
 
@@ -58,11 +59,17 @@ def view_spec(request, spec_id):
     spec = get_object_or_404(approval_models.WorkflowSpec,
                                 id=spec_id)
     if request.method == "POST":
-        print request.POST
         if 'toggle_public' in request.POST:
             spec.public = not spec.public
             spec.save()
-            print spec.public
+        elif 'create_dict' in request.POST:
+            task_type = request.POST.get('new_dict', False)
+            task = spec.spec.task_specs.get(
+                            request.POST.get('task_name', "0xD161AC71VE"), False)
+            if task and task_type in TASK_DICT_METHODS:
+                task.set_data(task_data = AbstractForm.make_task_dict(task_type, 'APPROVER'))
+                spec.save()
+                return redirect('task_dict', spec_id, task.name)
         else:
             for field in ['owner', 'approvers', 'delegators']:
                 spec.__setattr__(field, get_object_or_404(Group, id=request.POST.get(field+'-group', -1)))
@@ -71,16 +78,18 @@ def view_spec(request, spec_id):
         spec.save()
     return render(request, 'spec_builder/view_spec.html', {
         'spec_model': spec,
-        'groups': Group.objects.all()
+        'groups': Group.objects.all(),
+        'task_dicts': {k: v[0] for k,v in TASK_DICT_METHODS.items()}
     })
     
 @login_required_super
 def connect_task(request, spec_id, task_name):
+    """Controller for connection of taskforms (doesnt handle multichoice/exclusivechoice)"""
     spec_model = get_object_or_404(approval_models.WorkflowSpec,
                                 id=spec_id)
     origin_task = spec_model.spec.task_specs.get(task_name)
     
-    existing_error = new_error = None
+    existing_error = new_error = None       
     if origin_task is None:
         raise Http404('Unknown or Illegal origin task')
     if request.method == "POST":
@@ -114,12 +123,49 @@ def connect_task(request, spec_id, task_name):
         'existing_error': existing_error,
         'new_error': new_error,
     })
-                                
+    
+
+def task_dict(request, spec_id, task_name):
+    """Generic handler for task_dict editing"""
+    spec_model = get_object_or_404(approval_models.WorkflowSpec,
+                                id=spec_id)
+    task_spec = spec_model.spec.task_specs.get(task_name)
+    
+    if task_spec is None: raise Http404('Unknown or Illegal origin task')
+    else: task_type = task_spec.data['task_data'].get('form', False)
+        
+    if request.method == "POST":
+        if 'delete_dict' in request.POST:
+            del task_spec.data['task_data']
+            spec_model.save()
+            return redirect('view_spec', spec_id)
+        elif 'update_actor' in request.POST and request.POST.get('actor') in ['APPROVER', 'CUSTOMER']:
+            task_spec.data['task_data']['actor'] = request.POST.get('actor')
+            spec_model.save()
+            return redirect('task_dict', spec_id, task_name)
+    #redirect to appropriate task_dict controller
+    if task_type in TASK_DICT_METHODS:
+        return TASK_DICT_METHODS[task_type][1](request, spec_model, task_spec)
+    else:
+        return render(request, 'spec_builder/task_dict.html', {
+            'spec_model': spec_model,
+            'task': task_spec,
+        })
+    
+def file_upload_dict(request, spec, task_spec):
+    pass
 
 CONNECTABLE_TASKS = {
     'simple': ('Simple Task Node', taskspecs.Simple),
     'join': ('Blocking Join Node', taskspecs.Join)
-}                                
+}              
+    
+TASK_DICT_METHODS = {
+    'file_upload': ('Upload a File', file_upload_dict),
+}
+
+
+                                  
             
     
  
