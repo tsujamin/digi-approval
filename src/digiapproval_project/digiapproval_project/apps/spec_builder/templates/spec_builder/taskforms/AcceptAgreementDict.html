@@ -1,0 +1,20 @@
+{% extends 'spec_builder/task_dict.html' %}
+{% block taskdict_fields %}
+<div class="form-group">
+  <label for="agreement">Agreement Text</label>
+  <textarea name="agreement" class="form-control" rows="4">{{agreement}}</textarea>
+</div>
+<div class="form-group">
+  <label for="label">Agreement Label</label>
+  <input type="text" name="label" value="{{field.label}}" class="form-control">
+</div>
+<div class="checkbox">
+    <label>
+        <input type="checkbox" name="mandatory" {% if field.mandatory %}checked{% endif %}/>Is acceptance of this agreement mandatory?
+    </label>
+</div>
+{% endblock %}
+
+{% block task_info %}
+Information on the accept agreement task spec
+{% endblock %}

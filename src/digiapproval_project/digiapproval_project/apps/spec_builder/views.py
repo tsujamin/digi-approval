@@ -152,7 +152,31 @@ def task_dict(request, spec_id, task_name):
             'task': task_spec,
         })
     
-def file_upload_dict(request, spec, task_spec):
+def accept_agreement_dict(request, spec_model, task_spec):
+    agreement = task_spec.get_data('task_data')['data'].get('agreement', 'No Agreement is configured')
+    field = task_spec.get_data('task_data')['fields'].get('acceptance', {'label': 'Do you accept this agreement?',
+                                                                         'mandatory': True,
+                                                                         'type': 'checkbox',
+                                                                         'value': False})
+    if request.method == 'POST':
+        if 'agreement' in request.POST and len(request.POST.get('agreement')) is not 0:
+            agreement = request.POST.get('agreement')
+            task_spec.get_data('task_data')['data']['agreement'] = agreement
+        if 'label' in request.POST and len(request.POST.get('label')) is not 0:
+            field['label'] = request.POST.get('label')
+        if 'mandatory' in request.POST: field['mandatory'] = True
+        else: field['mandatory'] = False
+        task_spec.get_data('task_data')['fields']['acceptance'] = field
+    spec_model.save()
+
+    return render(request, 'spec_builder/taskforms/AcceptAgreementDict.html', {
+        'spec_model': spec_model,
+        'task': task_spec,
+        'agreement': agreement,
+        'field': field
+    })
+    
+def file_upload_dict(request, spec_model, task_spec):
     pass
 
 CONNECTABLE_TASKS = {
@@ -162,6 +186,7 @@ CONNECTABLE_TASKS = {
     
 TASK_DICT_METHODS = {
     'file_upload': ('Upload a File', file_upload_dict),
+    'accept_agreement': ('Accept an Agreement', accept_agreement_dict)
 }
 
 
