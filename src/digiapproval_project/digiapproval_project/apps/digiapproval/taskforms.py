@@ -752,9 +752,9 @@ form_classes = {
     "file_upload": FileUpload,
 }
 
-field_types = [
-    'checkbox',
-    'text',
-    'radio',
-    'file',
-]
+field_types = {
+    'checkbox': 'Checkbox',
+    'text': 'Text Entry',
+    'radio': 'Radio Button',
+    'file': 'File Upload',
+}
