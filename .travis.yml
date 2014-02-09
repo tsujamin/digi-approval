@@ -1,0 +1,25 @@
+language: "python"
+python:
+  - "2.7"
+addons:
+  postgresql: 9.3
+services:
+  - rabbitmq
+install:
+  - "sudo apt-get update"
+  - "sudo apt-get install clamav clamav-daemon"
+  - "sudo freshclam"
+  - "sudo /etc/init.d/clamav-daemon start"
+  - "pip install -r src/requirements.txt"
+  - "gem install erubis json"
+  - "ruby src/dev/init_travis.rb"
+before_script:
+  - cd src/digiapproval_project
+  - cd digimail
+  - lamson log
+  - cd ..
+  - psql -c 'create database django;' -U postgres
+script:
+  - python manage.py test digiapproval_project.apps.digiapproval
+after_script:
+  - cat digimail/logs/logger.log
