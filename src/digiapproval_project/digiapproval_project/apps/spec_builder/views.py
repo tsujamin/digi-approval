@@ -32,6 +32,7 @@ def builder_home(request):
     
 @login_required_super
 def new_spec(request):
+    """Creates new task from provided group and name"""
     if request.method == "POST":
         group = get_object_or_404(Group,
                                 id=request.POST.get('spec_owner', -1))
@@ -56,6 +57,7 @@ def new_spec(request):
     
 @login_required_super
 def view_spec(request, spec_id):
+    """Controller for spec view, handles creation of new task_dicts and redirection to connect/task_dict edit pages"""
     spec = get_object_or_404(approval_models.WorkflowSpec,
                                 id=spec_id)
     if request.method == "POST":
@@ -83,71 +85,78 @@ def view_spec(request, spec_id):
     })
     
 @login_required_super
-def connect_task(request, spec_id, task_name):
+def connect_task_controller(request, spec_id, task_name):
     """Controller for connection of taskforms (doesnt handle multichoice/exclusivechoice)"""
     spec_model = get_object_or_404(approval_models.WorkflowSpec,
                                 id=spec_id)
     origin_task = spec_model.spec.task_specs.get(task_name)
+    
+    if origin_task is None:
+        raise Http404('Unknown or Illegal origin task')
     
     #Test for special connect_method for the taskform of origin_task (IE branching taskforms)
     origin_task_form = origin_task.data.get('task_data',{}).get('form', None)
     (_,_,connect_method) = CONNECTABLE_TASKS.get(origin_task_form, (None,None, None))
     if connect_method: return connect_method(request, spec_model, origin_task)
     
-    existing_error = new_error = None       
-    if origin_task is None:
-        raise Http404('Unknown or Illegal origin task')
+    error = None       
+    
     if request.method == "POST":
         if 'connect' in request.POST:
-            next_task = spec_model.spec.task_specs.get(
-                            request.POST.get('existing_task', "0xD161AC71VE"), False)
-            if next_task and next_task.name != "Start": 
-                origin_task.connect(next_task)
-                spec_model.save()
-                return redirect('view_spec', spec_id)
-            else:
-                existing_error="Illegal or incorrect connecting task"
+            next_task = get_existing_task(request, spec_model)
+            if not next_task: error="Illegal or incorrect connecting task" #        
         elif 'create' in request.POST:
-            next_task = CONNECTABLE_TASKS.get(request.POST.get('new_task', False), False)
-            task_label = request.POST.get('task_label', False)
-            if next_task and task_label and len(task_label) is not 0 \
-                    and task_label not in spec_model.spec.task_specs:
-                
-                new_task = next_task[1](spec_model.spec, task_label)
-                if next_task[2]: #Special connect method
-                    #Set newely created task to type of task (ie choose_branch)
-                    new_task.set_data(task_data=AbstractForm.make_task_dict( 
-                        request.POST.get('new_task', False), 'APPROVER'))
-                origin_task.connect(new_task)
-                spec_model.save()
-                return redirect('view_spec', spec_id)
-            else:
-                new_error = "Illegal new task or invalid task name"
+            next_task = create_task(request, spec_model)
+            if not next_task: error = "Illegal new task or invalid task name"
+        if not error:        
+            origin_task.connect(next_task)
+            spec_model.save()
+            return redirect('view_spec', spec_id)
     
     return render(request, 'spec_builder/connect_task.html', {
         'spec_model': spec_model,
         'origin_task': origin_task,
         'existing_tasks': {k: type(v).__name__ for k, v in spec_model.spec.task_specs.items()},
         'legal_tasks': {k: (v[0],v[1].__name__) for k, v in CONNECTABLE_TASKS.items()},
-        'existing_error': existing_error,
-        'new_error': new_error,
+        'error': error,
     })
-    
+
+def get_existing_task(request, spec_model):
+    """Connects task from given request and returns it"""    
+    next_task = spec_model.spec.task_specs.get(
+                    request.POST.get('existing_task', "0xD161AC71VE"), False)
+    if next_task and next_task.name != "Start": 
+        return next_task
+        
+def create_task(request, spec_model):
+    next_task = CONNECTABLE_TASKS.get(request.POST.get('new_task', False), False)
+    task_label = request.POST.get('task_label', False)
+    if next_task and task_label and len(task_label) is not 0 \
+            and task_label not in spec_model.spec.task_specs: 
+        new_task = next_task[1](spec_model.spec, task_label)
+        if next_task[2]: #Special connect method
+            #Set newely created task to type of task (ie choose_branch)
+            new_task.set_data(task_data=AbstractForm.make_task_dict( 
+                request.POST.get('new_task', False), 'APPROVER'))
+        return new_task
 
 def task_dict(request, spec_id, task_name):
     """Generic handler for task_dict editing"""
     spec_model = get_object_or_404(approval_models.WorkflowSpec,
                                 id=spec_id)
     task_spec = spec_model.spec.task_specs.get(task_name)
+    error = None
     
     if task_spec is None: raise Http404('Unknown or Illegal origin task')
     else: task_type = task_spec.data['task_data'].get('form', False)
-        
     if request.method == "POST":
         if 'delete_dict' in request.POST:
-            del task_spec.data['task_data']
-            spec_model.save()
-            return redirect('view_spec', spec_id)
+            if task_type in CONNECTABLE_TASKS:
+                error = "Cannot delete this type of task"
+            else:
+                del task_spec.data['task_data']
+                spec_model.save()
+                return redirect('view_spec', spec_id)
         elif 'update_actor' in request.POST and request.POST.get('actor') in ['APPROVER', 'CUSTOMER']:
             task_spec.data['task_data']['actor'] = request.POST.get('actor')
             spec_model.save()
@@ -159,6 +168,7 @@ def task_dict(request, spec_id, task_name):
         return render(request, 'spec_builder/task_dict.html', {
             'spec_model': spec_model,
             'task': task_spec,
+            'general_error': error
         })
     
 def accept_agreement_dict(request, spec_model, task_spec):
@@ -243,15 +253,52 @@ def file_upload_dict(request, spec_model, task_spec):
         'mandatory': file_field['mandatory']
     })
     
-def choose_branch_dict(request, spec_model, task_spec):
-    pass
+def choose_branch_connect(request, spec_model, origin_task):
+    error = None       
+    
+    if request.method == "POST":
+        label = request.POST.get('label', '')
+        if label ==  '': #missing label
+            error = "Must have label for choice"
+        elif 'connect' in request.POST:
+            next_task = get_existing_task(request, spec_model)
+            if not next_task or next_task in origin_task.outputs: 
+                error="Illegal or incorrect connecting task" #        
+        elif 'create' in request.POST:
+            next_task = create_task(request, spec_model)
+            if not next_task or next_task in origin_task.outputs: 
+                error = "Illegal new task or invalid task name"
+        if not error:        
+            from SpiffWorkflow.operators import Attrib, Equal
+            
+            task_number = len(origin_task.outputs)
+            origin_task.connect_if(Equal(Attrib('selection'), task_number), next_task)
+            if task_number is 0: #default branch
+                origin_task.connect(next_task)
+                
+            origin_task.data['task_data']['fields'][next_task.name] = {
+                'label': label, 'mandatory': False,
+                'type': 'radio', 'value': False, 'number': task_number
+            }    
+                
+            spec_model.save()
+            return redirect('view_spec', spec_model.id)
+    
+    return render(request, 'spec_builder/taskforms/ChooseBranchConnect.html', {
+        'spec_model': spec_model,
+        'origin_task': origin_task,
+        'existing_tasks': {k: type(v).__name__ for k, v in spec_model.spec.task_specs.items()},
+        'legal_tasks': {k: (v[0],v[1].__name__) for k, v in CONNECTABLE_TASKS.items()},
+        'error': error,
+    })
+
     
     
 CONNECTABLE_TASKS = {
     #name : ('Nice Name', spiff taskspec, connect method)
     'simple': ('Simple Task Node', taskspecs.Simple, None),
     'join': ('Blocking Join Node', taskspecs.Join, None),
-    'choose_branch': ('Branch: Single', taskspecs.ExclusiveChoice, choose_branch_dict)
+    'choose_branch': ('Exclusive Branch', taskspecs.ExclusiveChoice, choose_branch_connect)
 }            
     
 TASK_DICT_METHODS = {

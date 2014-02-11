@@ -9,6 +9,8 @@
     <hr>
     
     <h3>Generic Configuration</h3>
+    <b>{% if general_error %}{{general_error}}{%endif%}</b><br>
+    
     <div class="form-group">
       <label for="actor">Set actor for task</label>
       <select name="actor">
@@ -17,7 +19,6 @@
       </select>
       <button type="submit" name="update_actor" class="btn btn-default">Set Actor</button>
     </div>
-    
     <div class="form-group">
       <button type="submit" name="delete_dict" class="btn btn-default">Delete Task Dictionary</button>
     </div>
