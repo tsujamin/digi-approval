@@ -13,10 +13,10 @@
     
     <div class="form-group">
       <label for="actor">Set actor for task</label>
-      <select name="actor">
+      <select name="actor" class="form-control">
         <option value="APPROVER" {% ifequal task.data.task_data.actor 'APPROVER' %}selected{% endifequal %}>Approver</option>
         <option value="CUSTOMER" {% ifequal task.data.task_data.actor 'CUSTOMER' %}selected{% endifequal %}>Customer</option>
-      </select>
+      </select><br>
       <button type="submit" name="update_actor" class="btn btn-default">Set Actor</button>
     </div>
     <div class="form-group">
