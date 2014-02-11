@@ -89,6 +89,11 @@ def connect_task(request, spec_id, task_name):
                                 id=spec_id)
     origin_task = spec_model.spec.task_specs.get(task_name)
     
+    #Test for special connect_method for the taskform of origin_task (IE branching taskforms)
+    origin_task_form = origin_task.data.get('task_data',{}).get('form', None)
+    (_,_,connect_method) = CONNECTABLE_TASKS.get(origin_task_form, (None,None, None))
+    if connect_method: return connect_method(request, spec_model, origin_task)
+    
     existing_error = new_error = None       
     if origin_task is None:
         raise Http404('Unknown or Illegal origin task')
@@ -108,8 +113,12 @@ def connect_task(request, spec_id, task_name):
             if next_task and task_label and len(task_label) is not 0 \
                     and task_label not in spec_model.spec.task_specs:
                 
-                next_task = next_task[1](spec_model.spec, task_label)
-                origin_task.connect(next_task)
+                new_task = next_task[1](spec_model.spec, task_label)
+                if next_task[2]: #Special connect method
+                    #Set newely created task to type of task (ie choose_branch)
+                    new_task.set_data(task_data=AbstractForm.make_task_dict( 
+                        request.POST.get('new_task', False), 'APPROVER'))
+                origin_task.connect(new_task)
                 spec_model.save()
                 return redirect('view_spec', spec_id)
             else:
@@ -234,11 +243,16 @@ def file_upload_dict(request, spec_model, task_spec):
         'mandatory': file_field['mandatory']
     })
     
+def choose_branch_dict(request, spec_model, task_spec):
+    pass
+    
     
 CONNECTABLE_TASKS = {
-    'simple': ('Simple Task Node', taskspecs.Simple),
-    'join': ('Blocking Join Node', taskspecs.Join)
-}              
+    #name : ('Nice Name', spiff taskspec, connect method)
+    'simple': ('Simple Task Node', taskspecs.Simple, None),
+    'join': ('Blocking Join Node', taskspecs.Join, None),
+    'choose_branch': ('Branch: Single', taskspecs.ExclusiveChoice, choose_branch_dict)
+}            
     
 TASK_DICT_METHODS = {
     'file_upload': ('Upload a File', file_upload_dict),
