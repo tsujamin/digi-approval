@@ -81,7 +81,7 @@ def view_spec(request, spec_id):
     return render(request, 'spec_builder/view_spec.html', {
         'spec_model': spec,
         'groups': Group.objects.all(),
-        'task_dicts': {k: v[0] for k,v in TASK_DICT_METHODS.items()}
+        'task_dicts': {k: v[0] for k,v in TASK_DICT_METHODS.items() if k not in CONNECTABLE_TASKS}
     })
     
 @login_required_super
@@ -254,6 +254,7 @@ def file_upload_dict(request, spec_model, task_spec):
     })
     
 def choose_branch_connect(request, spec_model, origin_task):
+    """Controller for creation of exclusivechoice choose_branch taks"""
     error = None       
     
     if request.method == "POST":
@@ -291,6 +292,55 @@ def choose_branch_connect(request, spec_model, origin_task):
         'legal_tasks': {k: (v[0],v[1].__name__) for k, v in CONNECTABLE_TASKS.items()},
         'error': error,
     })
+    
+def choose_branches_connect(request, spec_model, origin_task):
+    """Controller for posting mutlichoice choose_branches tasks (pretty much copypasta of above)"""
+    error = None       
+    
+    if request.method == "POST":
+        label = request.POST.get('label', '')
+        if label ==  '': #missing label
+            error = "Must have label for choice"
+        elif 'connect' in request.POST:
+            next_task = get_existing_task(request, spec_model)
+            if not next_task or next_task in origin_task.outputs: 
+                error="Illegal or incorrect connecting task" #        
+        elif 'create' in request.POST:
+            next_task = create_task(request, spec_model)
+            if not next_task or next_task in origin_task.outputs: 
+                error = "Illegal new task or invalid task name"
+        if not error:        
+            from SpiffWorkflow.operators import Attrib, Equal
+            
+            task_number = len(origin_task.outputs)            
+            origin_task.connect_if(Equal(Attrib("task" + str(task_number)), True), next_task)
+            
+            origin_task.data['task_data']['fields'][next_task.name] = {
+                'label': label, 'mandatory': False,
+                'type': 'checkbox', 'value': False, 'number': task_number
+            }    
+                
+            spec_model.save()
+            return redirect('view_spec', spec_model.id)
+    
+    return render(request, 'spec_builder/taskforms/ChooseBranchesConnect.html', {
+        'spec_model': spec_model,
+        'origin_task': origin_task,
+        'existing_tasks': {k: type(v).__name__ for k, v in spec_model.spec.task_specs.items()},
+        'legal_tasks': {k: (v[0],v[1].__name__) for k, v in CONNECTABLE_TASKS.items()},
+        'error': error,
+    })
+    
+def choose_branches_dict(request, spec_model, task_spec):
+    if 'choices' in request.POST:
+        task_spec.get_data('task_data')['options']['minimum_choices'] = int(request.POST.get('choices'))
+        spec_model.save()
+
+    return render(request, 'spec_builder/taskforms/ChooseBranchesDict.html', {
+        'spec_model': spec_model,
+        'task': task_spec,
+        'choices': task_spec.get_data('task_data')['options'].get('minimum_choices', 0)
+    })
 
     
     
@@ -298,13 +348,16 @@ CONNECTABLE_TASKS = {
     #name : ('Nice Name', spiff taskspec, connect method)
     'simple': ('Simple Task Node', taskspecs.Simple, None),
     'join': ('Blocking Join Node', taskspecs.Join, None),
-    'choose_branch': ('Exclusive Branch', taskspecs.ExclusiveChoice, choose_branch_connect)
+    'choose_branch': ('Exclusive Branch', taskspecs.ExclusiveChoice, choose_branch_connect),
+    'choose_branches': ('Multiple Branch', taskspecs.MultiChoice, choose_branches_connect)
+    
 }            
     
 TASK_DICT_METHODS = {
     'file_upload': ('Upload a File', file_upload_dict),
     'accept_agreement': ('Accept an Agreement', accept_agreement_dict),
     'field_entry': ('Fill out Form Fields', field_entry_dict),
+    'choose_branches': ('Multiple Branch', choose_branches_dict)
 }
 
 

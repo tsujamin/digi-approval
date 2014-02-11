@@ -515,7 +515,11 @@ class ChooseBranches(AbstractForm):
                 if not hasattr(self.spiff_task.data, data_field):
                     # init fields
                     self.spiff_task.data[data_field] = False
-                self.task_model.save()
+            #default to 0 minimum choices if unset
+            if not 'minimum_choices' in self.task_dict['options'] or \
+                    not isinstance(self.task_dict['options']['minimum_choices'], int):
+                self.task_dict['options']['minimum_choices'] = 0
+            self.task_model.save()
         else:
             raise TypeError("CheckTally requires an MultiChoice task")
 
@@ -529,9 +533,6 @@ class ChooseBranches(AbstractForm):
                     field['type'] != 'checkbox':
                 raise AttributeError("fields must have number and be of type" +
                                      " checkbox")
-        if not 'minimum_choices' in task_data['options'] or \
-                not isinstance(task_data['options']['minimum_choices'], int):
-            raise AttributeError("must have an integer minimum_choices option")
 
     @staticmethod
     def make_task_dict(actor, minimum_choices, *args, **kwargs):
@@ -562,8 +563,7 @@ class ChooseBranches(AbstractForm):
         count = 0
         if request.method == "POST":
             for field in form_fields:
-                value = request.POST.get(field, None)
-                if value is not None:
+                if field in request.POST:
                     form_fields[field]['value'] = True
                     data_field = "task" + str(form_fields[field]['number'])
                     self.spiff_task.data[data_field] = True

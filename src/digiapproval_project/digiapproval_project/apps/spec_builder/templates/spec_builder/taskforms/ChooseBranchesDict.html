@@ -1,0 +1,17 @@
+{% extends 'spec_builder/task_dict.html' %}
+{% block header %}Edit: Choose Branch Task "{{task.name}}" ({{spec_model.name}}) {% endblock %}
+
+{% block taskdict_fields %}
+<div class="form-group">
+  <label for="choices">Minimum Number of Branches to Select</label>
+  <input type="number" name="choices" value="{{choices}}" class="form-control">
+</div>
+
+<div class="form-group">
+  <button type="submit" name="submit" class="btn btn-default">Save Changes</button>
+</div>
+{% endblock %}
+
+{% block task_info %}
+Information on the choose branches task spec
+{% endblock %}
