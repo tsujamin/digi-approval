@@ -9,7 +9,7 @@
     <hr>
     
     <h3>Generic Configuration</h3>
-    <b>{% if general_error %}{{general_error}}{%endif%}</b><br>
+    {% if general_error %}<b>{{general_error}}</b><br>{%endif%}
     
     <div class="form-group">
       <label for="actor">Set actor for task</label>

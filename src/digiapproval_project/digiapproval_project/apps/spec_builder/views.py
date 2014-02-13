@@ -394,8 +394,53 @@ def check_tally_connect(request, spec_model, origin_task):
         'task_types': ['success', 'fail'],
         'error': error,
         'completed': completed
-    })    
+    })
+    
+def check_tally_dict(request, spec_model, task_spec):
+    """controlller for dictionary editing of check_tally tasks (modification of field_entry_dict)"""
+    fields = task_spec.get_data('task_data')['fields']
+    min_score = task_spec.get_data('min_score')
+    print min_score
+    if request.method == "POST":
+        if 'new_min_score' in request.POST:
+            min_score = request.POST.get('min_score', '')
+            min_score = int(min_score) if (min_score != '') else 0 #convert score to int      
+        elif 'new_field' in request.POST:
+            name = request.POST.get('new_name', False)
+            label = request.POST.get('new_label', False)
+            score = request.POST.get('new_score', '')
+            score = int(score) if (score != '') else 0 #convert score to int
+            if 'new_mandatory' in request.POST: mandatory = True
+            else: mandatory = False
+            if name and label and len(name) is not 0 \
+                and len(label) is not 0:
+                fields[name] = {'label': label, 'mandatory': mandatory,
+                                'type': 'checkbox', 'value': False, 'score': score}
+        else:
+            for field in fields:
+                if field+'_delete' in request.POST:
+                    del fields[field]
+                    break
+                label = request.POST.get(field+'_label', False)
+                score = request.POST.get(field+'_score', '')
+                score = int(score) if (score != '') else 0 #convert score to int
+                if label and len(label) is not 0:
+                    fields[field]['label'] = label
+                if field+'_mandatory' in request.POST:
+                    fields[field]['mandatory'] = True
+                else: fields[field]['mandatory'] = False
+                if score:
+                    fields[field]['score'] = score
+        task_spec.get_data('task_data')['fields'] = fields
+        spec_model.save()
 
+    return render(request, 'spec_builder/taskforms/CheckTallyDict.html', {
+        'spec_model': spec_model,
+        'task': task_spec,
+        'fields': task_spec.get_data('task_data')['fields'],
+        'field_types': field_types,
+        'min_score': min_score
+    })
     
     
 CONNECTABLE_TASKS = {
@@ -412,7 +457,8 @@ TASK_DICT_METHODS = {
     'file_upload': ('Upload a File', file_upload_dict),
     'accept_agreement': ('Accept an Agreement', accept_agreement_dict),
     'field_entry': ('Fill out Form Fields', field_entry_dict),
-    'choose_branches': ('Multiple Branch', choose_branches_dict)
+    'choose_branches': ('Multiple Branch', choose_branches_dict),
+    'check_tally': ('Checkbox Branch', check_tally_dict),
 }
 
 
