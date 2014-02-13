@@ -1,0 +1,70 @@
+{% extends 'spec_builder/task_dict.html' %}
+{% block header %}Edit: Check Tally Task "{{task.name}}" ({{spec_model.name}}) {% endblock %}
+
+{% block taskdict_fields %}
+<!-- minimum branch score -->
+<div class="form-group">
+  <label for="min_score"><h3>Minimum Score for Success Branch</h3></label>
+  <input type="text" name="min_score" value="{{min_score}}" placeholder="0" class="form-control">
+</div>
+<div class="form-group">
+  <button type="submit" name="new_min_score" class="btn btn-default">Update</button>
+</div>
+<hr>
+<!--New Field Entry-->
+<h3>New Item</h3>
+<div class="form-group">
+  <label for="new_name">Name</label>
+  <input type="text" name="new_name" class="form-control">
+</div>
+<div class="form-group">
+  <label for="new_label">Label</label>
+  <input type="text" name="new_label" class="form-control">
+</div>
+<div class="checkbox">
+    <label>
+        <input type="checkbox" name="new_mandatory"/>Mandatory
+    </label>
+</div>
+<div class="form-group">
+  <label for="new_score">Score</label>
+  <input type="text" name="new_score" placeholder="0" class="form-control">
+</div>
+<div class="form-group">
+  <button type="submit" name="new_field" class="btn btn-default">Add New Field</button>
+</div>
+
+<!--existing field modification-->
+{% if fields %}
+  {% for field_name, field_obj in fields.items %}
+    <hr>
+    <div class="form-group-inline">
+      <h3>
+        {{field_name}}
+        <button type="submit" name="{{field_name|add:'_delete'}}" class="btn btn-default">Remove</button>
+      </h3>
+    </div>
+    <div class="form-group">
+      <label for="{{field_name|add:'_label'}}">Label</label>
+      <input type="text" name="{{field_name|add:'_label'}}" value="{{field_obj.label}}" class="form-control">
+    </div>
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" name="{{field_name|add:'_mandatory'}}" {% if field_obj.mandatory %}checked{% endif %}/>Mandatory
+      </label>
+    </div>
+    <div class="form-group">
+      <label for="{{field_name|add:'_score'}}">Score</label>
+      <input type="text" name="{{field_name|add:'_score'}}" value="{{field_obj.score}}" placeholder="0" class="form-control">
+    </div>
+  {% endfor %}
+  
+  <div class="form-group">
+    <button type="submit" name="submit" class="btn btn-default">Save Changes</button>
+  </div>
+{% endif %}
+{% endblock %}
+
+{% block task_info %}
+Information on the check_tally task spec
+{% endblock %}

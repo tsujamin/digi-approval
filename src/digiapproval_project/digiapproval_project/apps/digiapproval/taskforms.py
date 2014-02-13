@@ -121,7 +121,8 @@ class AbstractForm(object):
                 'actor': actor,
                 'fields': {},
                 'data': {'task_info': task_info},
-                'options': {}
+                'options': {},
+                'nice_name': form_classes[form].__name__
                 }
 
     def form_request(self, request):
@@ -415,7 +416,7 @@ class CheckTally(AbstractForm):
                             success)
         ret_task.connect_if(LessThan(Attrib('score'), Attrib('min_score')),
                             fail)
-        ret_task.connect(success)  # Default taskspec
+        ret_task.connect(fail)  # Default taskspec
         return ret_task
 
 
@@ -514,7 +515,11 @@ class ChooseBranches(AbstractForm):
                 if not hasattr(self.spiff_task.data, data_field):
                     # init fields
                     self.spiff_task.data[data_field] = False
-                self.task_model.save()
+            #default to 0 minimum choices if unset
+            if not 'minimum_choices' in self.task_dict['options'] or \
+                    not isinstance(self.task_dict['options']['minimum_choices'], int):
+                self.task_dict['options']['minimum_choices'] = 0
+            self.task_model.save()
         else:
             raise TypeError("CheckTally requires an MultiChoice task")
 
@@ -526,12 +531,8 @@ class ChooseBranches(AbstractForm):
         for field in task_data['fields'].values():
             if not 'number' in field or \
                     field['type'] != 'checkbox':
-                print field
                 raise AttributeError("fields must have number and be of type" +
                                      " checkbox")
-        if not 'minimum_choices' in task_data['options'] or \
-                not isinstance(task_data['options']['minimum_choices'], int):
-            raise AttributeError("must have an integer minimum_choices option")
 
     @staticmethod
     def make_task_dict(actor, minimum_choices, *args, **kwargs):
@@ -562,9 +563,7 @@ class ChooseBranches(AbstractForm):
         count = 0
         if request.method == "POST":
             for field in form_fields:
-                print request.POST
-                value = request.POST.get(field, None)
-                if value is not None:
+                if field in request.POST:
                     form_fields[field]['value'] = True
                     data_field = "task" + str(form_fields[field]['number'])
                     self.spiff_task.data[data_field] = True
@@ -755,9 +754,9 @@ form_classes = {
     "file_upload": FileUpload,
 }
 
-field_types = [
-    'checkbox',
-    'text',
-    'radio',
-    'file',
-]
+field_types = {
+    'checkbox': 'Checkbox',
+    'text': 'Text Entry',
+    'radio': 'Radio Button',
+    'file': 'File Upload',
+}

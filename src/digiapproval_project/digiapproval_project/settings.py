@@ -41,6 +41,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.flatpages',
     'digiapproval_project.apps.digiapproval',
+    'digiapproval_project.apps.spec_builder',
     'south',
     'bootstrap3',
     'registration',
