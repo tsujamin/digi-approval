@@ -14,13 +14,16 @@ Approver: {{workflow.approver.get_full_name}}</p>
       {% if task.actor %}
       - {{task.actor|title}}
       {% if task.show_task_link %}
-      - <a href="{% url 'view_task' workflow.id task.uuid %}">Complete</a>
+      - <a href="{% url 'view_task' task.workflow_id task.uuid %}">Complete</a>
       {% endif %}
       {% if task.show_data_link %}
       - <a href="{% url 'view_task_data' task.uuid %}">View</a>
       {% endif %}
       {% endif %}
-      </li>
+      {% if task.indent %}<ul>
+      {% elif task.dedent %}</li></ul>
+      {% else %}</li>
+      {% endif %}
       {% endfor %}
     </ul>
     <h2>Options</h2>
