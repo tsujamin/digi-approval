@@ -1,0 +1,68 @@
+{% extends "digiapproval/base.tpl.html" %}
+{% block title %} Connect task to "{{origin_task.name}}" ({{spec_model.name}}){% endblock %}
+
+{% block content %}
+<div class="col-md-6">
+  {% if origin_task.outputs %}
+  <h3>Currently connected</h3>
+  <ul>
+    {% for task in origin_task.outputs %}
+    <li>{{task.name}}</li>
+    {% endfor %}
+  </ul>
+  <hr>
+  {% endif %}
+  
+  <form action="" method="POST" role="form">
+    {% csrf_token %}
+    <b>{% if error %}{{error}}{% endif %}</b><br>
+    <!-- iterate though success and fail options -->
+    {% for task_type in task_types %}
+    <h3>Connect {{task_type}} task</h3>
+    
+    <div class="radio">
+      <label>
+        <input type="radio" name="{{task_type|add:'_task'}}" value="{{task_type|add:'existing_task'}}" id="1">
+        <b>Connect to existing task</b>
+      </label>
+    </div>
+    <!--select pre-created task to connect to-->  
+    <div class="form-group">
+      <label for="{{task_type|add:'existing_task'}}" class="sr-only">Connect to existing task</label>
+      <select name="{{task_type|add:'existing_task'}}" class="form-control">
+        {% for task, type in existing_tasks.items %}
+        <option value="{{task}}">{{task}} ({{type}})</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="radio">
+      <label>
+        <input type="radio" name="{{task_type|add:'_task'}}" value="{{task_type|add:'existing_task'}}" id="1">
+        <b>Connect to new task</b>
+      </label>
+    </div>
+    <!-- build new task -->
+    <div class="form-group">
+      <label for="{{task_type|add:'_task_label'}}" class="sr-only">Name of task</label>
+      <input type="text" name="{{task_type|add:'_task_label'}}" class="form-control" placeholder="Name">
+    </div>  
+    <div class="form-group">
+      <label for="{{task_type|add:'_create_task'}}" class="sr-only">Connect to new task</label>
+      <select name="{{task_type|add:'_create_task'}}" class="form-control">
+        {% for task_name, desc in legal_tasks.items %}
+        <option value="{{task_name}}">{{desc.0}} ({{desc.1}})</option>
+        {% endfor %}
+      </select>      
+    </div>
+    {% endfor %}
+    <div class="form-group">
+      <button type="submit" name="create" class="btn btn-default">Create</button>
+    </div>
+    
+  </form>
+</div>
+<div clas="col-md-6">
+  <h3>Placeholder</h3>
+  Information on connecting tasks
+</div>
+{% endblock %}

@@ -341,6 +341,17 @@ def choose_branches_dict(request, spec_model, task_spec):
         'task': task_spec,
         'choices': task_spec.get_data('task_data')['options'].get('minimum_choices', 0)
     })
+    
+def check_tally_connect(request, spec_model, origin_task):
+    error = None
+    return render(request, 'spec_builder/taskforms/CheckTallyConnect.html', {
+        'spec_model': spec_model,
+        'origin_task': origin_task,
+        'existing_tasks': {k: type(v).__name__ for k, v in spec_model.spec.task_specs.items()},
+        'legal_tasks': {k: (v[0],v[1].__name__) for k, v in CONNECTABLE_TASKS.items()},
+        'task_types': ['success', 'fail'],
+        'error': error,
+    })    
 
     
     
@@ -349,7 +360,8 @@ CONNECTABLE_TASKS = {
     'simple': ('Simple Task Node', taskspecs.Simple, None),
     'join': ('Blocking Join Node', taskspecs.Join, None),
     'choose_branch': ('Exclusive Branch', taskspecs.ExclusiveChoice, choose_branch_connect),
-    'choose_branches': ('Multiple Branch', taskspecs.MultiChoice, choose_branches_connect)
+    'choose_branches': ('Multiple Branch', taskspecs.MultiChoice, choose_branches_connect),
+    'check_tally': ('Checkbox Exclusive Branch', taskspecs.ExclusiveChoice, check_tally_connect)
     
 }            
     
