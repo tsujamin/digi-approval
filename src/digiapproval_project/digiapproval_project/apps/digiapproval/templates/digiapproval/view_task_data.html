@@ -11,11 +11,13 @@ Approver: {{task.workflow.approver.get_full_name}}</p>
   <dt>{{field.0|title}}</dt>
   <dd><emph>{{field.1.label}}</emph> 
     <!-- create link if file field -->
-    {% ifequal field.1.type 'file' %}
+    {% if field.1.type == 'file' %}
       <a href="{{field.1.value}}">Click to download</a> 
+    {% elif field.1.type == 'checkbox' %}
+      {% if field.1.value %}Yes{% else %}No%{% endif %}
     {% else %} 
       {{field.1.value}} 
-    {% endifequal %}
+    {% endif %}
   </dd>
   {% endfor %}
 </dl>
