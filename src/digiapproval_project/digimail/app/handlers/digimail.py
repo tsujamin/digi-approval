@@ -18,7 +18,12 @@ def WORKFLOW_MESSAGE(message, uuid=None, host=None):
     # save it
     m = Message()
     m._sent = True
-    m.message = message.body()
+    
+    try:
+        m.message = message.body()[:message.body.index('---------- Write ABOVE THIS LINE to post a reply ----------')]
+    except ValueError:
+        m.message = message.body()
+    
     m.workflow = workflow
     m.sender = sender
     m.save()
