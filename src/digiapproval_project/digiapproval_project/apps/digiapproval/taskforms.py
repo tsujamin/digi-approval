@@ -648,10 +648,13 @@ class FileUpload(AbstractForm):
             # invalid access
             return response
         error = None
-
+        
         if request.method == "POST":
             file = request.FILES.get('file', None)
             file_name = request.POST.get('file_name', None)
+            #save filename in field for re-render
+            if file_name and file_name != "" :
+                self.task_dict['fields']['file_name']['value'] = file_name
             # Check validity of posted data
             if file is None and self.task_dict['fields']['file']['mandatory']:
                 error = "Uploading a file is mandatory"
@@ -660,7 +663,6 @@ class FileUpload(AbstractForm):
             else:  # place filevalue in task_dict
                 file_model = models.UserFile(_file=file, name=file_name)
                 file_model.save()
-                self.task_dict['fields']['file_name']['value'] = file_name
                 self.task_dict['fields']['file']['value'] = file_model.id
                 return self.complete_task(request)
         # default response, returns related template with current fields

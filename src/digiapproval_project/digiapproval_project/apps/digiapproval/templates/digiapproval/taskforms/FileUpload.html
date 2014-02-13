@@ -6,7 +6,7 @@
     <div class="form-group">
         <label for="{{field}}">{{items.label}}</label>
         <input type="{{items.type}}" name="{{ field }}" 
-        {% ifnotequal items.type 'file' %} class="form-control" {% endifnotequal %}/><!-- Creates field with specified field type -->
+        {% ifnotequal items.type 'file' %} value="{{items.value}}" class="form-control" {% endifnotequal %}/><!-- Creates field with specified field type -->
     </div>
     {% endfor %}
     <button type="submit" name="submit" class="btn btn-default">Upload</button><!-- Submit field, multiple submit buttons can exist and be handled seperatly -->
