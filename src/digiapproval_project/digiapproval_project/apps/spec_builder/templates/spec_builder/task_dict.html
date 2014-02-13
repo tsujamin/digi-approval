@@ -10,14 +10,17 @@
     
     <h3>Generic Configuration</h3>
     {% if general_error %}<b>{{general_error}}</b><br>{%endif%}
-    
+    <div class="form-group">
+      <label for="task_info">Description</label>      
+      <textarea name="task_info" class="form-control" rows="4">{{task.data.task_data.data.task_info}}</textarea>
+    </div>
     <div class="form-group">
       <label for="actor">Set actor for task</label>
       <select name="actor" class="form-control">
         <option value="APPROVER" {% ifequal task.data.task_data.actor 'APPROVER' %}selected{% endifequal %}>Approver</option>
         <option value="CUSTOMER" {% ifequal task.data.task_data.actor 'CUSTOMER' %}selected{% endifequal %}>Customer</option>
       </select><br>
-      <button type="submit" name="update_actor" class="btn btn-default">Set Actor</button>
+      <button type="submit" name="update_general" class="btn btn-default">Update</button>
     </div>
     <div class="form-group">
       <button type="submit" name="delete_dict" class="btn btn-default">Delete Task Dictionary</button>

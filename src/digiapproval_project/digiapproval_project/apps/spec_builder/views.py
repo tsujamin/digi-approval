@@ -169,8 +169,10 @@ def task_dict(request, spec_id, task_name):
                 del task_spec.data['task_data']
                 spec_model.save()
                 return redirect('view_spec', spec_id)
-        elif 'update_actor' in request.POST and request.POST.get('actor') in ['APPROVER', 'CUSTOMER']:
+        elif 'update_general' in request.POST and request.POST.get('actor') in ['APPROVER', 'CUSTOMER']:
             task_spec.data['task_data']['actor'] = request.POST.get('actor')
+            task_spec.data['task_data']['data']['task_info'] = request.POST.get('task_info')
+            
             spec_model.save()
             return redirect('task_dict', spec_id, task_name)
     #redirect to appropriate task_dict controller
@@ -404,7 +406,7 @@ def check_tally_dict(request, spec_model, task_spec):
     if request.method == "POST":
         if 'new_min_score' in request.POST:
             min_score = request.POST.get('min_score', '')
-            min_score = int(min_score) if (min_score != '') else 0 #convert score to int      
+            task_spec.set_data(min_score = int(min_score) if (min_score != '') else 0) #convert score to int and save    
         elif 'new_field' in request.POST:
             name = request.POST.get('new_name', False)
             label = request.POST.get('new_label', False)
