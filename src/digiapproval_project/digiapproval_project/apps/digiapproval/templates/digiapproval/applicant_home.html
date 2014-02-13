@@ -42,7 +42,7 @@
   {% endifequal %}
   {% ifnotequal unread 0 %}
     <ul><li>
-      <a href="{% url 'view_workflow_messages workflow_id=workflow.id %'}">{{unread}} unread messages </a>
+      <a href="{% url 'view_workflow_messages' workflow_id=workflow.id %}">{{unread}} unread messages </a>
     </li></ul>
   {% else %}{% endifnotequal %}
   </li>
