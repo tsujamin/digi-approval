@@ -236,17 +236,7 @@ class Workflow(models.Model):
             self.assign_approver()
         if self.workflow.is_completed() and self.completed is False:
             self.completed = True
-            
-            # If we're a subworkflow, complete the relevant Subworkflow task
-            # TODO: not yet tested
-            if self.parent_workflow and self.parent_task:
-                parent_task = self.parent_workflow.workflow.get_task(
-                    {'__uuid__': uuid.UUID(self.parent_task.uuid).hex})
-                
-                parent_task.complete()
-                self.parent_task.save()
-                self.parent_workflow.save()
-                # TODO: Doesn't send emails like AbstractForm.complete_task() does
+        
         super(Workflow, self).save(*args, **kwargs)
 
     def get_ready_task_forms(self, **kwargs):
