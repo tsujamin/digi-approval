@@ -416,7 +416,7 @@ class CheckTally(AbstractForm):
                             success)
         ret_task.connect_if(LessThan(Attrib('score'), Attrib('min_score')),
                             fail)
-        ret_task.connect(success)  # Default taskspec
+        ret_task.connect(fail)  # Default taskspec
         return ret_task
 
 

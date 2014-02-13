@@ -103,10 +103,10 @@ def connect_task_controller(request, spec_id, task_name):
     
     if request.method == "POST":
         if 'connect' in request.POST:
-            next_task = get_existing_task(request, spec_model)
+            next_task = get_existing_task_from_request(request, spec_model)
             if not next_task: error="Illegal or incorrect connecting task" #        
         elif 'create' in request.POST:
-            next_task = create_task(request, spec_model)
+            next_task = create_task_from_request(request, spec_model)
             if not next_task: error = "Illegal new task or invalid task name"
         if not error:        
             origin_task.connect(next_task)
@@ -121,24 +121,36 @@ def connect_task_controller(request, spec_id, task_name):
         'error': error,
     })
 
-def get_existing_task(request, spec_model):
-    """Connects task from given request and returns it"""    
-    next_task = spec_model.spec.task_specs.get(
-                    request.POST.get('existing_task', "0xD161AC71VE"), False)
+def get_existing_task(task_name, spec_model):
+    """Gets existing task from workflow spec"""
+    next_task = spec_model.spec.task_specs.get(task_name, False)
     if next_task and next_task.name != "Start": 
         return next_task
+
+def get_existing_task_from_request(request, spec_model):
+    """Connects task from given request (connect_task extending) and returns it """    
+    return get_existing_task(
+                    request.POST.get('existing_task', "0xD161AC71VE"),
+                    spec_model)
+
+def create_task(task_name, task_label, spec_model):
+    """Creates new task using provided parameters"""
+    next_task = CONNECTABLE_TASKS.get(task_name, False)
         
-def create_task(request, spec_model):
-    next_task = CONNECTABLE_TASKS.get(request.POST.get('new_task', False), False)
-    task_label = request.POST.get('task_label', False)
     if next_task and task_label and len(task_label) is not 0 \
             and task_label not in spec_model.spec.task_specs: 
         new_task = next_task[1](spec_model.spec, task_label)
         if next_task[2]: #Special connect method
             #Set newely created task to type of task (ie choose_branch)
             new_task.set_data(task_data=AbstractForm.make_task_dict( 
-                request.POST.get('new_task', False), 'APPROVER'))
-        return new_task
+                task_name, 'APPROVER'))
+        return new_task    
+        
+def create_task_from_request(request, spec_model):
+    """creates task from request (connect_task extending) and returns it"""
+    task_name = request.POST.get('new_task', False)
+    task_label = request.POST.get('task_label', False)
+    return create_task(task_name, task_label, spec_model)
 
 def task_dict(request, spec_id, task_name):
     """Generic handler for task_dict editing"""
@@ -262,11 +274,11 @@ def choose_branch_connect(request, spec_model, origin_task):
         if label ==  '': #missing label
             error = "Must have label for choice"
         elif 'connect' in request.POST:
-            next_task = get_existing_task(request, spec_model)
+            next_task = get_existing_task_from_request(request, spec_model)
             if not next_task or next_task in origin_task.outputs: 
                 error="Illegal or incorrect connecting task" #        
         elif 'create' in request.POST:
-            next_task = create_task(request, spec_model)
+            next_task = create_task_from_request(request, spec_model)
             if not next_task or next_task in origin_task.outputs: 
                 error = "Illegal new task or invalid task name"
         if not error:        
@@ -302,11 +314,11 @@ def choose_branches_connect(request, spec_model, origin_task):
         if label ==  '': #missing label
             error = "Must have label for choice"
         elif 'connect' in request.POST:
-            next_task = get_existing_task(request, spec_model)
+            next_task = get_existing_task_from_request(request, spec_model)
             if not next_task or next_task in origin_task.outputs: 
                 error="Illegal or incorrect connecting task" #        
         elif 'create' in request.POST:
-            next_task = create_task(request, spec_model)
+            next_task = create_task_from_request(request, spec_model)
             if not next_task or next_task in origin_task.outputs: 
                 error = "Illegal new task or invalid task name"
         if not error:        
@@ -343,7 +355,37 @@ def choose_branches_dict(request, spec_model, task_spec):
     })
     
 def check_tally_connect(request, spec_model, origin_task):
+    """Controller for connecting to check_tally"""
     error = None
+    completed = not (len(origin_task.outputs) is 0) #if outputs is not 0, assume connect task completed
+    if request.method == "POST" and not completed:
+        new_tasks = {}
+        for task_type in ['success', 'fail']:
+            post_task_type = request.POST.get((task_type + '_task'), '')
+            if post_task_type == (task_type + '_existing_task'): #if connecting to existing:
+                new_tasks[task_type] = get_existing_task(request.POST.get(task_type + '_existing_task', None), spec_model)
+            elif post_task_type == (task_type + '_create_task'): #else connecting to new task
+                label = request.POST.get(task_type + '_task_label', '')
+                print label
+                if label and label != '':
+                    new_tasks[task_type] = create_task(request.POST.get(task_type + '_create_task', None), label, spec_model)
+                else: error = "New task requires a name"
+        #Now we have the tasks for connecting in new_tasks[success/fail]. lets check that they are not none before connecting
+        for task in new_tasks.values():
+             if task is None or len(new_tasks) is not 2: error = "Must select valid tasks for success and fail branches"
+        if not error: #No outstanding errors, lets connect
+            from SpiffWorkflow.operators import Attrib, GreaterThan,\
+                Equal, LessThan
+            origin_task.set_data(min_score=0) #default required score
+            origin_task.connect_if(GreaterThan(Attrib('score'), Attrib('min_score')),
+                                new_tasks['success'])
+            origin_task.connect_if(Equal(Attrib('score'), Attrib('min_score')),
+                                new_tasks['success'])
+            origin_task.connect_if(LessThan(Attrib('score'), Attrib('min_score')),
+                                new_tasks['fail'])
+            origin_task.connect(new_tasks['fail'])  # Default taskspec
+            spec_model.save()
+            return redirect('view_spec', spec_model.id)
     return render(request, 'spec_builder/taskforms/CheckTallyConnect.html', {
         'spec_model': spec_model,
         'origin_task': origin_task,
@@ -351,6 +393,7 @@ def check_tally_connect(request, spec_model, origin_task):
         'legal_tasks': {k: (v[0],v[1].__name__) for k, v in CONNECTABLE_TASKS.items()},
         'task_types': ['success', 'fail'],
         'error': error,
+        'completed': completed
     })    
 
     

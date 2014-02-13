@@ -12,24 +12,26 @@
   </ul>
   <hr>
   {% endif %}
-  
+  {% if completed %}
+    <b>Tasks already connected</b>
+  {% else %}
   <form action="" method="POST" role="form">
     {% csrf_token %}
-    <b>{% if error %}{{error}}{% endif %}</b><br>
+    {%if error %}<b>{{error}}</b><br>{% endif %}
     <!-- iterate though success and fail options -->
     {% for task_type in task_types %}
     <h3>Connect {{task_type}} task</h3>
     
     <div class="radio">
       <label>
-        <input type="radio" name="{{task_type|add:'_task'}}" value="{{task_type|add:'existing_task'}}" id="1">
+        <input type="radio" name="{{task_type|add:'_task'}}" value="{{task_type|add:'_existing_task'}}" id="1">
         <b>Connect to existing task</b>
       </label>
     </div>
     <!--select pre-created task to connect to-->  
     <div class="form-group">
-      <label for="{{task_type|add:'existing_task'}}" class="sr-only">Connect to existing task</label>
-      <select name="{{task_type|add:'existing_task'}}" class="form-control">
+      <label for="{{task_type|add:'_existing_task'}}" class="sr-only">Connect to existing task</label>
+      <select name="{{task_type|add:'_existing_task'}}" class="form-control">
         {% for task, type in existing_tasks.items %}
         <option value="{{task}}">{{task}} ({{type}})</option>
         {% endfor %}
@@ -37,7 +39,7 @@
     </div>
     <div class="radio">
       <label>
-        <input type="radio" name="{{task_type|add:'_task'}}" value="{{task_type|add:'existing_task'}}" id="1">
+        <input type="radio" name="{{task_type|add:'_task'}}" value="{{task_type|add:'_create_task'}}" id="1">
         <b>Connect to new task</b>
       </label>
     </div>
@@ -60,6 +62,7 @@
     </div>
     
   </form>
+  {% endif %}
 </div>
 <div clas="col-md-6">
   <h3>Placeholder</h3>
