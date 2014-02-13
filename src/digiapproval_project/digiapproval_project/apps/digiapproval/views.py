@@ -411,21 +411,10 @@ def view_workflow_messages(request, workflow_id):
 def workflow_state(request, workflow_id):
     """Controller for modification of workflow state"""
     workflow = get_object_or_404(Workflow, id=workflow_id)
-    actor = workflow.actor_type(request.user)
-    if actor is None:
-        raise PermissionDenied
     new_state = request.POST.get('wf_state', False)
-    states = map(lambda (choice, _): (choice), Workflow.STATE_CHOICES)
+    actor = workflow.actor_type(request.user)
 
-    if request.method == 'POST' and new_state in states:
-        (_, nice_new_state) = filter(
-            lambda (short, long): (short == new_state),
-            Workflow.STATE_CHOICES)[0]
-
-        # a customer can only cancel an application
-        if actor == 'CUSTOMER' and new_state != 'CANCELLED':
-            raise PermissionDenied
-
+    if request.method == 'POST':
         # a change other than approval requires confirmation
         if not (new_state == "APPROVED" or request.POST.get('confirm', False)):
             return render(request, "digiapproval/confirm_workflow_state.html",
@@ -433,20 +422,23 @@ def workflow_state(request, workflow_id):
                            'new_state': new_state
                            })
 
-        # users are not allowed to change from canceled wf states
-        if workflow.state not in ['DENIED', 'CANCELLED']:
-            workflow.state = new_state  # assign new state
-            if workflow.state == 'STARTED':
-                workflow.completed = False
-            elif workflow.state in ['DENIED', 'CANCELLED']:
-                workflow.workflow.cancel()
-                workflow.completed = True
-            else:
-                workflow.completed = True
-        workflow.save()
-        Message(workflow=workflow, sender=request.user,
-                message=nice_new_state).save()
-        Message.mark_all_read(workflow, request.user)
+        # attempt to change the state and notify
+        try:
+            workflow.change_state_by_user(new_state=new_state,
+                                          user=request.user)
+        except PermissionDenied, pd:
+            raise pd
+        except ValueError, ve:
+            # TODO: render nicely.
+            # this catches invalid states and invalid transitions
+            return HttpResponse(str(ve))
+        else:
+            (_, nice_new_state) = filter(
+                lambda (short, long): (short == new_state),
+                Workflow.STATE_CHOICES)[0]
+            Message(workflow=workflow, sender=request.user,
+                    message=nice_new_state).save()
+            Message.mark_all_read(workflow, request.user)
 
         if actor == 'CUSTOMER':
             return redirect('applicant_home')

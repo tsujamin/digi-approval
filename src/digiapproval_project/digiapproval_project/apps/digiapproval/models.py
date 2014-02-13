@@ -5,7 +5,7 @@ from django.core.mail import send_mail
 from django.template import Context, loader
 from .fields import WorkflowField, WorkflowSpecField
 from jsonfield import JSONField
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from registration.signals import user_registered
 import uuid
 
@@ -285,6 +285,41 @@ class Workflow(models.Model):
             if user != self.approver:
                 return None
         return actor
+
+    def change_state_by_user(self, new_state='', user=None):
+        """Can the user change this workflow's state to new_state? If so,
+        make the change, otherwise raise an exception to say why not.
+
+        Raises PermissionDenied errors if the user lacks the permissions.
+        Raises ValueError if the change requested is invalid (e.g. restarting
+        an abandoned workflow, invalid state)."""
+
+        states = map(lambda (choice, _): (choice), Workflow.STATE_CHOICES)
+        if new_state not in states:
+            raise ValueError(("Attempted to change into state '%s', which is" +
+                             " not a valid state.") % new_state)
+
+        actor = self.actor_type(user)
+        if actor is None:
+            raise PermissionDenied
+
+        if actor == 'CUSTOMER' and new_state != 'CANCELLED':
+            raise PermissionDenied
+
+        # A workflow cannot be uncancelled.
+        if self.state not in ['DENIED', 'CANCELLED']:
+            self.state = new_state  # assign new state
+            if self.state == 'STARTED':
+                self.completed = False
+            elif self.state in ['DENIED', 'CANCELLED']:
+                self.workflow.cancel()
+                self.completed = True
+            else:
+                self.completed = True
+        else:
+            raise ValueError("A cancelled or denied workflow cannot be" +
+                             " restarted.")
+        self.save()
 
     def __unicode__(self):
         return u'%s (%s)' % (self.customer.user.username, self.spec.name)
