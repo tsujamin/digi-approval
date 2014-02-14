@@ -28,6 +28,8 @@ urlpatterns = patterns(
         name='view_workflow'),
     url(r'^new_workflow/(?P<workflowspec_id>\d+)/$', views.new_workflow,
         name='new_workflow'),
+    url(r'^workflow_spec/(?P<workflowspec_id>\d+)/svg$',
+        views.view_workflowspec_svg, name='view_workflowspec_svg'),
     url(r'^view_task/(?P<workflow_id>\d+)/(?P<task_uuid>.+)/$',
         views.view_task, name='view_task'),
     url(r'^view_task_data/(?P<task_uuid>.+)/$', views.view_task_data,

@@ -6,9 +6,8 @@ from digiapproval_project.apps.digiapproval import models as approval_models
 from digiapproval_project.apps.digiapproval.taskforms import AbstractForm, field_types
 from SpiffWorkflow.specs import WorkflowSpec
 from SpiffWorkflow import specs as taskspecs
-import networkx as nx
-from SpiffWorkflow.storage.NetworkXSerializer import NetworkXSerializer
 from django.core.urlresolvers import reverse
+import networkx as nx
 
 def index(request):
     return redirect('home')
@@ -62,18 +61,7 @@ def new_spec(request):
 def view_spec_svg(request, spec_id):
     spec = get_object_or_404(approval_models.WorkflowSpec,
                                 id=spec_id)
-    nxs = NetworkXSerializer()
-    graph = nxs.serialize_workflow_spec(spec.spec)
-    
-    for nodename in graph.nodes():
-        node = graph.node[nodename]
-        if 'task_data' in node['data']['data']:
-            node['style'] = 'filled'
-            if node['data']['data']['task_data']['actor'] == 'CUSTOMER':
-                node['fillcolor'] = '#CCCCFF'
-            else:
-                node['fillcolor'] = '#CCFFCC'
-    
+    graph = spec.to_coloured_graph()
     agraph = nx.to_agraph(graph)
 
     for nodename in agraph.nodes():
@@ -86,8 +74,6 @@ def view_spec_svg(request, spec_id):
                 'fontcolor': '#0000FF'
                 })
         del node.attr['data']
-        
-        node.attr['label'] = node.attr['label'].replace("\n", "\\n")
 
     response = HttpResponse(agraph.draw(None, 'svg', 'dot'),
                             content_type="image/svg+xml")

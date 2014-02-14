@@ -14,7 +14,7 @@ from SpiffWorkflow import Task as SpiffTask
 import itertools
 from django.core.urlresolvers import reverse
 from .utils import never_cache
-
+import networkx as nx
 
 ## MAIN PAGES
 def index(request):
@@ -212,6 +212,16 @@ def delegator_worklist(request):
 
 
 ## WORKFLOWS / TASKS
+
+def view_workflowspec_svg(request, workflowspec_id):
+    spec = get_object_or_404(WorkflowSpec, id=workflowspec_id)
+
+    graph = spec.to_coloured_graph()
+    agraph = nx.to_agraph(graph)
+
+    response = HttpResponse(agraph.draw(None, 'svg', 'dot'),
+                            content_type="image/svg+xml")
+    return response
 
 def workflow_taskdata(workflow_id, actor):
     """Extracts task metadata from a workflow, for display in view_workflow"""
