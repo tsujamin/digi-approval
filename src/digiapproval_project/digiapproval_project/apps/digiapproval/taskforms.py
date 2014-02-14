@@ -49,7 +49,7 @@ class AbstractForm(object):
             (1, first_task),
             (2, next_task),
             )
-
+        
         review_task.set_data(
             task_data=ChooseBranch.make_task_dict(
                 'APPROVER',
@@ -113,15 +113,15 @@ class AbstractForm(object):
             raise AttributeError("actor of task must be customer or approver")
         elif form not in form_classes:
             raise AttributeError("form must be key of form_classes")
-        if 'task_info' in kwargs:
-            task_info = kwargs['task_info']
-        else:
-            task_info = ""
+        
+        task_info = kwargs.get('task_info', '')
+        options = kwargs.get('options', {})
+        
         return {'form': form,
                 'actor': actor,
                 'fields': {},
                 'data': {'task_info': task_info},
-                'options': {},
+                'options': options,
                 'nice_name': form_classes[form].__name__
                 }
 
@@ -139,6 +139,22 @@ class AbstractForm(object):
 
         if not (is_authenticated and (is_approver or is_customer_and_actor)):
             return HttpResponseRedirect(reverse('applicant_home'))
+    
+    def form_render(self, request, *args, **kwargs):
+        """Wrapper around django.shortcuts.render() which adds task information"""
+        
+        if 'dictionary' in kwargs:
+            dictionary = kwargs['dictionary']
+        elif len(args) >= 2:
+            dictionary = args[1] # it'll be the 3rd argument
+        
+        defaults = (('task', self.spiff_task.get_name()),
+                    ('task_info', self.task_dict['data']['task_info'])
+                    )
+        map(dictionary.setdefault, *zip(*defaults))
+        
+        return render(request, *args, **kwargs)
+        
     
     def complete_task(self):
         """Sets current task as complete, saves the models, emails those involved"""
@@ -239,13 +255,11 @@ class AcceptAgreement(AbstractForm):
                 return self.complete_task_request(request)
             error = "You must accept the agreement to continue"
         # default response
-        return render(request, 'digiapproval/taskforms/AcceptAgreement.html', {
+        return self.form_render(request, 'digiapproval/taskforms/AcceptAgreement.html', {
             'error': error,
-            'task': self.spiff_task.get_name(),
             'agreement': self.task_dict['data']['agreement'],
             'checkbox_label': self.task_dict['fields']['acceptance']['label'],
             'checkbox_value': self.task_dict['fields']['acceptance']['value'],
-            'task_info': self.task_dict['data']['task_info']
         })
 
 
@@ -307,11 +321,9 @@ class FieldEntry(AbstractForm):
             if error is None:  # Correctly filled out
                 return self.complete_task_request(request)
         # default response
-        return render(request, 'digiapproval/taskforms/FieldEntry.html', {
+        return self.form_render(request, 'digiapproval/taskforms/FieldEntry.html', {
             'error': error,
-            'task': self.spiff_task.get_name(),
             'form_fields': form_fields,
-            'task_info': self.task_dict['data']['task_info']
         })
 
 
@@ -386,11 +398,9 @@ class CheckTally(AbstractForm):
                 self.spiff_task.set_data(score=current_score)
                 return self.complete_task_request(request)
         # default response
-        return render(request, 'digiapproval/taskforms/CheckTally.html', {
+        return self.form_render(request, 'digiapproval/taskforms/CheckTally.html', {
             'error': error,
-            'task': self.spiff_task.get_name(),
             'form_fields': form_fields,
-            'task_info': self.task_dict['data']['task_info']
         })
 
     @staticmethod
@@ -467,11 +477,9 @@ class ChooseBranch(AbstractForm):
             else:
                 error = "Invalid Selection"
         # default response, returns related template with current fields
-        return render(request, 'digiapproval/taskforms/ChooseBranch.html', {
+        return self.form_render(request, 'digiapproval/taskforms/ChooseBranch.html', {
             'error': error,
-            'task': self.spiff_task.get_name(),
             'form_fields': form_fields,
-            'task_info': self.task_dict['data']['task_info']
         })
 
     @staticmethod
@@ -563,11 +571,9 @@ class ChooseBranches(AbstractForm):
                          str(self.task_dict['options']['minimum_choices']) +
                          " option(s)")
         # default response, returns related template with current fields
-        return render(request, 'digiapproval/taskforms/ChooseBranches.html', {
+        return self.form_render(request, 'digiapproval/taskforms/ChooseBranches.html', {
             'error': error,
-            'task': self.spiff_task.get_name(),
             'form_fields': form_fields,
-            'task_info': self.task_dict['data']['task_info']
         })
 
     @staticmethod
@@ -647,11 +653,9 @@ class FileUpload(AbstractForm):
                 self.task_dict['fields']['file']['value'] = file_model.id
                 return self.complete_task_request(request)
         # default response, returns related template with current fields
-        return render(request, 'digiapproval/taskforms/FileUpload.html', {
+        return self.form_render(request, 'digiapproval/taskforms/FileUpload.html', {
             'error': error,
-            'task': self.spiff_task.get_name(),
             'form_fields': self.task_dict['fields'],
-            'task_info': self.task_dict['data']['task_info']
         })
 
 
@@ -768,11 +772,9 @@ class ExampleTaskForm(AbstractForm):
                 # All field data was valid, now complete the task
                 return self.complete_task_request(request)
         # default response, returns related template with current fields
-        return render(request, 'digiapproval/taskforms/ExampleTaskForm.html', {
+        return self.form_render(request, 'digiapproval/taskforms/ExampleTaskForm.html', {
             'error': error,
-            'task': self.spiff_task.get_name(),
             'form_fields': self.task_dict['fields'],
-            'task_info': self.task_dict['data']['task_info']
         })
 
 form_classes = {
