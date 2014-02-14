@@ -64,17 +64,29 @@ def view_spec_svg(request, spec_id):
                                 id=spec_id)
     nxs = NetworkXSerializer()
     graph = nxs.serialize_workflow_spec(spec.spec)
+    
+    for nodename in graph.nodes():
+        node = graph.node[nodename]
+        if 'task_data' in node['data']['data']:
+            node['style'] = 'filled'
+            if node['data']['data']['task_data']['actor'] == 'CUSTOMER':
+                node['fillcolor'] = '#CCCCFF'
+            else:
+                node['fillcolor'] = '#CCFFCC'
+    
     agraph = nx.to_agraph(graph)
 
     for nodename in agraph.nodes():
         node = agraph.get_node(nodename)
-        node.attr.update(
-            {'URL': reverse('task_dict', kwargs={
-                'spec_id': spec.id,
-                'task_name': str(node)}),
-            'fontcolor': '#0000FF',
-            'data': {},
-            })
+        if 'task_data' in node.attr['data']:
+            node.attr.update({
+                'URL': reverse('task_dict', kwargs={
+                    'spec_id': spec.id,
+                    'task_name': str(node)}),
+                'fontcolor': '#0000FF'
+                })
+        del node.attr['data']
+        
         node.attr['label'] = node.attr['label'].replace("\n", "\\n")
 
     response = HttpResponse(agraph.draw(None, 'svg', 'dot'),
