@@ -64,7 +64,7 @@ def view_spec_svg(request, spec_id):
                                 id=spec_id)
     nxs = NetworkXSerializer()
     graph = nxs.serialize_workflow_spec(spec.spec)
-    agraph = nx.to_agraph(g)
+    agraph = nx.to_agraph(graph)
 
     for nodename in agraph.nodes():
         node = agraph.get_node(nodename)
@@ -77,7 +77,7 @@ def view_spec_svg(request, spec_id):
             })
         node.attr['label'] = node.attr['label'].replace("\n", "\\n")
 
-    response = HttpResponse(ag.draw(None, 'svg', 'dot'),
+    response = HttpResponse(agraph.draw(None, 'svg', 'dot'),
                             content_type="image/svg+xml")
     return response
 
