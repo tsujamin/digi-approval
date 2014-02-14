@@ -143,20 +143,20 @@ class AbstractForm(object):
     def form_render(self, request, *args, **kwargs):
         """Wrapper around django.shortcuts.render() which adds task information"""
         
+        args = list(args)
+        
+        dictionary = {
+            'task': self.spiff_task.get_name(),
+            'task_info': self.task_dict['data'].get('task_info', ''),
+            'form_fields': self.task_dict.get('fields', None),
+        }
+        
         if 'dictionary' in kwargs:
-            dictionary = kwargs['dictionary']
+            dictionary.update(kwargs.pop['dictionary'])
         elif len(args) >= 2:
-            dictionary = args[1] # it'll be the 3rd argument
-        else:
-            dictionary = {}
+            dictionary.update(args.pop(1)) # it'll be the 3rd argument
         
-        defaults = (('task', self.spiff_task.get_name()),
-                    ('task_info', self.task_dict['data'].get('task_info', '')),
-                    ('form_fields', self.task_dict.get('fields', None)),
-                    )
-        map(dictionary.setdefault, *zip(*defaults))
-        
-        return render(request, *args, **kwargs)
+        return render(request, dictionary=dictionary, *args, **kwargs)
         
     
     def complete_task(self):
@@ -326,7 +326,6 @@ class FieldEntry(AbstractForm):
         # default response
         return self.form_render(request, 'digiapproval/taskforms/FieldEntry.html', {
             'error': error,
-            'form_fields': form_fields,
         })
 
 
