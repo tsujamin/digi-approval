@@ -149,7 +149,8 @@ class AbstractForm(object):
             dictionary = args[1] # it'll be the 3rd argument
         
         defaults = (('task', self.spiff_task.get_name()),
-                    ('task_info', self.task_dict['data']['task_info'])
+                    ('task_info', self.task_dict['data'].get('task_info', '')),
+                    ('form_fields', self.task_dict['data'].get('fields', None)),
                     )
         map(dictionary.setdefault, *zip(*defaults))
         
@@ -400,7 +401,6 @@ class CheckTally(AbstractForm):
         # default response
         return self.form_render(request, 'digiapproval/taskforms/CheckTally.html', {
             'error': error,
-            'form_fields': form_fields,
         })
 
     @staticmethod
@@ -479,7 +479,6 @@ class ChooseBranch(AbstractForm):
         # default response, returns related template with current fields
         return self.form_render(request, 'digiapproval/taskforms/ChooseBranch.html', {
             'error': error,
-            'form_fields': form_fields,
         })
 
     @staticmethod
@@ -573,7 +572,6 @@ class ChooseBranches(AbstractForm):
         # default response, returns related template with current fields
         return self.form_render(request, 'digiapproval/taskforms/ChooseBranches.html', {
             'error': error,
-            'form_fields': form_fields,
         })
 
     @staticmethod
@@ -655,7 +653,6 @@ class FileUpload(AbstractForm):
         # default response, returns related template with current fields
         return self.form_render(request, 'digiapproval/taskforms/FileUpload.html', {
             'error': error,
-            'form_fields': self.task_dict['fields'],
         })
 
 
@@ -774,7 +771,6 @@ class ExampleTaskForm(AbstractForm):
         # default response, returns related template with current fields
         return self.form_render(request, 'digiapproval/taskforms/ExampleTaskForm.html', {
             'error': error,
-            'form_fields': self.task_dict['fields'],
         })
 
 form_classes = {
