@@ -9,6 +9,7 @@ urlpatterns = patterns(
     url(r'^builder_home/$', views.builder_home, name="home"),
     url(r'^new_spec/$', views.new_spec, name="new_spec"),
     url(r'^view_spec/(?P<spec_id>\d+)/$', views.view_spec, name="view_spec"),
+    url(r'^view_spec/(?P<spec_id>\d+)/svg/$', views.view_spec_svg, name="view_spec_svg"),
     url(r'^connect_task/(?P<spec_id>\d+)/(?P<task_name>.+)/$', views.connect_task_controller, name="connect_task"),
     url(r'^task_dict/(?P<spec_id>\d+)/(?P<task_name>.+)/$', views.task_dict, name="task_dict")   
 )

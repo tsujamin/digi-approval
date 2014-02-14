@@ -6,6 +6,9 @@ from digiapproval_project.apps.digiapproval import models as approval_models
 from digiapproval_project.apps.digiapproval.taskforms import AbstractForm, field_types
 from SpiffWorkflow.specs import WorkflowSpec
 from SpiffWorkflow import specs as taskspecs
+import networkx as nx
+from SpiffWorkflow.storage.NetworkXSerializer import NetworkXSerializer
+from django.core.urlresolvers import reverse
 
 def index(request):
     return redirect('home')
@@ -54,6 +57,30 @@ def new_spec(request):
     return render(request, 'spec_builder/new_spec.html', {
         'groups': Group.objects.all()
     })
+
+@login_required_super
+def view_spec_svg(request, spec_id):
+    spec = get_object_or_404(approval_models.WorkflowSpec,
+                                id=spec_id)
+    nxs = NetworkXSerializer()
+    graph = nxs.serialize_workflow_spec(spec.spec)
+    agraph = nx.to_agraph(g)
+
+    for nodename in agraph.nodes():
+        node = agraph.get_node(nodename)
+        node.attr.update(
+            {'URL': reverse('task_dict', kwargs={
+                'spec_id': spec.id,
+                'task_name': str(node)}),
+            'fontcolor': '#0000FF',
+            'data': {},
+            })
+        node.attr['label'] = node.attr['label'].replace("\n", "\\n")
+
+    response = HttpResponse(ag.draw(None, 'svg', 'dot'),
+                            content_type="image/svg+xml")
+    return response
+
     
 @login_required_super
 def view_spec(request, spec_id):
