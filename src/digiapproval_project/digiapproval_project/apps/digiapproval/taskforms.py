@@ -152,7 +152,7 @@ class AbstractForm(object):
         
         defaults = (('task', self.spiff_task.get_name()),
                     ('task_info', self.task_dict['data'].get('task_info', '')),
-                    ('form_fields', self.task_dict['data'].get('fields', None)),
+                    ('form_fields', self.task_dict.get('fields', None)),
                     )
         map(dictionary.setdefault, *zip(*defaults))
         
