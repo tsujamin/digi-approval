@@ -288,8 +288,8 @@ class Workflow(models.Model):
             actor = 'CUSTOMER'
             # FIXME: this doesn't cope with multiple layers of parent account -
             # but we should probably remove those multiple layers
-            if customer != self.customer and \
-                    self.customer not in self.customer.parent_accounts.all():
+            if not (customer == self.customer or \
+                    customer in self.customer.sub_accounts.all()):
                 return None
         except:
             actor = 'APPROVER'
