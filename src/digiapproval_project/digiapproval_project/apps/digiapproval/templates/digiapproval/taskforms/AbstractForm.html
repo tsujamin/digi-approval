@@ -2,9 +2,13 @@
 {% block title %}{{ task }}{% endblock %}
 
 {% block content %}
+
 <div class="row">
   <div class="col-md-6">
       {% if error %}<b>{{ error }}</b><p>{% endif %}
+      {% if previous_task %}
+          <h2><a href="{% url 'view_task_data' previous_task.uuid %}">View previous task</a></h2>
+      {% endif %}
       {% block form %}{% endblock form %}
   </div>
   <div class "col-md-6">

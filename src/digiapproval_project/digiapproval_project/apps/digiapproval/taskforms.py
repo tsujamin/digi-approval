@@ -57,7 +57,8 @@ class AbstractForm(object):
                  "Previous section needs to be re-completed", 1),
                 ('continue',
                  "Previous section was completed acceptably", 2),
-                task_info=kwargs.get('task_info', "")
+                task_info=kwargs.get('task_info', ""),
+                options={'display_previous_task': True}
                 ))
         return review_task
 
@@ -150,6 +151,15 @@ class AbstractForm(object):
             'task_info': self.task_dict['data'].get('task_info', ''),
             'form_fields': self.task_dict.get('fields', None),
         }
+        
+        if self.task_dict['options'].get('display_previous_task', False):
+            previous_spiff_task = self.spiff_task.parent
+            if isinstance(previous_spiff_task.id, dict):
+                previous_task_uuid = uuid.UUID(previous_spiff_task.id['__uuid__'])
+            else:
+                previous_task_uuid = previous_spiff_task.id
+            previous_task = models.Task.objects.get(uuid=previous_task_uuid)
+            dictionary['previous_task'] = previous_task
         
         if 'dictionary' in kwargs:
             dictionary.update(kwargs.pop['dictionary'])
