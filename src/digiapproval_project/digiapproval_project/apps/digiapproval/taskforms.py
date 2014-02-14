@@ -147,6 +147,8 @@ class AbstractForm(object):
             dictionary = kwargs['dictionary']
         elif len(args) >= 2:
             dictionary = args[1] # it'll be the 3rd argument
+        else:
+            dictionary = {}
         
         defaults = (('task', self.spiff_task.get_name()),
                     ('task_info', self.task_dict['data'].get('task_info', '')),
