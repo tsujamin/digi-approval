@@ -40,4 +40,11 @@ urlpatterns = patterns(
         name='update_workflow_state'),
     url(r'^workflow_label/(?P<workflow_id>\d+)/$', views.workflow_label,
         name='update_workflow_label'),
+
+    url(r'^view_spec/(?P<spec_id>\d+)/svg/$', views.view_workflowspec_svg,
+        kwargs={'fullsize': False}, name="view_workflowspec_svg"),
+    url(r'^view_spec/(?P<spec_id>\d+)/svg/fullsize/$',
+        views.view_workflowspec_svg,
+        kwargs={'fullsize': True}, name="view_workflowspec_svg_fullsize"),
+
 )

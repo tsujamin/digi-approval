@@ -15,6 +15,8 @@ import itertools
 from django.core.urlresolvers import reverse
 from .utils import never_cache
 import networkx as nx
+import re
+
 
 ## MAIN PAGES
 def index(request):
@@ -213,14 +215,22 @@ def delegator_worklist(request):
 
 ## WORKFLOWS / TASKS
 
-def view_workflowspec_svg(request, workflowspec_id):
-    spec = get_object_or_404(WorkflowSpec, id=workflowspec_id)
+def view_workflowspec_svg(request, spec_id, fullsize=False):
+    spec = get_object_or_404(WorkflowSpec, id=spec_id)
 
     graph = spec.to_coloured_graph()
     agraph = nx.to_agraph(graph)
 
-    response = HttpResponse(agraph.draw(None, 'svg', 'dot'),
-                            content_type="image/svg+xml")
+    for nodename in agraph.nodes():
+        del agraph.get_node(nodename).attr['data']
+    
+    svg = agraph.draw(None, 'svg', 'dot')
+    # http://www.graphviz.org/content/percentage-size-svg-output
+    if not fullsize:
+        svg = re.sub(r'<svg width="[0-9]+pt" height="[0-9]+pt"',
+                     r'<svg width="100%" height="100%"', svg)
+        
+    response = HttpResponse(svg, content_type="image/svg+xml")
     return response
 
 def workflow_taskdata(workflow_id, actor):
