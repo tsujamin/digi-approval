@@ -100,11 +100,10 @@
 </div>
 </div>
 <div class="row">
-<div class="col-md-12">
-  <h3>Workflow</h3>
+  <div class="col-md-12">
+    <h3>Workflow</h3>
     <p><a href="{% url 'view_spec_svg_fullsize' spec_id=spec_model.id %}" target="_blank">Open in new tab</a></p>
     <object type="image/svg+xml" data="{% url 'view_spec_svg' spec_id=spec_model.id %}" alt="A graphical deption of the specification."></object>
-  </svg>
-</div>
+  </div>
 </div>
 {% endblock %}

@@ -46,5 +46,10 @@ urlpatterns = patterns(
     url(r'^view_spec/(?P<spec_id>\d+)/svg/fullsize/$',
         views.view_workflowspec_svg,
         kwargs={'fullsize': True}, name="view_workflowspec_svg_fullsize"),
+    url(r'^view_workflow/(?P<workflow_id>\d+)/svg/$', views.view_workflow_svg,
+        kwargs={'fullsize': False}, name="view_workflow_svg"),
+    url(r'^view_workflow/(?P<workflow_id>\d+)/svg/fullsize/$',
+        views.view_workflow_svg,
+        kwargs={'fullsize': True}, name="view_workflow_svg_fullsize"),
 
 )
