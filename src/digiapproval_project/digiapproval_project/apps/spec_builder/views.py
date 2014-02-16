@@ -6,6 +6,9 @@ from digiapproval_project.apps.digiapproval import models as approval_models
 from digiapproval_project.apps.digiapproval.taskforms import AbstractForm, field_types
 from SpiffWorkflow.specs import WorkflowSpec
 from SpiffWorkflow import specs as taskspecs
+from django.core.urlresolvers import reverse
+import networkx as nx
+import re
 
 def index(request):
     return redirect('home')
@@ -54,6 +57,34 @@ def new_spec(request):
     return render(request, 'spec_builder/new_spec.html', {
         'groups': Group.objects.all()
     })
+
+@login_required_super
+def view_spec_svg(request, spec_id, fullsize=False):
+    spec = get_object_or_404(approval_models.WorkflowSpec,
+                                id=spec_id)
+    graph = spec.to_coloured_graph()
+    agraph = nx.to_agraph(graph)
+
+    for nodename in agraph.nodes():
+        node = agraph.get_node(nodename)
+        if 'task_data' in node.attr['data']:
+            node.attr.update({
+                'URL': reverse('task_dict', kwargs={
+                    'spec_id': spec.id,
+                    'task_name': str(node)}),
+                'fontcolor': '#0000FF'
+                })
+        del node.attr['data']
+
+    svg = agraph.draw(None, 'svg', 'dot')
+    # http://www.graphviz.org/content/percentage-size-svg-output
+    if not fullsize:
+        svg = re.sub(r'<svg width="[0-9]+pt" height="[0-9]+pt"',
+                     r'<svg width="100%" height="100%"', svg)
+        
+    response = HttpResponse(svg, content_type="image/svg+xml")
+    return response
+
     
 @login_required_super
 def view_spec(request, spec_id):

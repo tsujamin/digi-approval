@@ -28,6 +28,8 @@ urlpatterns = patterns(
         name='view_workflow'),
     url(r'^new_workflow/(?P<workflowspec_id>\d+)/$', views.new_workflow,
         name='new_workflow'),
+    url(r'^workflow_spec/(?P<workflowspec_id>\d+)/svg$',
+        views.view_workflowspec_svg, name='view_workflowspec_svg'),
     url(r'^view_task/(?P<workflow_id>\d+)/(?P<task_uuid>.+)/$',
         views.view_task, name='view_task'),
     url(r'^view_task_data/(?P<task_uuid>.+)/$', views.view_task_data,
@@ -38,4 +40,16 @@ urlpatterns = patterns(
         name='update_workflow_state'),
     url(r'^workflow_label/(?P<workflow_id>\d+)/$', views.workflow_label,
         name='update_workflow_label'),
+
+    url(r'^view_spec/(?P<spec_id>\d+)/svg/$', views.view_workflowspec_svg,
+        kwargs={'fullsize': False}, name="view_workflowspec_svg"),
+    url(r'^view_spec/(?P<spec_id>\d+)/svg/fullsize/$',
+        views.view_workflowspec_svg,
+        kwargs={'fullsize': True}, name="view_workflowspec_svg_fullsize"),
+    url(r'^view_workflow/(?P<workflow_id>\d+)/svg/$', views.view_workflow_svg,
+        kwargs={'fullsize': False}, name="view_workflow_svg"),
+    url(r'^view_workflow/(?P<workflow_id>\d+)/svg/fullsize/$',
+        views.view_workflow_svg,
+        kwargs={'fullsize': True}, name="view_workflow_svg_fullsize"),
+
 )

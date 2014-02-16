@@ -79,4 +79,11 @@ Approver: {{workflow.approver.get_full_name}}</p>
     {% endif %}
   </div>
 </div>
+<div class="row">
+  <div class="col-md-12">
+    <h3>Workflow</h3>
+    <p><a href="{% url 'view_workflow_svg_fullsize' workflow_id=workflow.id %}" target="_blank">Open in new tab</a></p>
+    <object type="image/svg+xml" data="{% url 'view_workflow_svg' workflow_id=workflow.id %}" alt="A graphical depiction of the workflow."></object>
+  </div>
+</div>
 {% endblock content %}
