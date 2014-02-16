@@ -4,6 +4,7 @@
 from functools import partial
 
 from django.contrib.auth.models import User, Group
+from registration_email.forms import generate_username
 from SpiffWorkflow import specs
 
 from digiapproval_project.apps.digiapproval import models
@@ -164,7 +165,7 @@ def directorate_to_group(group_name):
     
 def approver_to_user((name, password, email, groups)):
     """Returns django.contrib.auth user created from parameter tuple"""
-    user = User.objects.create_user(email[:email.find('@')], email, password)
+    user = User.objects.create_user(generate_username(email), email, password)
     user.first_name, user.last_name = name.split()
     user.save()
     for group in groups:
@@ -173,7 +174,7 @@ def approver_to_user((name, password, email, groups)):
     
 def to_customer_account((account_type, first_name, last_name, username, password, email, parents)):
     """Returns customer account created from parameter tuple"""
-    user = User.objects.create_user(username, email, password)
+    user = User.objects.create_user(generate_username(email), email, password)
     user.first_name = first_name
     user.last_name = last_name
     user.save()

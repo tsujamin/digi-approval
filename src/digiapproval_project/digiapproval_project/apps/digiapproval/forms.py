@@ -1,13 +1,13 @@
 from django import forms
 from django.forms.formsets import BaseFormSet
 from models import CustomerAccount
-from registration.forms import RegistrationForm
+from registration_email.forms import EmailRegistrationForm
 from django.core.validators import MinLengthValidator
 
 
-class CustomerRegistrationForm(RegistrationForm):
+class CustomerRegistrationForm(EmailRegistrationForm):
     """User registration for for use by DigiApproval customers.
-    Extends the django-registration RegistrationForm to gather the extra info
+    Extends the django-registration-email EmailRegistrationForm to gather the extra info
     we need."""
     first_name = forms.CharField(max_length=30,
                                  validators=[MinLengthValidator(1)])

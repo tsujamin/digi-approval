@@ -45,6 +45,7 @@ INSTALLED_APPS = (
     'south',
     'bootstrap3',
     'registration',
+    'registration_email',
     'breadcrumbs',
 )
 
@@ -128,6 +129,10 @@ BOOTSTRAP3 = {
 
 # Registration
 ACCOUNT_ACTIVATION_DAYS = 7  # One-week activation window
+AUTHENTICATION_BACKENDS = (
+    'registration_email.auth.EmailBackend',
+)
+LOGIN_REDIRECT_URL = '/'
 
 # breadcrumbs
 from django.conf import global_settings

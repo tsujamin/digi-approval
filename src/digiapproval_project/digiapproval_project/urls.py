@@ -21,5 +21,5 @@ urlpatterns = patterns(
     url(r'^admin/', include(admin.site.urls)),
     url(r'^pages/', include('django.contrib.flatpages.urls')),
     url(r'^spec_builder/', include('digiapproval_project.apps.spec_builder.urls')),
-    url(r'^accounts/', include('registration.backends.default.urls')),
+    url(r'^accounts/', include('registration_email.backends.default.urls')),
 )
