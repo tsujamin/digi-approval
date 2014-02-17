@@ -72,7 +72,8 @@ def view_spec_svg(request, spec_id, fullsize=False):
                 'URL': reverse('task_dict', kwargs={
                     'spec_id': spec.id,
                     'task_name': str(node)}),
-                'fontcolor': '#0000FF'
+                'fontcolor': '#0000FF',
+                'target': '_parent',
                 })
         del node.attr['data']
 

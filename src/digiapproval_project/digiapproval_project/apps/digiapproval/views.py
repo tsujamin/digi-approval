@@ -278,12 +278,14 @@ def view_workflow_svg(request, workflow_id, fullsize=False):
                     'workflow_id': workflow_id,
                     'task_uuid': str(task.id['__uuid__'])})
                 node['fontcolor'] = '#0000FF'
+                node['target'] = '_parent'
             elif target.state == target.READY:  # other party - greyed out red
                 node['fillcolor'] = '#AA4444'
             elif target.state == target.COMPLETED:
                 node['URL'] = reverse('view_task_data', kwargs={
                     'task_uuid': str(task.id['__uuid__'])})
                 node['fontcolor'] = '#0000FF'
+                node['target'] = '_parent'
 
     agraph = nx.to_agraph(graph)
     
