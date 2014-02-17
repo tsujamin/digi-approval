@@ -526,7 +526,6 @@ def check_tally_dict(request, spec_model, task_spec):
     """
     fields = task_spec.get_data('task_data')['fields']
     min_score = task_spec.get_data('min_score')
-    print min_score
     if request.method == "POST":
         if 'new_min_score' in request.POST:
             min_score = request.POST.get('min_score', '')
@@ -574,6 +573,20 @@ def check_tally_dict(request, spec_model, task_spec):
         'field_types': field_types,
         'min_score': min_score
     })
+    
+def subworkflow_dict(request, spec_model, task_spec):
+    if request.method == "POST":
+        sub_spec = get_object_or_404(approval_models.WorkflowSpec,
+                                     id = request.POST.get('sub_spec', -1))
+        task_spec.data['task_data']['data']['workflowspec_id'] = sub_spec.id
+        spec_model.save()
+    sub_id = task_spec.get_data('task_data')['data'].get('workflowspec_id', -1)    
+    return render(request, 'spec_builder/taskforms/SubWorkflowDict.html', {
+        'spec_model': spec_model,
+        'task': task_spec,
+        'specs': approval_models.WorkflowSpec.objects.all(),
+        'current_sub_id': sub_id
+    })
 
 
 CONNECTABLE_TASKS = {
@@ -595,4 +608,5 @@ TASK_DICT_METHODS = {
     'field_entry': ('Fill out a Form', field_entry_dict),
     'choose_branches': ('Multiple Branch', choose_branches_dict),
     'check_tally': ('Checkbox Branch', check_tally_dict),
+    'subworkflow': ('Complete a Sub Workflow', subworkflow_dict)
 }
