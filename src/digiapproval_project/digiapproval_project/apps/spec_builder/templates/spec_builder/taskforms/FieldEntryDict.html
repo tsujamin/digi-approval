@@ -1,5 +1,5 @@
 {% extends 'spec_builder/task_dict.html' %}
-{% block header %}Edit: Field Entry Task "{{task.name}}" ({{spec_model.name}}) {% endblock %}
+{% block header %}Edit "Fill out a Form" for: "{{task.name}}" ({{spec_model.name}}) {% endblock %}
 
 {% block taskdict_fields %}
 <!--New Field Entry-->
@@ -63,5 +63,14 @@
 {% endblock %}
 
 {% block task_info %}
-Information on the field entry task spec
+<p>
+  The "Fill out a Form" task form prompts the user to complete a series of fields. New fields require the following attributes:
+  <ul>
+    <li><b>Name:</b> for internal reference only </li>
+    <li><b>Label:</b> displayed alongside the field </li>
+    <li><b>Mandatory:</b> sets if this the completion of this field is mandatory </li>
+    <li><b>Type:</b> the type of the displayed field</li>
+  </ul>
+  Previously added fields can be further modified or removed.
+</p> 
 {% endblock %}

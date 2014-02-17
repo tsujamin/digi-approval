@@ -1,5 +1,5 @@
 {% extends 'spec_builder/task_dict.html' %}
-{% block header %}Edit: Choose Branch Task "{{task.name}}" ({{spec_model.name}}) {% endblock %}
+{% block header %}Edit "Multiple Branch" for: "{{task.name}}" ({{spec_model.name}}) {% endblock %}
 
 {% block taskdict_fields %}
 <div class="form-group">
@@ -13,5 +13,8 @@
 {% endblock %}
 
 {% block task_info %}
-Information on the choose branches task spec
+<p>
+The "Multiple Branch" form prompts the user with multiple tasks that can be subsequently started. These tasks can be connected <a href="{% url 'connect_task' spec_id=spec_model.id task_name=task.name %}">here</a>.</p> 
+<p> The minimum number of tasks the user can instantiate is configurable on the left</p>
+<p> As this form is tied to the underlying task its deletion is prohibited</p>
 {% endblock %}

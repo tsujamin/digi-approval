@@ -1,11 +1,11 @@
 {% extends "digiapproval/base.tpl.html" %}
-{% block title %} Edit Task Dictionary of: "{{task.name}}" ({{spec_model.name}}){% endblock %}
+{% block title %} Edit Form for: "{{task.name}}" ({{spec_model.name}}){% endblock %}
 
 {% block content %}
 <div class="col-md-6">
   <form action="{% url 'task_dict' spec_id=spec_model.id task_name=task.name %}" method="POST" role="form">
     {% csrf_token %}
-    {% block taskdict_fields %}No task configuration available{% endblock %}
+    {% block taskdict_fields %}No form configuration available{% endblock %}
     <hr>
     
     <h3>Generic Configuration</h3>
@@ -15,7 +15,7 @@
       <textarea name="task_info" class="form-control" rows="4">{{task.data.task_data.data.task_info}}</textarea>
     </div>
     <div class="form-group">
-      <label for="actor">Set actor for task</label>
+      <label for="actor">Set actor for form</label>
       <select name="actor" class="form-control">
         <option value="APPROVER" {% ifequal task.data.task_data.actor 'APPROVER' %}selected{% endifequal %}>Approver</option>
         <option value="CUSTOMER" {% ifequal task.data.task_data.actor 'CUSTOMER' %}selected{% endifequal %}>Customer</option>
@@ -23,16 +23,24 @@
       <button type="submit" name="update_general" class="btn btn-default">Update</button>
     </div>
     <div class="form-group">
-      <button type="submit" name="delete_dict" class="btn btn-default">Delete Task Dictionary</button>
+      <button type="submit" name="delete_dict" class="btn btn-default">Delete Task Form</button>
     </div>
 
   </form>
 </div>
 
 <div class="col-md-6">
-  <h3>Placeholder</h3>
-  Information on creating task_dicts
-  <br>
-  {% block task_info %}No task specific information available{% endblock %}
+  <h3>Configuring Task Forms</h3>
+  <p>This page allows you to configure the form associated with this step in the application.</p>
+  <hr>
+  <h4>Form Specific Configuration</h4>
+  {% block task_info %}No form specific details available{% endblock %}
+  <hr>
+  <h4>Common Configuration</h4>
+  <p>All forms have a <b>Description</b> text which is shown along side the form as it is being completed.
+  This is a great place to place any helpful tips for Customers or directions for Approvers. The use of HTML is permitted.</p>
+  <p>Forms also have an associated account type which completes it (called the <b>actor</b>). 
+  This can either be the Customer or the Approver.<p>
+  <p>Unless specified in the form specific details a form can be deleted whilst leaving its associated task intact</p>
 </div>
 {% endblock %}
