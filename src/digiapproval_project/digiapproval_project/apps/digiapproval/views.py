@@ -18,6 +18,7 @@ import networkx as nx
 import re
 from SpiffWorkflow.storage.NetworkXSerializer import NetworkXSerializer
 
+
 ## MAIN PAGES
 def index(request):
     return render(request, 'digiapproval/index.html')
@@ -216,22 +217,24 @@ def delegator_worklist(request):
 ## WORKFLOWS / TASKS
 
 def view_workflowspec_svg(request, spec_id, fullsize=False):
+    # TODO: Check public etc
     spec = get_object_or_404(WorkflowSpec, id=spec_id)
-    
+
     graph = spec.to_coloured_graph()
     agraph = nx.to_agraph(graph)
 
     for nodename in agraph.nodes():
         del agraph.get_node(nodename).attr['data']
-    
+
     svg = agraph.draw(None, 'svg', 'dot')
     # http://www.graphviz.org/content/percentage-size-svg-output
     if not fullsize:
         svg = re.sub(r'<svg width="[0-9]+pt" height="[0-9]+pt"',
                      r'<svg width="100%" height="100%"', svg)
-        
+
     response = HttpResponse(svg, content_type="image/svg+xml")
     return response
+
 
 @login_required
 def view_workflow_svg(request, workflow_id, fullsize=False):
@@ -239,7 +242,7 @@ def view_workflow_svg(request, workflow_id, fullsize=False):
     actor = workflow.actor_type(request.user)
     if actor is None:
         raise PermissionDenied()
-    
+
     nxs = NetworkXSerializer()
     graph = nxs.serialize_workflow(workflow.workflow)
 
@@ -253,9 +256,9 @@ def view_workflow_svg(request, workflow_id, fullsize=False):
         target = None
         possible_tasks = workflow.workflow.get_tasks_from_spec_name(nodename)
         if any([task for task in possible_tasks
-                     if (task.state in (task.MAYBE,
-                                        task.LIKELY,
-                                        task.FUTURE))]):
+                if (task.state in (task.MAYBE,
+                                   task.LIKELY,
+                                   task.FUTURE))]):
             # never link to a task if it's been looped back on and is now in
             # some way pending
             continue
@@ -288,20 +291,21 @@ def view_workflow_svg(request, workflow_id, fullsize=False):
                 node['target'] = '_parent'
 
     agraph = nx.to_agraph(graph)
-    
+
     svg = agraph.draw(None, 'svg', 'dot')
     # http://www.graphviz.org/content/percentage-size-svg-output
     if not fullsize:
         svg = re.sub(r'<svg width="[0-9]+pt" height="[0-9]+pt"',
                      r'<svg width="100%" height="100%"', svg)
-        
+
     response = HttpResponse(svg, content_type="image/svg+xml")
     return response
+
 
 def workflow_taskdata(workflow_id, actor):
     """Extracts task metadata from a workflow, for display in view_workflow"""
     workflow = Workflow.objects.get(pk=workflow_id)
-    
+
     # iterate through the tasks, making a list of actually useful information
     tasks_it = SpiffTask.Iterator(workflow.workflow.task_tree)
     # ... skip the root
@@ -315,14 +319,17 @@ def workflow_taskdata(workflow_id, actor):
             'actor': (task.task_spec.get_data('task_data')['actor']
                       if task.task_spec.get_data('task_data') else ''),
             'form': (task.task_spec.get_data('task_data')['form']
-                      if task.task_spec.get_data('task_data') else ''),
+                     if task.task_spec.get_data('task_data') else ''),
             'uuid': task.id['__uuid__'],
-            'workflow_id': workflow_id, # we need this in the result dict to deal
-                                        # with links to subworkflows - AJD
-            'indent': False, # if True, indent list AFTER printing current task
-            'dedent': False, # if True, dedent list AFTER printing current task
+            'workflow_id': workflow_id,  # we need this in the result dict to
+                                         # deal with links to subworkflows: AJD
+
+            # if True, indent list AFTER printing current task
+            'indent': False,
+            # if True, dedent list AFTER printing current task
+            'dedent': False,
             }
-        
+
         # should various links be shown?
         result['show_task_link'] = (task.state == task.READY and
                                     result['actor'] == actor)
@@ -336,23 +343,25 @@ def workflow_taskdata(workflow_id, actor):
              actor == 'APPROVER') and
                 result['actor']):
             tasks.append(result)
-        
+
             # Subworkflows
             if result['form'] == 'subworkflow':
                 subworkflow_id = None
                 try:
-                    task_model = Task.objects.get(uuid=uuid.UUID(result['uuid']))
+                    task_model = Task.objects.get(
+                        uuid=uuid.UUID(result['uuid']))
                     subworkflow_id = task_model.task['data']['workflow_id']
                 except:
                     pass
-                
+
                 if subworkflow_id:
                     tasks[-1]['indent'] = True
                     tasks.extend(workflow_taskdata(subworkflow_id, actor))
                     tasks[-1]['dedent'] = True
-                
+
     return tasks
-    
+
+
 @never_cache
 @login_required
 def view_workflow(request, workflow_id):
@@ -369,7 +378,7 @@ def view_workflow(request, workflow_id):
     request.breadcrumbs([portal_breadcrumb(workflow, request.user),
                          workflow_breadcrumb(workflow)])
     tasks = workflow_taskdata(workflow_id, actor)
-    
+
     # mark all messages read
     Message.mark_all_read(workflow, request.user)
 

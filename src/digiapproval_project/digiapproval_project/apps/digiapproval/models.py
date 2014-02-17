@@ -13,7 +13,6 @@ from jsonfield import JSONField
 
 from .fields import WorkflowField, WorkflowSpecField
 
-import networkx as nx
 from SpiffWorkflow.storage.NetworkXSerializer import NetworkXSerializer
 
 
@@ -171,7 +170,7 @@ class WorkflowSpec(models.Model):
     def to_coloured_graph(self):
         nxs = NetworkXSerializer()
         graph = nxs.serialize_workflow_spec(self.spec)
-    
+
         for nodename in graph.nodes():
             node = graph.node[nodename]
             if 'task_data' in node['data']['data']:
@@ -183,9 +182,8 @@ class WorkflowSpec(models.Model):
 
             node['label'] = node['label'].replace("\n", "\\n")
 
-
         return graph
-    
+
     def __unicode__(self):
         return u'%s (%s)' % (self.name, self.owner.name)
 
@@ -213,13 +211,14 @@ class Workflow(models.Model):
     # TODO FIXME: are we using uuid.hex? no hyphens!
     uuid = models.CharField(max_length=36, editable=False,
                             default=lambda: uuid.uuid4().hex)
-    
+
     # Parent information for subworkflows
-    parent_workflow = models.ForeignKey('Workflow', null=True, blank=True, default=None,
+    parent_workflow = models.ForeignKey('Workflow', null=True, blank=True,
+                                        default=None,
                                         related_name='subworkflows')
-    parent_task = models.ForeignKey('Task', null=True, blank=True, default=None,
-                                    related_name='subworkflows')
-    
+    parent_task = models.ForeignKey('Task', null=True, blank=True,
+                                    default=None, related_name='subworkflows')
+
     # Descriptive information
     label = models.CharField(max_length=50, default="Untitled Application")
 
@@ -258,7 +257,7 @@ class Workflow(models.Model):
             self.assign_approver()
         if self.workflow.is_completed() and self.completed is False:
             self.completed = True
-        
+
         super(Workflow, self).save(*args, **kwargs)
 
     def get_ready_task_forms(self, **kwargs):
@@ -310,7 +309,7 @@ class Workflow(models.Model):
             actor = 'CUSTOMER'
             # FIXME: this doesn't cope with multiple layers of parent account -
             # but we should probably remove those multiple layers
-            if not (customer == self.customer or \
+            if not (customer == self.customer or
                     customer in self.customer.sub_accounts.all()):
                 return None
         except:
