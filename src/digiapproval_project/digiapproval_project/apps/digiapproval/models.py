@@ -13,6 +13,10 @@ from jsonfield import JSONField
 
 from .fields import WorkflowField, WorkflowSpecField
 
+import networkx as nx
+from SpiffWorkflow.storage.NetworkXSerializer import NetworkXSerializer
+
+
 class UserFile(models.Model):
     VIRUS_STATUS_CHOICES = (
         ('UNSCANNED', "Unscanned, not queued for scanning."),
@@ -164,6 +168,24 @@ class WorkflowSpec(models.Model):
         workflow.workflow.complete_next()
         return workflow
 
+    def to_coloured_graph(self):
+        nxs = NetworkXSerializer()
+        graph = nxs.serialize_workflow_spec(self.spec)
+    
+        for nodename in graph.nodes():
+            node = graph.node[nodename]
+            if 'task_data' in node['data']['data']:
+                node['style'] = 'filled'
+                if node['data']['data']['task_data']['actor'] == 'CUSTOMER':
+                    node['fillcolor'] = '#CCCCFF'
+                else:
+                    node['fillcolor'] = '#CCFFCC'
+
+            node['label'] = node['label'].replace("\n", "\\n")
+
+
+        return graph
+    
     def __unicode__(self):
         return u'%s (%s)' % (self.name, self.owner.name)
 

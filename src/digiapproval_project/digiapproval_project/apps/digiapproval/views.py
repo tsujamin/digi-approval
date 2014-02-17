@@ -14,7 +14,9 @@ from SpiffWorkflow import Task as SpiffTask
 import itertools
 from django.core.urlresolvers import reverse
 from .utils import never_cache
-
+import networkx as nx
+import re
+from SpiffWorkflow.storage.NetworkXSerializer import NetworkXSerializer
 
 ## MAIN PAGES
 def index(request):
@@ -212,6 +214,87 @@ def delegator_worklist(request):
 
 
 ## WORKFLOWS / TASKS
+
+def view_workflowspec_svg(request, spec_id, fullsize=False):
+    spec = get_object_or_404(WorkflowSpec, id=spec_id)
+    
+    graph = spec.to_coloured_graph()
+    agraph = nx.to_agraph(graph)
+
+    for nodename in agraph.nodes():
+        del agraph.get_node(nodename).attr['data']
+    
+    svg = agraph.draw(None, 'svg', 'dot')
+    # http://www.graphviz.org/content/percentage-size-svg-output
+    if not fullsize:
+        svg = re.sub(r'<svg width="[0-9]+pt" height="[0-9]+pt"',
+                     r'<svg width="100%" height="100%"', svg)
+        
+    response = HttpResponse(svg, content_type="image/svg+xml")
+    return response
+
+@login_required
+def view_workflow_svg(request, workflow_id, fullsize=False):
+    workflow = get_object_or_404(Workflow, id=workflow_id)
+    actor = workflow.actor_type(request.user)
+    if actor is None:
+        raise PermissionDenied()
+    
+    nxs = NetworkXSerializer()
+    graph = nxs.serialize_workflow(workflow.workflow)
+
+    for nodename in graph.nodes():
+        node = graph.node[nodename]
+
+        # standard fix
+        node['label'] = node['label'].replace("\n", "\\n")
+
+        # try to link them up
+        target = None
+        possible_tasks = workflow.workflow.get_tasks_from_spec_name(nodename)
+        if any([task for task in possible_tasks
+                     if (task.state in (task.MAYBE,
+                                        task.LIKELY,
+                                        task.FUTURE))]):
+            # never link to a task if it's been looped back on and is now in
+            # some way pending
+            continue
+
+        # otherwise try to pick a ready or completed task
+        for task in possible_tasks:
+            if task.state == task.READY:
+                # pick this one definitely
+                target = task
+                break
+            elif task.state == task.COMPLETED and target is None:
+                # pick the first one unless a Ready one comes up
+                target = task
+
+        if target is not None and 'task_data' in target.task_spec.data:
+            #print target.task_spec.data['task_data']
+            if target.state == target.READY and \
+                    target.task_spec.data['task_data']['actor'] == actor:
+                node['URL'] = reverse('view_task', kwargs={
+                    'workflow_id': workflow_id,
+                    'task_uuid': str(task.id['__uuid__'])})
+                node['fontcolor'] = '#0000FF'
+            elif target.state == target.READY:  # other party - greyed out red
+                node['fillcolor'] = '#AA4444'
+            elif target.state == target.COMPLETED:
+                node['URL'] = reverse('view_task_data', kwargs={
+                    'task_uuid': str(task.id['__uuid__'])})
+                node['fontcolor'] = '#0000FF'
+
+    agraph = nx.to_agraph(graph)
+    
+    svg = agraph.draw(None, 'svg', 'dot')
+    # http://www.graphviz.org/content/percentage-size-svg-output
+    if not fullsize:
+        svg = re.sub(r'<svg width="[0-9]+pt" height="[0-9]+pt"',
+                     r'<svg width="100%" height="100%"', svg)
+        
+    response = HttpResponse(svg, content_type="image/svg+xml")
+    return response
 
 def workflow_taskdata(workflow_id, actor):
     """Extracts task metadata from a workflow, for display in view_workflow"""
