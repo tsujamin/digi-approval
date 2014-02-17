@@ -13,6 +13,8 @@ urlpatterns = patterns(
         kwargs={'fullsize': False}, name="view_spec_svg"),
     url(r'^view_spec/(?P<spec_id>\d+)/svg/fullsize/$', views.view_spec_svg,
         kwargs={'fullsize': True}, name="view_spec_svg_fullsize"),
-    url(r'^connect_task/(?P<spec_id>\d+)/(?P<task_name>.+)/$', views.connect_task_controller, name="connect_task"),
-    url(r'^task_dict/(?P<spec_id>\d+)/(?P<task_name>.+)/$', views.task_dict, name="task_dict")   
+    url(r'^connect_task/(?P<spec_id>\d+)/(?P<task_name>.+)/$',
+        views.connect_task_controller, name="connect_task"),
+    url(r'^task_dict/(?P<spec_id>\d+)/(?P<task_name>.+)/$', views.task_dict,
+        name="task_dict")
 )

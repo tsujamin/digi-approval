@@ -99,10 +99,13 @@ def login_required_delegator(function=None,
     if function:
         return actual_decorator(function)
     return actual_decorator
-    
-def login_required_super(function=None, redirect_field_name=REDIRECT_FIELD_NAME,
-                        login_url=None):
-    """Decorator for views that checks if the user is authenticated as a superuser"""
+
+
+def login_required_super(function=None,
+                         redirect_field_name=REDIRECT_FIELD_NAME,
+                         login_url=None):
+    """Decorator for views that checks if the user is authenticated as a
+    superuser"""
     actual_decorator = user_passes_test(
         lambda u: (u.is_authenticated and
                    u.is_superuser),
@@ -112,4 +115,3 @@ def login_required_super(function=None, redirect_field_name=REDIRECT_FIELD_NAME,
     if function:
         return actual_decorator(function)
     return actual_decorator
-
