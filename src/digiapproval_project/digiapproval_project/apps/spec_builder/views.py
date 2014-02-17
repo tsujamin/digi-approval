@@ -592,7 +592,7 @@ CONNECTABLE_TASKS = {
 TASK_DICT_METHODS = {
     'file_upload': ('Upload a File', file_upload_dict),
     'accept_agreement': ('Accept an Agreement', accept_agreement_dict),
-    'field_entry': ('Fill out Form Fields', field_entry_dict),
+    'field_entry': ('Fill out a Form', field_entry_dict),
     'choose_branches': ('Multiple Branch', choose_branches_dict),
     'check_tally': ('Checkbox Branch', check_tally_dict),
 }
