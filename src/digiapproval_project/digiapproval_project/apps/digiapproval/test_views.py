@@ -36,9 +36,9 @@ class LoggedInCustomerViewsUnitTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_applicant_home_customer(self):
-        """Test that the applicant home renders for an applicant/customer."""
+        """Test that the applicant home redirects for an applicant/customer."""
         response = self.client.get(reverse('applicant_home'))
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
 
 
 class LoggedInOrganisationViewsUnitTests(TestCase):

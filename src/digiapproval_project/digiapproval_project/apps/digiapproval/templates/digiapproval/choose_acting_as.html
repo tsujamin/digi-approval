@@ -1,0 +1,20 @@
+{% extends "page.tpl.html" %}
+{% load bootstrap3 %}
+{% block title %}Choose Account{% endblock %}
+
+{% block content %}
+<p class="lead">Make applications as:</p>
+{% for id_name in ids_names %}
+<form method="POST">
+{% csrf_token %}
+<input type="hidden" value="{{id_name.0}}" name="acting_as_id">
+{% buttons %}
+<button type="submit" class="btn {% ifequal forloop.counter0 0 %}btn-primary{% endifequal%}">
+{{id_name.1}}
+</button>
+{% endbuttons %}
+</form>
+{% endfor %}
+
+
+{% endblock content %}

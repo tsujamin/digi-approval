@@ -47,9 +47,22 @@
               </ul>
               <ul class="nav navbar-nav navbar-right">
                 {% if user.is_authenticated %}
-                  <li>
-                    <a href="{% url 'settings' %}">Logged in as: {{ user.get_full_name }}</a>
-                  </li>
+                  {% if acting_as.others.0 %}
+                    <li>
+                      <a href="#" class="dropdown-toggle" data-toggle="dropdown">Working as: {{ acting_as.name }} <b class="caret"></b></a>
+                      <ul class="dropdown-menu">
+                        {% for actor in acting_as.others %}
+                        <li><a href="{% url 'act_as' customer_id=actor.0 %}">Switch to {{actor.1}}</a></li>
+                        {% endfor %}
+                      </ul>
+                    </li>
+                  {% else %}
+                    <li>
+                      <a href="{% url 'settings' %}">Logged in as: {{ user.get_full_name }}</a>
+                    </li> 
+                  {% endif %}
+                  
+                  
                   <li>
                   {% if user.customeraccount.account_type == 'CUSTOMER' %}
                     <a href="{% url 'remove_parentaccounts' %}">My Organisations</a>
