@@ -279,7 +279,12 @@ def view_workflowspec_svg(request, spec_id, fullsize=False):
     for nodename in agraph.nodes():
         del agraph.get_node(nodename).attr['data']
 
+    # IE9 (+others?) fix: they don't have "Times Roman", only "Times
+    # New Roman"
+    agraph.node_attr['fontname'] = "Times New Roman"
+    agraph.edge_attr['fontname'] = "Times New Roman"
     svg = agraph.draw(None, 'svg', 'dot')
+
     # http://www.graphviz.org/content/percentage-size-svg-output
     if not fullsize:
         svg = re.sub(r'<svg width="[0-9]+pt" height="[0-9]+pt"',
@@ -344,6 +349,10 @@ def view_workflow_svg(request, workflow_id, fullsize=False):
                 node['target'] = '_parent'
 
     agraph = nx.to_agraph(graph)
+    # IE9 (+others?) fix: they don't have "Times Roman", only "Times
+    # New Roman"
+    agraph.node_attr['fontname'] = "Times New Roman"
+    agraph.edge_attr['fontname'] = "Times New Roman"
 
     svg = agraph.draw(None, 'svg', 'dot')
     # http://www.graphviz.org/content/percentage-size-svg-output
