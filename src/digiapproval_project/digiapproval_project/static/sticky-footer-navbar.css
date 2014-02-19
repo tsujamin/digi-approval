@@ -45,6 +45,11 @@ code {
   font-size: 80%;
 }
 
+/* IE9 compat yay */
 object {
   width: 100%;
+}
+
+.placeholder {
+  color: #aaa;
 }
