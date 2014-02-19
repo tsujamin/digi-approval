@@ -469,7 +469,16 @@ def new_workflow(request, workflowspec_id):
     error = None
 
     customer = request.user.customeraccount
-    acting_as_id = request.session['acting_as_id']
+
+    # login?next will get us here without an acting_as_id
+    # todo refactor
+    acting_as_id = request.session.get('acting_as_id', None)
+    if acting_as_id is None:
+        if customer.parent_accounts.count() == 0:
+            acting_as_id = customer.id
+            request.session['acting_as_id'] = acting_as_id
+        else:
+            return redirect('choose_acting_as')
 
     if not customer.can_i_act_as_user_id(acting_as_id):
         raise PermissionDenied
