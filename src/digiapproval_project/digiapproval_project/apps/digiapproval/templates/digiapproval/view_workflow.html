@@ -63,7 +63,7 @@ Approver: {{workflow.approver.get_full_name}}</p>
     <form action="{% url 'view_workflow_messages' workflow.id %}" method="POST" role="form">
       {% csrf_token %}
       <label for="new_message">New Message:</label>
-      <textarea name="new_message" class="form-control" rows="4"></textarea><br>
+      <textarea name="new_message" id="new_message" class="form-control" rows="4"></textarea><br>
       <button type="submit" name="submit" class="btn btn-default">Post Message</button>
     </form>
     {% if messages %}
