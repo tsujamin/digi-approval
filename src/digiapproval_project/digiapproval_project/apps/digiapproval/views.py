@@ -45,6 +45,10 @@ def profile(request):
             for g in request.user.groups.all()]):
         return redirect('delegator_worklist')
 
+    # supers? spec_builder
+    if request.user.is_superuser:
+        return redirect('/spec_builder/builder_home/')
+
     return HttpResponse("""You don't have a role in the DigiApproval system.
                         This is probably a bug, and we're very sorry - please
                         contact us.""")
@@ -280,7 +284,7 @@ def view_workflowspec_svg(request, spec_id, fullsize=False):
         del agraph.get_node(nodename).attr['data']
 
     # IE9 (+others?) fix: they don't have "Times Roman", only "Times
-    # New Roman"
+    # New Roman" TODO REFACTOR
     agraph.node_attr['fontname'] = "Times New Roman"
     agraph.edge_attr['fontname'] = "Times New Roman"
     svg = agraph.draw(None, 'svg', 'dot')
