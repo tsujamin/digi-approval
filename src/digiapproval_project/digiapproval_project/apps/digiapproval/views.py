@@ -308,6 +308,8 @@ def view_workflow_svg(request, workflow_id, fullsize=False):
     nxs = NetworkXSerializer()
     graph = nxs.serialize_workflow(workflow.workflow)
 
+    graph.remove_node('Root')
+
     for nodename in graph.nodes():
         node = graph.node[nodename]
 
