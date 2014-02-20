@@ -2,6 +2,8 @@ from lamson.routing import route, route_like, stateless
 from digiapproval_project.apps.digiapproval.models import Message, Workflow
 from django.contrib.auth.models import User
 
+SEPARATOR = '---------- Write ABOVE THIS LINE to post a reply ----------'
+
 
 @route("workflow-(uuid)@(host)", uuid="[a-fA-F0-9]+")
 @stateless
@@ -18,12 +20,13 @@ def WORKFLOW_MESSAGE(message, uuid=None, host=None):
     # save it
     m = Message()
     m._sent = True
-    
+
     try:
-        m.message = message.body()[:message.body.index('---------- Write ABOVE THIS LINE to post a reply ----------')]
+        sep_idx = message.body().index(SEPARATOR)
+        m.message = message.body()[:sep_idx]
     except ValueError:
         m.message = message.body()
-    
+
     m.workflow = workflow
     m.sender = sender
     m.save()

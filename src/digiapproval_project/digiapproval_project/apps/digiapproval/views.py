@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.forms.formsets import formset_factory
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from .forms import DelegatorBaseFormSet, DelegatorForm
 from .auth_decorators import login_required_organisation,\
@@ -44,6 +45,10 @@ def profile(request):
     if any([hasattr(g, 'workflowspecs_delegators')
             for g in request.user.groups.all()]):
         return redirect('delegator_worklist')
+
+    # supers? spec_builder
+    if request.user.is_superuser:
+        return redirect('/spec_builder/builder_home/')
 
     return HttpResponse("""You don't have a role in the DigiApproval system.
                         This is probably a bug, and we're very sorry - please
@@ -279,7 +284,12 @@ def view_workflowspec_svg(request, spec_id, fullsize=False):
     for nodename in agraph.nodes():
         del agraph.get_node(nodename).attr['data']
 
+    # IE9 (+others?) fix: they don't have "Times Roman", only "Times
+    # New Roman" TODO REFACTOR
+    agraph.node_attr['fontname'] = "Times New Roman"
+    agraph.edge_attr['fontname'] = "Times New Roman"
     svg = agraph.draw(None, 'svg', 'dot')
+
     # http://www.graphviz.org/content/percentage-size-svg-output
     if not fullsize:
         svg = re.sub(r'<svg width="[0-9]+pt" height="[0-9]+pt"',
@@ -298,6 +308,8 @@ def view_workflow_svg(request, workflow_id, fullsize=False):
 
     nxs = NetworkXSerializer()
     graph = nxs.serialize_workflow(workflow.workflow)
+
+    graph.remove_node('Root')
 
     for nodename in graph.nodes():
         node = graph.node[nodename]
@@ -344,6 +356,10 @@ def view_workflow_svg(request, workflow_id, fullsize=False):
                 node['target'] = '_parent'
 
     agraph = nx.to_agraph(graph)
+    # IE9 (+others?) fix: they don't have "Times Roman", only "Times
+    # New Roman"
+    agraph.node_attr['fontname'] = "Times New Roman"
+    agraph.edge_attr['fontname'] = "Times New Roman"
 
     svg = agraph.draw(None, 'svg', 'dot')
     # http://www.graphviz.org/content/percentage-size-svg-output
@@ -389,11 +405,10 @@ def workflow_taskdata(workflow_id, actor):
         result['show_data_link'] = (task.state == task.COMPLETED and
                                     result['actor'])
 
-        # Filter (non completed/ready tasks from customers) and task with
-        # task_dict
+        # Filter non completed/ready tasks and task with task_dict. We no
+        # longer bother to show future tasks because of the svg.
         if ((result['state_name'] == 'READY' or
-             result['state_name'] == 'COMPLETED' or
-             actor == 'APPROVER') and
+             result['state_name'] == 'COMPLETED') and
                 result['actor']):
             tasks.append(result)
 
@@ -432,13 +447,17 @@ def view_workflow(request, workflow_id):
                          workflow_breadcrumb(workflow)])
     tasks = workflow_taskdata(workflow_id, actor)
 
+    if not any([True for task in tasks if task['show_task_link']]):
+        messages.success(request, "There are no tasks requiring your " +
+                         "attention at this point.")
+
     # mark all messages read
     Message.mark_all_read(workflow, request.user)
 
     return render(request, 'digiapproval/view_workflow.html', {
         'workflow': workflow,
         'tasks': tasks,
-        'messages': workflow.message_set.order_by('id').reverse()[0:5],
+        'wf_messages': workflow.message_set.order_by('id').reverse()[0:5],
         'user_type': actor
         })
 
@@ -460,7 +479,16 @@ def new_workflow(request, workflowspec_id):
     error = None
 
     customer = request.user.customeraccount
-    acting_as_id = request.session['acting_as_id']
+
+    # login?next will get us here without an acting_as_id
+    # todo refactor
+    acting_as_id = request.session.get('acting_as_id', None)
+    if acting_as_id is None:
+        if customer.parent_accounts.count() == 0:
+            acting_as_id = customer.id
+            request.session['acting_as_id'] = acting_as_id
+        else:
+            return redirect('choose_acting_as')
 
     if not customer.can_i_act_as_user_id(acting_as_id):
         raise PermissionDenied
@@ -575,7 +603,7 @@ def view_workflow_messages(request, workflow_id):
         return redirect(request.META['HTTP_REFERER'])
     else:
         return render(request, 'digiapproval/view_workflow_messages.html', {
-            'messages': workflow.message_set.order_by('id').reverse(),
+            'wf_messages': workflow.message_set.order_by('id').reverse(),
             'workflow': workflow,
         })
 

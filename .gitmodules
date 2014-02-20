@@ -1,3 +1,6 @@
 [submodule "chef-repo/cookbooks/python-build"]
 	path = chef-repo/cookbooks/python-build
 	url = https://github.com/shimizukawa/chef-python-build
+[submodule "src/digiapproval_project/digiapproval_project/static/jquery-placeholder"]
+	path = src/digiapproval_project/digiapproval_project/static/jquery-placeholder
+	url = git@github.com:mathiasbynens/jquery-placeholder.git
