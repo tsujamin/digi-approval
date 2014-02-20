@@ -20,7 +20,7 @@ kombu==3.0.8
 pytz==2013.8
 # helpfully, the version of pyclamd on pypi is out of date
 http://xael.org/norman/python/pyclamd/pyClamd-0.3.4.tar.gz
-git+git://github.com/DigiACTive/SpiffWorkflow.git#egg=SpiffWorkflow
+git+git://github.com/DigiACTive/SpiffWorkflow.git@digiactive#egg=SpiffWorkflow
 #lamson
 Jinja2==2.7.1
 MarkupSafe==0.18
@@ -35,13 +35,14 @@ python-modargs==1.7
 git+git://github.com/bradjasper/django-jsonfield.git#egg=jsonfield
 # bootstrap to make things pretty
 django-bootstrap3==2.5.5
-# seacucmber for mail on aws
-seacucumber==1.5.1
-boto==2.24.0
-dkimpy==0.5.4
+# django-celery-email, our version, for email on aws
+git+git://github.com/DigiACTive/django-celery-email.git#egg=django-celery-email
 # registration
 hg+https://daxtens@bitbucket.org/daxtens/django-registration/#egg=django-registration
 # uwsgi
 uWSGI==2.0
 # breadcrumbs
 django-breadcrumbs==1.1.3
+# graphs!
+networkx==1.8.1
+pygraphviz==1.2

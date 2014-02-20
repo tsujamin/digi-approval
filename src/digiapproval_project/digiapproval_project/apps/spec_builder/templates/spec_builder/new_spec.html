@@ -1,0 +1,34 @@
+{% extends "digiapproval/base.tpl.html" %}
+{% block title %} New Workflow Spec {% endblock %}
+
+{%block content %}
+<div class="col-md-6">
+  <form action="" method="POST" role="form">
+    {% csrf_token %}
+    <div class="form-group">      
+      <label for="spec_name">Name of Workflow</label>      
+      <input type="text" name="spec_name" class="form-control" placeholder="Name of Workflow" max_length="64"/>
+    </div>
+    <div class="form-group">
+      <label for="spec_owner">Owner</label>
+      <select name="spec_owner" class="form-control">
+        {% for group in groups %}
+        <option value="{{group.id}}">{{group.name}}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="spec_desc">Description</label>
+      <textarea name="spec_desc" class="form-control" rows="4"></textarea>
+    </div>
+    <button type="submit" name="submit" class="btn btn-default">Create Workflow Spec</button>
+  </form>
+</div>
+<div class="col-md-6">
+  <h3>Creating Workflow Specifications</h3>
+  <p>This page will create a new Workflow Specification (Application).</p>
+  <p>Workflow Specifications require a name, a description (to be displayed to the user) and an group to own, review and delegate over it.</p>
+  
+</div>
+{% endblock %}
+  

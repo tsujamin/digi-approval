@@ -1,4 +1,5 @@
 {% autoescape off %}
+---------- Write ABOVE THIS LINE to post a reply ----------
 DigiApproval message
 
 Workflow: {{message.workflow.label}} ({{message.workflow.spec.name}})

@@ -69,8 +69,9 @@ def login_required_approver(function=None,
     """
     actual_decorator = user_passes_test(
         lambda u: (u.is_authenticated and
-                   any([hasattr(g, 'workflowspecs_approvers')
-                        for g in u.groups.all()])),
+                   any([g.workflowspecs_approvers.all()
+                        for g in u.groups.all()
+                        if hasattr(g, 'workflowspecs_approvers')])),
         login_url=login_url,
         redirect_field_name=redirect_field_name
     )
@@ -89,8 +90,25 @@ def login_required_delegator(function=None,
     """
     actual_decorator = user_passes_test(
         lambda u: (u.is_authenticated and
-                   any([hasattr(g, 'workflowspecs_delegators')
-                        for g in u.groups.all()])),
+                   any([g.workflowspecs_delegators.all()
+                        for g in u.groups.all()
+                        if hasattr(g, 'workflowspecs_delegators')])),
+        login_url=login_url,
+        redirect_field_name=redirect_field_name
+    )
+    if function:
+        return actual_decorator(function)
+    return actual_decorator
+
+
+def login_required_super(function=None,
+                         redirect_field_name=REDIRECT_FIELD_NAME,
+                         login_url=None):
+    """Decorator for views that checks if the user is authenticated as a
+    superuser"""
+    actual_decorator = user_passes_test(
+        lambda u: (u.is_authenticated and
+                   u.is_superuser),
         login_url=login_url,
         redirect_field_name=redirect_field_name
     )

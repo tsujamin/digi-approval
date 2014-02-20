@@ -1,13 +1,19 @@
 from __future__ import absolute_import
+
+import uuid
+
 from django.db import models
 from django.contrib.auth.models import Group, User
 from django.core.mail import send_mail
 from django.template import Context, loader
-from .fields import WorkflowField, WorkflowSpecField
-from jsonfield import JSONField
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+
 from registration.signals import user_registered
-import uuid
+from jsonfield import JSONField
+
+from .fields import WorkflowField, WorkflowSpecField
+
+from SpiffWorkflow.storage.NetworkXSerializer import NetworkXSerializer
 
 
 class UserFile(models.Model):
@@ -125,6 +131,16 @@ class CustomerAccount(models.Model):
         finally:
             super(CustomerAccount, self).save(*args, **kwargs)
 
+    def can_i_act_as_user_id(self, acting_as_id):
+        accounts = [self]
+        accounts.extend([x for x in self.parent_accounts.all()])
+        ids = [x.id for x in accounts]
+        try:
+            acting_as_id = int(acting_as_id)
+            return (acting_as_id in ids)
+        except (ValueError, TypeError):
+            return False
+
     def __unicode__(self):
         return self.account_type + ": " + self.user.username
 
@@ -161,6 +177,23 @@ class WorkflowSpec(models.Model):
         workflow.workflow.complete_next()
         return workflow
 
+    def to_coloured_graph(self):
+        nxs = NetworkXSerializer()
+        graph = nxs.serialize_workflow_spec(self.spec)
+
+        for nodename in graph.nodes():
+            node = graph.node[nodename]
+            if 'task_data' in node['data']['data']:
+                node['style'] = 'filled'
+                if node['data']['data']['task_data']['actor'] == 'CUSTOMER':
+                    node['fillcolor'] = '#CCCCFF'
+                else:
+                    node['fillcolor'] = '#CCFFCC'
+
+            node['label'] = node['label'].replace("\n", "\\n")
+
+        return graph
+
     def __unicode__(self):
         return u'%s (%s)' % (self.name, self.owner.name)
 
@@ -189,6 +222,14 @@ class Workflow(models.Model):
     uuid = models.CharField(max_length=36, editable=False,
                             default=lambda: uuid.uuid4().hex)
 
+    # Parent information for subworkflows
+    parent_workflow = models.ForeignKey('Workflow', null=True, blank=True,
+                                        default=None,
+                                        related_name='subworkflows')
+    parent_task = models.ForeignKey('Task', null=True, blank=True,
+                                    default=None, related_name='subworkflows')
+
+    # Descriptive information
     label = models.CharField(max_length=50, default="Untitled Application")
 
     def assign_approver(self):
@@ -226,6 +267,7 @@ class Workflow(models.Model):
             self.assign_approver()
         if self.workflow.is_completed() and self.completed is False:
             self.completed = True
+
         super(Workflow, self).save(*args, **kwargs)
 
     def get_ready_task_forms(self, **kwargs):
@@ -277,14 +319,49 @@ class Workflow(models.Model):
             actor = 'CUSTOMER'
             # FIXME: this doesn't cope with multiple layers of parent account -
             # but we should probably remove those multiple layers
-            if customer != self.customer and \
-                    self.customer not in self.customer.parent_accounts.all():
+            if not (customer == self.customer or
+                    customer in self.customer.sub_accounts.all()):
                 return None
         except:
             actor = 'APPROVER'
             if user != self.approver:
                 return None
         return actor
+
+    def change_state_by_user(self, new_state='', user=None):
+        """Can the user change this workflow's state to new_state? If so,
+        make the change, otherwise raise an exception to say why not.
+
+        Raises PermissionDenied errors if the user lacks the permissions.
+        Raises ValueError if the change requested is invalid (e.g. restarting
+        an abandoned workflow, invalid state)."""
+
+        states = map(lambda (choice, _): (choice), Workflow.STATE_CHOICES)
+        if new_state not in states:
+            raise ValueError(("Attempted to change into state '%s', which is" +
+                             " not a valid state.") % new_state)
+
+        actor = self.actor_type(user)
+        if actor is None:
+            raise PermissionDenied
+
+        if actor == 'CUSTOMER' and new_state != 'CANCELLED':
+            raise PermissionDenied
+
+        # A workflow cannot be uncancelled.
+        if self.state not in ['DENIED', 'CANCELLED']:
+            self.state = new_state  # assign new state
+            if self.state == 'STARTED':
+                self.completed = False
+            elif self.state in ['DENIED', 'CANCELLED']:
+                self.workflow.cancel()
+                self.completed = True
+            else:
+                self.completed = True
+        else:
+            raise ValueError("A cancelled or denied workflow cannot be" +
+                             " restarted.")
+        self.save()
 
     def __unicode__(self):
         return u'%s (%s)' % (self.customer.user.username, self.spec.name)

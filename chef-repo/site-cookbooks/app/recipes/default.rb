@@ -27,6 +27,9 @@ when "centos"
   yum_package "python27"
 end
 
+# Install graphviz, which we use for layouts
+yum_package "graphviz"
+yum_package "graphviz-devel"
 
 # Allow it to find postgres
 ENV["PATH"] = ENV["PATH"] + ":/usr/pgsql-9.3/bin"

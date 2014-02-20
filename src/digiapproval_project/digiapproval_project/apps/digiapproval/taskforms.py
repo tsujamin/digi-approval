@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from . import models
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
@@ -57,7 +57,8 @@ class AbstractForm(object):
                  "Previous section needs to be re-completed", 1),
                 ('continue',
                  "Previous section was completed acceptably", 2),
-                task_info=kwargs.get('task_info', "")
+                task_info=kwargs.get('task_info', ""),
+                options={'display_previous_task': True}
                 ))
         return review_task
 
@@ -113,15 +114,16 @@ class AbstractForm(object):
             raise AttributeError("actor of task must be customer or approver")
         elif form not in form_classes:
             raise AttributeError("form must be key of form_classes")
-        if 'task_info' in kwargs:
-            task_info = kwargs['task_info']
-        else:
-            task_info = ""
+
+        task_info = kwargs.get('task_info', '')
+        options = kwargs.get('options', {})
+
         return {'form': form,
                 'actor': actor,
                 'fields': {},
                 'data': {'task_info': task_info},
-                'options': {}
+                'options': options,
+                'nice_name': form_classes[form].__name__
                 }
 
     def form_request(self, request):
@@ -139,15 +141,42 @@ class AbstractForm(object):
         if not (is_authenticated and (is_approver or is_customer_and_actor)):
             return HttpResponseRedirect(reverse('applicant_home'))
 
-    def complete_task(self, request):
-        """Sets current task as complete, saves the models and redirects to
-        index or next task (if there is only one).
+    def form_render(self, request, *args, **kwargs):
+        """Wrapper around django.shortcuts.render() which adds task
+        information"""
 
-        Doesn't just get next task due to Join tasks being separate instances.
-        Also emails those involved."""
+        args = list(args)
+
+        dictionary = {
+            'task': self.spiff_task.get_name(),
+            'task_info': self.task_dict['data'].get('task_info', ''),
+            'form_fields': self.task_dict.get('fields', None),
+        }
+
+        if self.task_dict['options'].get('display_previous_task', False):
+            previous_spiff_task = self.spiff_task.parent
+            if isinstance(previous_spiff_task.id, dict):
+                previous_task_uuid = uuid.UUID(
+                    previous_spiff_task.id['__uuid__'])
+            else:
+                previous_task_uuid = previous_spiff_task.id
+            previous_task = models.Task.objects.get(uuid=previous_task_uuid)
+            dictionary['previous_task'] = previous_task
+
+        if 'dictionary' in kwargs:
+            dictionary.update(kwargs.pop['dictionary'])
+        elif len(args) >= 2:
+            dictionary.update(args.pop(1))  # it'll be the 3rd argument
+
+        return render(request, dictionary=dictionary, *args, **kwargs)
+
+    def complete_task(self):
+        """Sets current task as complete, saves the models, emails those
+        involved"""
         self.spiff_task.complete()
         self.task_model.save()
         self.workflow_model.save()
+
         # send email. don't use the message class: we don't want it
         # displayed/stored
         sender = (self.workflow_model.approver if self.actor == 'APPROVER'
@@ -166,7 +195,16 @@ class AbstractForm(object):
                   ('workflow-%s@digiactive.com.au' % self.workflow_model.uuid),
                   recipients, fail_silently=False)
 
+    def complete_task_request(self, request):
+        """Completes current task and redirects to index or next task (if there
+        is only one).
+
+        Doesn't just get next task due to Join tasks being separate
+        instances."""
         # redirect
+
+        self.complete_task()
+
         waiting_tasks = self.workflow_model.get_ready_task_forms(
             actor=self.actor)
         if len(waiting_tasks) is 1:
@@ -227,24 +265,21 @@ class AcceptAgreement(AbstractForm):
                     self.task_dict['fields']['acceptance']['value'] = True
                 else:
                     self.task_dict['fields']['acceptance']['value'] = False
-                return self.complete_task(request)
+                return self.complete_task_request(request)
             elif mandatory and (checkbox_value is not None):
                 self.task_dict['fields']['acceptance']['value'] = True
-                return self.complete_task(request)
+                return self.complete_task_request(request)
             error = "You must accept the agreement to continue"
         # default response
-        return render(request, 'digiapproval/taskforms/AcceptAgreement.html', {
+        context = {
             'error': error,
-            'task': self.spiff_task.get_name(),
             'agreement': self.task_dict['data']['agreement'],
             'checkbox_label': self.task_dict['fields']['acceptance']['label'],
             'checkbox_value': self.task_dict['fields']['acceptance']['value'],
-            'task_info': self.task_dict['data']['task_info']
-        })
-
-    def complete_task(self, request):
-        """Perform post completion tasks"""
-        return super(AcceptAgreement, self).complete_task(request)
+        }
+        return self.form_render(request,
+                                'digiapproval/taskforms/AcceptAgreement.html',
+                                context)
 
 
 class FieldEntry(AbstractForm):
@@ -303,18 +338,11 @@ class FieldEntry(AbstractForm):
                 else:
                     form_fields[field]['value'] = value
             if error is None:  # Correctly filled out
-                return self.complete_task(request)
+                return self.complete_task_request(request)
         # default response
-        return render(request, 'digiapproval/taskforms/FieldEntry.html', {
-            'error': error,
-            'task': self.spiff_task.get_name(),
-            'form_fields': form_fields,
-            'task_info': self.task_dict['data']['task_info']
-        })
-
-    def complete_task(self, request):
-        """Perform post completion tasks"""
-        return super(FieldEntry, self).complete_task(request)
+        return self.form_render(request,
+                                'digiapproval/taskforms/FieldEntry.html',
+                                {'error': error})
 
 
 class CheckTally(AbstractForm):
@@ -386,18 +414,11 @@ class CheckTally(AbstractForm):
             if error is None:
                 # Correctly filled out
                 self.spiff_task.set_data(score=current_score)
-                return self.complete_task(request)
+                return self.complete_task_request(request)
         # default response
-        return render(request, 'digiapproval/taskforms/CheckTally.html', {
-            'error': error,
-            'task': self.spiff_task.get_name(),
-            'form_fields': form_fields,
-            'task_info': self.task_dict['data']['task_info']
-        })
-
-    def complete_task(self, request):
-        """Perform post completion tasks"""
-        return super(CheckTally, self).complete_task(request)
+        return self.form_render(request,
+                                'digiapproval/taskforms/CheckTally.html',
+                                {'error': error})
 
     @staticmethod
     def create_exclusive_task(spec, name, min_score, success, fail, *args,
@@ -415,7 +436,7 @@ class CheckTally(AbstractForm):
                             success)
         ret_task.connect_if(LessThan(Attrib('score'), Attrib('min_score')),
                             fail)
-        ret_task.connect(success)  # Default taskspec
+        ret_task.connect(fail)  # Default taskspec
         return ret_task
 
 
@@ -469,21 +490,13 @@ class ChooseBranch(AbstractForm):
                 form_fields[value]['value'] = True
                 self.spiff_task.set_data(
                     selection=form_fields[value]['number'])
-                return self.complete_task(request)
+                return self.complete_task_request(request)
             else:
                 error = "Invalid Selection"
         # default response, returns related template with current fields
-        return render(request, 'digiapproval/taskforms/ChooseBranch.html', {
-            'error': error,
-            'task': self.spiff_task.get_name(),
-            'form_fields': form_fields,
-            'task_info': self.task_dict['data']['task_info']
-        })
-
-    def complete_task(self, request):
-        """Perform post completion tasks, no need to save models as handled by
-        parent class"""
-        return super(ChooseBranch, self).complete_task(request)
+        return self.form_render(request,
+                                'digiapproval/taskforms/ChooseBranch.html',
+                                {'error': error})
 
     @staticmethod
     def create_exclusive_task(spec, name, *args, **kwargs):
@@ -514,7 +527,13 @@ class ChooseBranches(AbstractForm):
                 if not hasattr(self.spiff_task.data, data_field):
                     # init fields
                     self.spiff_task.data[data_field] = False
-                self.task_model.save()
+            #default to 0 minimum choices if unset
+            if not ('minimum_choices' in self.task_dict['options'] and
+                    isinstance(self.task_dict['options']['minimum_choices'],
+                               int)
+                    ):
+                self.task_dict['options']['minimum_choices'] = 0
+            self.task_model.save()
         else:
             raise TypeError("CheckTally requires an MultiChoice task")
 
@@ -526,12 +545,8 @@ class ChooseBranches(AbstractForm):
         for field in task_data['fields'].values():
             if not 'number' in field or \
                     field['type'] != 'checkbox':
-                print field
                 raise AttributeError("fields must have number and be of type" +
                                      " checkbox")
-        if not 'minimum_choices' in task_data['options'] or \
-                not isinstance(task_data['options']['minimum_choices'], int):
-            raise AttributeError("must have an integer minimum_choices option")
 
     @staticmethod
     def make_task_dict(actor, minimum_choices, *args, **kwargs):
@@ -562,31 +577,21 @@ class ChooseBranches(AbstractForm):
         count = 0
         if request.method == "POST":
             for field in form_fields:
-                print request.POST
-                value = request.POST.get(field, None)
-                if value is not None:
+                if field in request.POST:
                     form_fields[field]['value'] = True
                     data_field = "task" + str(form_fields[field]['number'])
                     self.spiff_task.data[data_field] = True
                     count += 1
             if count >= self.task_dict['options']['minimum_choices']:
-                return self.complete_task(request)
+                return self.complete_task_request(request)
             else:
                 error = ("Please select at least " +
                          str(self.task_dict['options']['minimum_choices']) +
                          " option(s)")
         # default response, returns related template with current fields
-        return render(request, 'digiapproval/taskforms/ChooseBranches.html', {
-            'error': error,
-            'task': self.spiff_task.get_name(),
-            'form_fields': form_fields,
-            'task_info': self.task_dict['data']['task_info']
-        })
-
-    def complete_task(self, request):
-        """Perform post completion tasks, no need to save models as handled by
-        parent class"""
-        return super(ChooseBranches, self).complete_task(request)
+        return self.form_render(request,
+                                'digiapproval/taskforms/ChooseBranches.html',
+                                {'error': error})
 
     @staticmethod
     def create_multichoice_task(spec, name, *args, **kwargs):
@@ -651,6 +656,9 @@ class FileUpload(AbstractForm):
         if request.method == "POST":
             file = request.FILES.get('file', None)
             file_name = request.POST.get('file_name', None)
+            #save filename in field for re-render
+            if file_name and file_name != "":
+                self.task_dict['fields']['file_name']['value'] = file_name
             # Check validity of posted data
             if file is None and self.task_dict['fields']['file']['mandatory']:
                 error = "Uploading a file is mandatory"
@@ -659,21 +667,81 @@ class FileUpload(AbstractForm):
             else:  # place filevalue in task_dict
                 file_model = models.UserFile(_file=file, name=file_name)
                 file_model.save()
-                self.task_dict['fields']['file_name']['value'] = file_name
                 self.task_dict['fields']['file']['value'] = file_model.id
-                return self.complete_task(request)
+                return self.complete_task_request(request)
         # default response, returns related template with current fields
-        return render(request, 'digiapproval/taskforms/FileUpload.html', {
-            'error': error,
-            'task': self.spiff_task.get_name(),
-            'form_fields': self.task_dict['fields'],
-            'task_info': self.task_dict['data']['task_info']
-        })
+        return self.form_render(request,
+                                'digiapproval/taskforms/FileUpload.html',
+                                {'error': error})
 
-    def complete_task(self, request):
-        """Perform post completion tasks, no need to save models as handled by
-        parent class"""
-        return super(FileUpload, self).complete_task(request)
+
+class Subworkflow(AbstractForm):
+    """Allows workflow to be embedded as a task in a different workflow"""
+
+    def __init__(self, spiff_task, workflow_model, *args, **kwargs):
+        """Task form initialisation and validation"""
+        super(Subworkflow, self).__init__(spiff_task, workflow_model,
+                                          *args, **kwargs)
+
+        # Create the sub-Workflow if it's not already created
+        if 'workflow_id' not in self.task_dict['data']:
+            workflowspec = models.WorkflowSpec.objects.get(
+                id=self.task_dict['data']['workflowspec_id'])
+            workflow = workflowspec.start_workflow(
+                self.workflow_model.customer)
+            workflow.parent_workflow = self.workflow_model
+            workflow.parent_task = self.task_model
+            workflow.save()
+            self.task_dict['data']['workflow_id'] = workflow.id
+            self.task_model.save()
+            self.workflow_model.save()
+
+        # Check if the sub-Workflow has completed, and if so, complete the
+        # Subworkflow task.
+        #
+        # TODO this technically doesn't trigger when the sub-Workflow
+        # completes, it triggers when the user looks at things again, causing
+        # the Subworkflow taskform to be instantiated
+        workflow = models.Workflow.objects.get(
+            pk=self.task_dict['data']['workflow_id'])
+        if workflow.completed:
+            self.complete_task()
+
+    @staticmethod
+    def validate_task_data(task_data):
+        """Validates that provided task_data dict is of valid construction,
+        throws AttributeErrors
+        """
+        AbstractForm.validate_task_data(task_data)
+        #Test taskform specific fields here
+
+    @staticmethod
+    def make_task_dict(actor, workflowspec_id, *args, **kwargs):
+        """Constructs a task_dict for this taskform using provided params"""
+        task_dict = AbstractForm.make_task_dict("subworkflow", actor,
+                                                *args, **kwargs)
+        task_dict['data']['workflowspec_id'] = workflowspec_id
+
+        #Add task specific forms to task_dict
+        Subworkflow.validate_task_data(task_dict)
+        return task_dict
+
+    def form_request(self, request):
+        """Controller for this task form, handles post and checks validity
+        before completing task.
+
+        Redirects user to the sub-Workflow"""
+        # Check authorisation
+        response = super(Subworkflow, self).form_request(request)
+        if response is not None:
+            return response  # invalid access
+
+        return redirect('view_workflow',
+                        workflow_id=self.task_dict['data']['workflow_id'])
+
+    def complete_task_request(self, request):
+        """Subworkflows shouldn't be completed manually - raise exception"""
+        raise Exception("complete_task_request() called on Subworkflow")
 
 
 class ExampleTaskForm(AbstractForm):
@@ -729,20 +797,11 @@ class ExampleTaskForm(AbstractForm):
                     self.task_dict['fields'][field]['value'] = value
             if error is None:
                 # All field data was valid, now complete the task
-                return self.complete_task(request)
+                return self.complete_task_request(request)
         # default response, returns related template with current fields
-        return render(request, 'digiapproval/taskforms/ExampleTaskForm.html', {
-            'error': error,
-            'task': self.spiff_task.get_name(),
-            'form_fields': self.task_dict['fields'],
-            'task_info': self.task_dict['data']['task_info']
-        })
-
-    def complete_task(self, request):
-        """Perform post completion tasks, no need to save models as handled by
-        parent class"""
-        return super(ExampleTaskForm, self).complete_task(request)
-
+        return self.form_render(request,
+                                'digiapproval/taskforms/ExampleTaskForm.html',
+                                {'error': error})
 
 form_classes = {
     "accept_agreement": AcceptAgreement,
@@ -751,11 +810,12 @@ form_classes = {
     "choose_branch": ChooseBranch,
     "choose_branches": ChooseBranches,
     "file_upload": FileUpload,
+    "subworkflow": Subworkflow,
 }
 
-field_types = [
-    'checkbox',
-    'text',
-    'radio',
-    'file',
-]
+field_types = {
+    'checkbox': 'Checkbox',
+    'text': 'Text Entry',
+    'radio': 'Radio Button',
+    'file': 'File Upload',
+}

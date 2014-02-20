@@ -41,6 +41,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.flatpages',
     'digiapproval_project.apps.digiapproval',
+    'digiapproval_project.apps.spec_builder',
     'south',
     'bootstrap3',
     'registration',
@@ -78,7 +79,7 @@ DATABASES = {
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Australia/Canberra'
 
 USE_I18N = True
 
@@ -128,10 +129,11 @@ BOOTSTRAP3 = {
 # Registration
 ACCOUNT_ACTIVATION_DAYS = 7  # One-week activation window
 
-# breadcrumbs
+# breadcrumbs, acting as
 from django.conf import global_settings
 TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
     'django.core.context_processors.request',
+    'digiapproval_project.apps.digiapproval.acting_as_processor.acting_as',
 )
 
 # Patch in our local settings

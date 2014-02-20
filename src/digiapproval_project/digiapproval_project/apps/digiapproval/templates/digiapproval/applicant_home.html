@@ -7,11 +7,7 @@
 <ul>
   {% for workflow, tasks, unread in running_workflows_and_tasks %}
   <li>
-  {% ifequal workflow.customer.user.id user.id %}
     <a href="{% url 'view_workflow' workflow_id=workflow.id %}">{{workflow.label}} - {{workflow.spec.name}}</a>
-  {% else %}
-    <a href="{% url 'view_workflow' workflow_id=workflow.id %}">{{workflow.label}} - {{workflow.spec.name}} ({{ workflow.customer.user.get_full_name }})</a>
-  {% endifequal %}
   <ul>
     {% ifnotequal unread 0 %}
       <li>
@@ -42,7 +38,7 @@
   {% endifequal %}
   {% ifnotequal unread 0 %}
     <ul><li>
-      <a href="{% url 'view_workflow_messages workflow_id=workflow.id %'}">{{unread}} unread messages </a>
+      <a href="{% url 'view_workflow_messages' workflow_id=workflow.id %}">{{unread}} unread messages </a>
     </li></ul>
   {% else %}{% endifnotequal %}
   </li>
