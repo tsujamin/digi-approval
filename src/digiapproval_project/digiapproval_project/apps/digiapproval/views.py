@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.forms.formsets import formset_factory
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from .forms import DelegatorBaseFormSet, DelegatorForm
 from .auth_decorators import login_required_organisation,\
@@ -446,13 +447,17 @@ def view_workflow(request, workflow_id):
                          workflow_breadcrumb(workflow)])
     tasks = workflow_taskdata(workflow_id, actor)
 
+    if not any([True for task in tasks if task['show_task_link']]):
+        messages.success(request, "There are no tasks requiring your " +
+                         "attention at this point.")
+
     # mark all messages read
     Message.mark_all_read(workflow, request.user)
 
     return render(request, 'digiapproval/view_workflow.html', {
         'workflow': workflow,
         'tasks': tasks,
-        'messages': workflow.message_set.order_by('id').reverse()[0:5],
+        'wf_messages': workflow.message_set.order_by('id').reverse()[0:5],
         'user_type': actor
         })
 
@@ -598,7 +603,7 @@ def view_workflow_messages(request, workflow_id):
         return redirect(request.META['HTTP_REFERER'])
     else:
         return render(request, 'digiapproval/view_workflow_messages.html', {
-            'messages': workflow.message_set.order_by('id').reverse(),
+            'wf_messages': workflow.message_set.order_by('id').reverse(),
             'workflow': workflow,
         })
 

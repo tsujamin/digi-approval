@@ -101,6 +101,7 @@
         {% endfor %}
       </ul>
       {% endif %}
+      {% bootstrap_messages %}
       <h1>{% block header%}{% usemacro title %}{% endblock %}</h1>
         {% block content %}{% endblock %}
 
