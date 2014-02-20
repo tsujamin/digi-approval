@@ -404,11 +404,10 @@ def workflow_taskdata(workflow_id, actor):
         result['show_data_link'] = (task.state == task.COMPLETED and
                                     result['actor'])
 
-        # Filter (non completed/ready tasks from customers) and task with
-        # task_dict
+        # Filter non completed/ready tasks and task with task_dict. We no
+        # longer bother to show future tasks because of the svg.
         if ((result['state_name'] == 'READY' or
-             result['state_name'] == 'COMPLETED' or
-             actor == 'APPROVER') and
+             result['state_name'] == 'COMPLETED') and
                 result['actor']):
             tasks.append(result)
 
