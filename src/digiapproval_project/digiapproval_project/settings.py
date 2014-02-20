@@ -80,7 +80,7 @@ DATABASES = {
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Australia/Canberra'
 
 USE_I18N = True
 
@@ -134,10 +134,11 @@ AUTHENTICATION_BACKENDS = (
 )
 LOGIN_REDIRECT_URL = '/'
 
-# breadcrumbs
+# breadcrumbs, acting as
 from django.conf import global_settings
 TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
     'django.core.context_processors.request',
+    'digiapproval_project.apps.digiapproval.acting_as_processor.acting_as',
 )
 
 # Patch in our local settings

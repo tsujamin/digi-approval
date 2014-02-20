@@ -1,8 +1,8 @@
 <form action="{% url 'update_workflow_state' workflow.id %}" method="POST" role="form" class="form-inline">
   {% csrf_token %}
+  <label for="wf_state">Application state:</label><br>
   <div class="form-group">
-    <label for="wf_state">
-    <select name="wf_state" class="form-control">
+    <select name="wf_state" id="wf_state" class="form-control">
       <option value="STARTED" {% ifequal workflow.state 'STARTED' %}selected{% endifequal %}>Open</option>
       <option value="CANCELLED" {% ifequal workflow.state 'CANCELLED' %}selected{% endifequal %}>Withdrawn</option>
       <option value="APPROVED" {% ifequal workflow.state 'APPROVED' %}selected{% endifequal %}>Approved</option>

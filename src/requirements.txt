@@ -35,10 +35,8 @@ python-modargs==1.7
 git+git://github.com/bradjasper/django-jsonfield.git#egg=jsonfield
 # bootstrap to make things pretty
 django-bootstrap3==2.5.5
-# seacucmber for mail on aws
-seacucumber==1.5.1
-boto==2.24.0
-dkimpy==0.5.4
+# django-celery-email, our version, for email on aws
+git+git://github.com/DigiACTive/django-celery-email.git#egg=django-celery-email
 # registration
 hg+https://daxtens@bitbucket.org/daxtens/django-registration/#egg=django-registration
 git+git://github.com/bitmazk/django-registration-email#egg=registration_email

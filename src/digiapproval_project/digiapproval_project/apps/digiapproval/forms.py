@@ -1,9 +1,8 @@
 from django import forms
 from django.forms.formsets import BaseFormSet
+from django.core.validators import MinLengthValidator
 from models import CustomerAccount
 from registration_email.forms import EmailRegistrationForm
-from django.core.validators import MinLengthValidator
-
 
 class CustomerRegistrationForm(EmailRegistrationForm):
     """User registration for for use by DigiApproval customers.

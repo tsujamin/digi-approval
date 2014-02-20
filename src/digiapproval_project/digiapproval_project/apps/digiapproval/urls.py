@@ -16,6 +16,10 @@ urlpatterns = patterns(
 
     # applicants-only pages
     url(r'^applicant_home/$', views.applicant_home, name='applicant_home'),
+    url(r'^choose_acting_as/$', views.choose_acting_as,
+        name='choose_acting_as'),
+    url(r'^act_as/(?P<customer_id>\d+)$', views.act_as,
+        name='act_as'),
 
     # staff-only pages
     url(r'^approver_worklist/$', views.approver_worklist,

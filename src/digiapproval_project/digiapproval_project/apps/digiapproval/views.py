@@ -3,7 +3,8 @@ from django.http import HttpResponse
 from django.forms.formsets import formset_factory
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
+from django.contrib import messages
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from .forms import DelegatorBaseFormSet, DelegatorForm
 from .auth_decorators import login_required_organisation,\
     login_required_customer, login_required_approver, login_required_delegator
@@ -44,6 +45,10 @@ def profile(request):
     if any([hasattr(g, 'workflowspecs_delegators')
             for g in request.user.groups.all()]):
         return redirect('delegator_worklist')
+
+    # supers? spec_builder
+    if request.user.is_superuser:
+        return redirect('/spec_builder/builder_home/')
 
     return HttpResponse("""You don't have a role in the DigiApproval system.
                         This is probably a bug, and we're very sorry - please
@@ -108,19 +113,72 @@ def applicant_home(request):
 
     Requires authenticated CustomerAccount of type CUSTOMER.
     """
-    customer = request.user.customeraccount
+
+    # determine whether we need to select an account to operate on
+    acting_as_id = request.session.get('acting_as_id', None)
+
+    if (acting_as_id is None and
+            request.user.customeraccount.parent_accounts.count() == 0):
+        # shortcut the process if not part of an organisation
+        request.session['acting_as_id'] = request.user.customeraccount.id
+        acting_as = request.user.customeraccount
+    elif request.user.customeraccount.can_i_act_as_user_id(acting_as_id):
+        # load the data if valid
+        acting_as = CustomerAccount.objects.get(id=int(acting_as_id))
+    else:
+        # otherwise, redirect to choose who we're acting as
+        return redirect('choose_acting_as')
+
     return render(request, 'digiapproval/applicant_home.html', {
         'running_workflows_and_tasks': map(
             lambda wf: (wf, wf.get_ready_task_forms(actor='CUSTOMER'),
                         Message.get_unread_messages(wf, request.user).count()),
-            customer.get_all_workflows(completed=False)),
+            acting_as.get_own_workflows(completed=False)),
         'completed_workflows': map(
             lambda wf: (wf,
                         Message.get_unread_messages(wf, request.user).count()),
-            customer.get_all_workflows(completed=True)),
+            acting_as.get_all_workflows(completed=True)),
         'workflow_specs': WorkflowSpec.objects.filter(public=True,
                                                       toplevel=True)
     })
+
+
+@login_required_customer
+@never_cache
+def choose_acting_as(request):
+    accounts = [request.user.customeraccount]
+    accounts.extend([x for x
+                     in request.user.customeraccount.parent_accounts.all()])
+
+    if request.method == 'POST':
+        try:
+            acting_as_id = int(request.POST['acting_as_id'])
+            User.objects.get(id=acting_as_id)
+        except (ValueError, ObjectDoesNotExist):
+            # this is invalid data.
+            # set some sort of message. TODO
+            pass
+
+        if not request.user.customeraccount.can_i_act_as_user_id(acting_as_id):
+            # also invalid data
+            pass
+        else:
+            request.session['acting_as_id'] = acting_as_id
+            return redirect('applicant_home')
+
+    ids_names = [(account.id, account.user.get_full_name())
+                 for account in accounts]
+    return render(request, 'digiapproval/choose_acting_as.html',
+                  {'ids_names': ids_names})
+
+
+@login_required_customer
+def act_as(request, customer_id):
+    if request.user.customeraccount.can_i_act_as_user_id(customer_id):
+        request.session['acting_as_id'] = customer_id
+        return redirect('applicant_home')
+    else:
+        return redirect('choose_acting_as')
 
 
 ## STAFF-ONLY PAGES
@@ -226,7 +284,12 @@ def view_workflowspec_svg(request, spec_id, fullsize=False):
     for nodename in agraph.nodes():
         del agraph.get_node(nodename).attr['data']
 
+    # IE9 (+others?) fix: they don't have "Times Roman", only "Times
+    # New Roman" TODO REFACTOR
+    agraph.node_attr['fontname'] = "Times New Roman"
+    agraph.edge_attr['fontname'] = "Times New Roman"
     svg = agraph.draw(None, 'svg', 'dot')
+
     # http://www.graphviz.org/content/percentage-size-svg-output
     if not fullsize:
         svg = re.sub(r'<svg width="[0-9]+pt" height="[0-9]+pt"',
@@ -245,6 +308,8 @@ def view_workflow_svg(request, workflow_id, fullsize=False):
 
     nxs = NetworkXSerializer()
     graph = nxs.serialize_workflow(workflow.workflow)
+
+    graph.remove_node('Root')
 
     for nodename in graph.nodes():
         node = graph.node[nodename]
@@ -291,6 +356,10 @@ def view_workflow_svg(request, workflow_id, fullsize=False):
                 node['target'] = '_parent'
 
     agraph = nx.to_agraph(graph)
+    # IE9 (+others?) fix: they don't have "Times Roman", only "Times
+    # New Roman"
+    agraph.node_attr['fontname'] = "Times New Roman"
+    agraph.edge_attr['fontname'] = "Times New Roman"
 
     svg = agraph.draw(None, 'svg', 'dot')
     # http://www.graphviz.org/content/percentage-size-svg-output
@@ -336,11 +405,10 @@ def workflow_taskdata(workflow_id, actor):
         result['show_data_link'] = (task.state == task.COMPLETED and
                                     result['actor'])
 
-        # Filter (non completed/ready tasks from customers) and task with
-        # task_dict
+        # Filter non completed/ready tasks and task with task_dict. We no
+        # longer bother to show future tasks because of the svg.
         if ((result['state_name'] == 'READY' or
-             result['state_name'] == 'COMPLETED' or
-             actor == 'APPROVER') and
+             result['state_name'] == 'COMPLETED') and
                 result['actor']):
             tasks.append(result)
 
@@ -379,13 +447,17 @@ def view_workflow(request, workflow_id):
                          workflow_breadcrumb(workflow)])
     tasks = workflow_taskdata(workflow_id, actor)
 
+    if not any([True for task in tasks if task['show_task_link']]):
+        messages.success(request, "There are no tasks requiring your " +
+                         "attention at this point.")
+
     # mark all messages read
     Message.mark_all_read(workflow, request.user)
 
     return render(request, 'digiapproval/view_workflow.html', {
         'workflow': workflow,
         'tasks': tasks,
-        'messages': workflow.message_set.order_by('id').reverse()[0:5],
+        'wf_messages': workflow.message_set.order_by('id').reverse()[0:5],
         'user_type': actor
         })
 
@@ -407,9 +479,21 @@ def new_workflow(request, workflowspec_id):
     error = None
 
     customer = request.user.customeraccount
-    permitted_accounts = [customer]
-    for account in customer.parent_accounts.all():
-        permitted_accounts.append(account)
+
+    # login?next will get us here without an acting_as_id
+    # todo refactor
+    acting_as_id = request.session.get('acting_as_id', None)
+    if acting_as_id is None:
+        if customer.parent_accounts.count() == 0:
+            acting_as_id = customer.id
+            request.session['acting_as_id'] = acting_as_id
+        else:
+            return redirect('choose_acting_as')
+
+    if not customer.can_i_act_as_user_id(acting_as_id):
+        raise PermissionDenied
+
+    acting_as = CustomerAccount.objects.get(id=int(acting_as_id))
 
     request.breadcrumbs([
         ('Applicant Portal', reverse('applicant_home')),
@@ -417,19 +501,14 @@ def new_workflow(request, workflowspec_id):
         ])
 
     if request.method == 'POST' and request.POST.get('create_workflow', False):
-        acct_id = int(request.POST.get('account', None))
-        wf_customer = get_object_or_404(CustomerAccount, id=acct_id)
-        if wf_customer in permitted_accounts:
-            workflow = workflowspec.start_workflow(wf_customer)
-            label = request.POST.get('label', False)
-            if label and len(label) > 0:
-                workflow.label = label
-            workflow.save()
-            return redirect('view_workflow', workflow_id=workflow.id)
-        error = "Please select a valid account"
+        workflow = workflowspec.start_workflow(acting_as)
+        label = request.POST.get('label', False)
+        if label and len(label) > 0:
+            workflow.label = label
+        workflow.save()
+        return redirect('view_workflow', workflow_id=workflow.id)
     return render(request, 'digiapproval/new_workflow.html', {
         'workflowspec': workflowspec,
-        'accounts': permitted_accounts,
         'error': error
     })
 
@@ -524,7 +603,7 @@ def view_workflow_messages(request, workflow_id):
         return redirect(request.META['HTTP_REFERER'])
     else:
         return render(request, 'digiapproval/view_workflow_messages.html', {
-            'messages': workflow.message_set.order_by('id').reverse(),
+            'wf_messages': workflow.message_set.order_by('id').reverse(),
             'workflow': workflow,
         })
 

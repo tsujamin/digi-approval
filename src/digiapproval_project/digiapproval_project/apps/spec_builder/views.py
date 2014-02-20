@@ -88,6 +88,11 @@ def view_spec_svg(request, spec_id, fullsize=False):
                 })
         del node.attr['data']
 
+    # IE9 (+others?) fix: they don't have "Times Roman", only "Times
+    # New Roman" TODO REFACTOR
+    agraph.node_attr['fontname'] = "Times New Roman"
+    agraph.edge_attr['fontname'] = "Times New Roman"
+
     svg = agraph.draw(None, 'svg', 'dot')
     # http://www.graphviz.org/content/percentage-size-svg-output
     if not fullsize:
@@ -573,14 +578,15 @@ def check_tally_dict(request, spec_model, task_spec):
         'field_types': field_types,
         'min_score': min_score
     })
-    
+
+
 def subworkflow_dict(request, spec_model, task_spec):
     if request.method == "POST":
         sub_spec = get_object_or_404(approval_models.WorkflowSpec,
-                                     id = request.POST.get('sub_spec', -1))
+                                     id=request.POST.get('sub_spec', -1))
         task_spec.data['task_data']['data']['workflowspec_id'] = sub_spec.id
         spec_model.save()
-    sub_id = task_spec.get_data('task_data')['data'].get('workflowspec_id', -1)    
+    sub_id = task_spec.get_data('task_data')['data'].get('workflowspec_id', -1)
     return render(request, 'spec_builder/taskforms/SubWorkflowDict.html', {
         'spec_model': spec_model,
         'task': task_spec,

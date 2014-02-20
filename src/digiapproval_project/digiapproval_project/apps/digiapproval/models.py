@@ -131,6 +131,16 @@ class CustomerAccount(models.Model):
         finally:
             super(CustomerAccount, self).save(*args, **kwargs)
 
+    def can_i_act_as_user_id(self, acting_as_id):
+        accounts = [self]
+        accounts.extend([x for x in self.parent_accounts.all()])
+        ids = [x.id for x in accounts]
+        try:
+            acting_as_id = int(acting_as_id)
+            return (acting_as_id in ids)
+        except (ValueError, TypeError):
+            return False
+
     def __unicode__(self):
         return self.account_type + ": " + self.user.username
 
