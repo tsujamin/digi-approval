@@ -166,8 +166,8 @@ def disconnect_task(request, spec_id, task_name):
     
     disconnected_task = spec_model.spec.task_specs.get(
         request.POST.get('disconnect', '')) #may be null if not disconnect operation   
-    if not origin_task:
-        raise Http404("Unknown or Illegal tasks")
+    if not origin_task or not spec_model:
+        raise Http404("Unknown or Illegal tasks/spec")
     
     #Check for special case taskform
     origin_form_type = origin_task.data.get('task_data',{}).get('form', None)
@@ -449,10 +449,14 @@ def choose_branch_connect(request, spec_model, origin_task):
     
 def disconnect_choose_branch(request, spec_model, origin_task, disconnected_task):    
     if 'update' in request.POST:
-        new_default = origin_task = spec_model.spec.task_specs.get(
-            request.POST.get('updated_default', '0xBADBADBAD'))
-        raise NotImplementedError
-        #unsure how to remove only the default_task_spec from array when multiple exist
+        new_default = get_existing_task(
+            request.POST.get('updated_default', '0xBADBADBAD'), spec_model)
+        if new_default and new_default is not spec_model.spec.start:
+            origin_task.outputs.remove(
+                get_existing_task(origin_task.default_task_spec, spec_model))
+            origin_task.default_task_spec = None
+            origin_task.connect(new_default)
+            
     elif disconnected_task and disconnected_task in origin_task.outputs and \
         disconnected_task.name != origin_task.default_task_spec:        
         del origin_task.data['task_data']['fields'][disconnected_task.name]
@@ -572,7 +576,6 @@ def check_tally_connect(request, spec_model, origin_task):
             # else connecting to new task
             elif post_task_type == (task_type + '_create_task'):
                 label = request.POST.get(task_type + '_task_label', '')
-                print label
                 if label and label != '':
                     new_tasks[task_type] = create_task(
                         request.POST.get(task_type + '_create_task', None),
@@ -591,7 +594,6 @@ def check_tally_connect(request, spec_model, origin_task):
                 origin_task.default_task_spec = None
                 while origin_task.outputs != []:
                     origin_task.disconnect(origin_task.outputs[0]) 
-                print origin_task.outputs         
             from SpiffWorkflow.operators import Attrib, GreaterThan, \
                 Equal, LessThan
             origin_task.set_data(min_score=0)  # default required score
