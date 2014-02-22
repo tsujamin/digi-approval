@@ -1,6 +1,39 @@
 {% extends "spec_builder/connect_task.html" %}
+{% block currently_conected %}
+
+{% if origin_task.outputs %}
+<h3>Currently connected</h3>
+<b> {% if disconnect_error %}{{disconnect_error}}{%endif%}</b>
+<form action="{% url 'disconnect_task' spec_id=spec_model.id task_name=origin_task.name %}" method="POST" role="form">
+  {% csrf_token %}
+  <ul>
+    {% for task, field in origin_task.data.task_data.fields.items %}
+      <li>
+        {{field.label}} ({{task}})
+        <button type="submit" name="disconnect" value="{{task}}" class="btn btn-default">Disconnect</button>
+      </li><p>
+    {% endfor %}
+    <li>        
+      Default Task ({{origin_task.default_task_spec}})      
+      <button type="submit" name="update" class="btn btn-default">Update</button><p>
+      <div class="form-group">
+        <select name="update_default" class="form-control">
+          {% for task, type in existing_tasks.items %}
+          <option value="{{task}}">{{task}} ({{type}})</option>
+          {% endfor %}
+        </select>
+      </div>
+    </li>
+  </ul>
+</form>
+<hr>
+{% endif %}
+
+{% endblock %}
+
+
 {% block connect_other_fields %}
-<div class="form-group">
+<div class="form-group">  
   <label for="label">Choice Label</label>
   <input type="text" name="label" class="form-control" placeholder="Continue to this task">
 </div>

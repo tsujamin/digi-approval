@@ -3,6 +3,8 @@
 
 {% block content %}
 <div class="col-md-6">
+  {% block currently_conected %}
+  
   {% if origin_task.outputs %}
   <h3>Currently connected</h3>
   <b> {% if disconnect_error %}{{disconnect_error}}{%endif%}</b>
@@ -10,15 +12,17 @@
     {% csrf_token %}
     <ul>
       {% for task in origin_task.outputs %}
-      <li>
-        {{task.name}}
-        <button type="submit" name="disconnect" value="{{task.name}}" class="btn btn-default">Disconnect</button>
-      </li>
+        <li>
+          {{task.name}}
+          <button type="submit" name="disconnect" value="{{task.name}}" class="btn btn-default">Disconnect</button>
+        </li>
       {% endfor %}
     </ul>
   </form>
   <hr>
   {% endif %}
+  
+  {% endblock %}
   <form action="" method="POST" role="form">
     {% csrf_token %}
     <b>{% if error %}{{error}}{% endif %}</b><br>
