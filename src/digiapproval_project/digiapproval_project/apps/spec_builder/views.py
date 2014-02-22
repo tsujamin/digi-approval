@@ -145,6 +145,20 @@ def view_spec(request, spec_id):
                        if k not in CONNECTABLE_TASKS}
     })
 
+def delete_task(request, spec_id, task_name):
+    """Deletes a taskspec from a worflow spec"""
+    spec_model = get_object_or_404(approval_models.WorkflowSpec,
+                                    id=spec_id)
+    task = spec_model.spec.task_specs.get(task_name)
+    if not task or task_name == 'Start':
+        raise Http404("Unknown or Illegal origin task")
+    
+    task.delete()
+    spec_model.save()
+    
+    return redirect('view_spec', spec_id)
+    
+    
 
 @login_required_super
 def connect_task_controller(request, spec_id, task_name):
