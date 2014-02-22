@@ -150,7 +150,7 @@ def delete_task(request, spec_id, task_name):
     spec_model = get_object_or_404(approval_models.WorkflowSpec,
                                     id=spec_id)
     task = spec_model.spec.task_specs.get(task_name)
-    if not task or task_name == 'Start':
+    if not task or task_name == 'Start' or len(task.inputs) is not 0:
         raise Http404("Unknown or Illegal origin task")
     
     task.delete()
