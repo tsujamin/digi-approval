@@ -4,8 +4,8 @@ from django.contrib.auth.models import Group
 from digiapproval_project.apps.digiapproval.auth_decorators import \
     login_required_super
 from digiapproval_project.apps.digiapproval import models as approval_models
-from digiapproval_project.apps.digiapproval.taskforms import AbstractForm, \
-    field_types
+from digiapproval_project.apps.digiapproval.taskforms import AbstractForm
+from digiapproval_project.apps.digiapproval.taskform_types import TASKFORM_FIELD_TYPES
 from SpiffWorkflow.specs import WorkflowSpec
 from SpiffWorkflow import specs as taskspecs
 from django.core.urlresolvers import reverse
@@ -308,7 +308,7 @@ def field_entry_dict(request, spec_model, task_spec):
             else:
                 mandatory = False
             if name and label and len(name) is not 0 \
-                    and len(label) is not 0 and ftype in field_types:
+                    and len(label) is not 0 and ftype in TASKFORM_FIELD_TYPES:
                 fields[name] = {'label': label, 'mandatory': mandatory,
                                 'type': ftype, 'value': False}
         else:
@@ -323,7 +323,7 @@ def field_entry_dict(request, spec_model, task_spec):
                     fields[field]['mandatory'] = True
                 else:
                     fields[field]['mandatory'] = False
-                if request.POST.get(field+'_type', False) in field_types:
+                if request.POST.get(field+'_type', False) in TASKFORM_FIELD_TYPES:
                     fields[field]['type'] = request.POST.get(field+'_type')
         task_spec.get_data('task_data')['fields'] = fields
         spec_model.save()
@@ -332,7 +332,7 @@ def field_entry_dict(request, spec_model, task_spec):
         'spec_model': spec_model,
         'task': task_spec,
         'fields': task_spec.get_data('task_data')['fields'],
-        'field_types': field_types
+        'field_types': TASKFORM_FIELD_TYPES
     })
 
 
@@ -575,7 +575,7 @@ def check_tally_dict(request, spec_model, task_spec):
         'spec_model': spec_model,
         'task': task_spec,
         'fields': task_spec.get_data('task_data')['fields'],
-        'field_types': field_types,
+        'field_types': TASKFORM_FIELD_TYPES,
         'min_score': min_score
     })
 

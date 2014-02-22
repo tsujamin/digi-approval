@@ -77,6 +77,12 @@ class TestData:
              'lane_hold@laneholdings.com.au', []),
             ])
 
+    def create_semantic_field_types(self):
+        self._print("creating semantic field types")
+        self.SEMANTIC_FIELD_TYPES = map(to_semantic_field_type, [
+            ('event_name', 'text')
+        ])
+
     def create_workflow_specs(self):
         self._print("creating workflow specifications")
         self.WORKFLOW_SPECS = map(to_workflow_spec, [
@@ -151,7 +157,7 @@ class TestData:
             user.delete()
         for group in Group.objects.all():
             group.delete()
-        for model in [models.Task, models.Workflow, models.WorkflowSpec, models.CustomerAccount, models.UserFile, models.Message]:
+        for model in [models.Task, models.Workflow, models.WorkflowSpec, models.CustomerAccount, models.UserFile, models.Message, models.SemanticFieldType]:
             for instance in model.objects.all():
                 instance.delete()
                 
@@ -182,7 +188,12 @@ def to_customer_account((account_type, first_name, last_name, username, password
     for parent in parents:
         customer.parent_accounts.add(parent)
     return customer
-    
+
+def to_semantic_field_type((name, field_type)):
+    semantic_field_type = models.SemanticFieldType(name=name, field_type=field_type)
+    semantic_field_type.save()
+    return semantic_field_type
+
 def to_workflow_spec((name, description, owner, approvers, delegators, public, toplevel, wf_spec_with_id)):
     """Returns a WorkflowSpec model from parameter tuple"""
     spec_model = models.WorkflowSpec(name=name, description=description, \
@@ -250,23 +261,31 @@ def workflowspec_one():
     return (1, wf_spec)
     
 def workflowspec_two():
+    # Tests semantic field data
     wf_spec = specs.WorkflowSpec()
     cust_agreement = specs.Simple(wf_spec, "Customer Agreement")
     cust_fieldentry = specs.Simple(wf_spec, "Permit Details")
+    cust_fieldentry2 = specs.Simple(wf_spec, "Permit Details (Continued)")
     approver_agreement = specs.Simple(wf_spec, "Approver Agreement")
     task_join1 = specs.Join(wf_spec, "Parties In Agreement")
     
     wf_spec.start.connect(cust_fieldentry)
     wf_spec.start.connect(approver_agreement)
-    cust_fieldentry.connect(cust_agreement)
+    cust_fieldentry.connect(cust_fieldentry2)
+    cust_fieldentry2.connect(cust_agreement)
     cust_agreement.connect(task_join1)
     approver_agreement.connect(task_join1)
     
     cust_agreement.set_data(task_data = AcceptAgreement.make_task_dict(True, lorum_ipsum, 'CUSTOMER'))
     cust_fieldentry.set_data(task_data = FieldEntry.make_task_dict('CUSTOMER', 
-        ('event_name', 'What is the name of your event:  ', 'text', True),
-        ('event_purpose', 'What is the purpose of your event: ', 'text', True),
-        ('event_love', 'In 50 words or less, why do you love applying for events: ', 'text', True),)
+        ('event_name', 'What is the name of your event:  ', 'text', True, 'event_name'),
+        ('event_purpose', 'What is the purpose of your event: ', 'text', True, None),
+        ('event_love', 'In 50 words or less, why do you love applying for events: ', 'text', True, None),)
+    )
+    cust_fieldentry2.set_data(task_data = FieldEntry.make_task_dict('CUSTOMER', 
+        ('event_name', 'Event Name:  ', 'text', True, 'event_name'),
+        ('event_purpose', 'Why should we give you this permit?', 'text', True, None),
+        ('event_love', 'Enter miscellaneous comments here:', 'text', True, None),)
     )
     approver_agreement.set_data(task_data = AcceptAgreement.make_task_dict(True, lorum_ipsum,'APPROVER'))
     return (2, wf_spec)
@@ -289,15 +308,15 @@ def workflowspec_three():
     
     cust_agreement.set_data(task_data = AcceptAgreement.make_task_dict(True, lorum_ipsum, 'CUSTOMER'))
     cust_fieldentry.set_data(task_data = FieldEntry.make_task_dict('CUSTOMER', 
-        ('event_name', 'What is the name of your event:  ', 'text', True),
-        ('event_purpose', 'What is the purpose of your event: ', 'text', True),
-        ('event_love', 'In 50 words or less, why do you love applying for events: ', 'text', True),)
+        ('event_name', 'What is the name of your event:  ', 'text', True, None),
+        ('event_purpose', 'What is the purpose of your event: ', 'text', True, None),
+        ('event_love', 'In 50 words or less, why do you love applying for events: ', 'text', True, None),)
     )
     approver_agreement.set_data(task_data = AcceptAgreement.make_task_dict(True, lorum_ipsum,'APPROVER'))
     customer_tally.set_data(task_data = CheckTally.make_task_dict('CUSTOMER',
-        ('like_bureaucracy', "Do you like Bureaucracy", False, 5),
-        ('like_events', "Do you like throwing events", False, 10),
-        ('like_digiactive', "Do you like DigiACTive", True, 15),)
+        ('like_bureaucracy', "Do you like Bureaucracy", False, 5, None),
+        ('like_events', "Do you like throwing events", False, 10, None),
+        ('like_digiactive', "Do you like DigiACTive", True, 15, None),)
     )
     
     return (3, wf_spec)
@@ -329,22 +348,22 @@ def workflowspec_four():
     
     cust_agreement.set_data(task_data = AcceptAgreement.make_task_dict(True, lorum_ipsum, 'CUSTOMER'))
     cust_fieldentry.set_data(task_data = FieldEntry.make_task_dict('CUSTOMER', 
-        ('event_name', 'What is the name of your event:  ', 'text', True),
-        ('event_purpose', 'What is the purpose of your event: ', 'text', True),
-        ('event_love', 'In 50 words or less, why do you love applying for events: ', 'text', True),)
+        ('event_name', 'What is the name of your event:  ', 'text', True, None),
+        ('event_purpose', 'What is the purpose of your event: ', 'text', True, None),
+        ('event_love', 'In 50 words or less, why do you love applying for events: ', 'text', True, None),)
     )
     cust_upload.set_data(task_data = FileUpload.make_task_dict(True, 'CUSTOMER'))
     approver_agreement.set_data(task_data = AcceptAgreement.make_task_dict(True, lorum_ipsum,'APPROVER'))
     
     customer_choice.set_data(task_data = ChooseBranches.make_task_dict('CUSTOMER', 1,
-        ('agreement', "Read and accept agreement", 1),
-        ('field_entry', "Go straight to field entry", 2),
-        ('cust_upload', "Upload most recently signed bank checque", 3),)
+        ('agreement', "Read and accept agreement", 1, None),
+        ('field_entry', "Go straight to field entry", 2, None),
+        ('cust_upload', "Upload most recently signed bank checque", 3, None),)
     )
     
     approver_choice.set_data(task_data = ChooseBranch.make_task_dict('APPROVER', 
-        ('agreement', "Read and accept agreement", 1),
-        ('skip', "Skip to next action", 2))
+        ('agreement', "Read and accept agreement", 1, None),
+        ('skip', "Skip to next action", 2, None))
     )
     
     return (4, wf_spec)
@@ -418,31 +437,31 @@ def workflowspec_realistic_one():
 
     #S2: Event Info form
     cust_event_info.set_data(task_data = FieldEntry.make_task_dict('CUSTOMER',
-        ('event_name', "What is the name of your proposed event", 'text', True),
-        ('event_description', "Please describe the nature of your event", 'text', True),
-        ('info_first_event', "Is this the first time you've organised an event?" , 'checkbox', False),
-        ('event_other', "Please enter any relevant comments about your event", 'text', False),
+        ('event_name', "What is the name of your proposed event", 'text', True, None),
+        ('event_description', "Please describe the nature of your event", 'text', True, None),
+        ('info_first_event', "Is this the first time you've organised an event?" , 'checkbox', False, None),
+        ('event_other', "Please enter any relevant comments about your event", 'text', False, None),
         task_info="""Welcome to the <b>DigiApproval</b> system. 
 If you have any concern during your application process please contact your assigned assessor."""
     ))
     cust_event_attendance.set_data(task_data = ChooseBranch.make_task_dict('CUSTOMER',
-        ('need_ramp', "Over 50 participants are expected to attend", 1),
-        ('assess_ramp', "Fewer than 50 participants are expected to attend ", 2),
+        ('need_ramp', "Over 50 participants are expected to attend", 1, None),
+        ('assess_ramp', "Fewer than 50 participants are expected to attend ", 2, None),
         task_info="""In order to assess your need for a <b>Risk Assessment Management Plan</b> (RAMP) we require some information on the number of expected attendies."""
     ))
     cust_ramp_tally.set_data(task_data = CheckTally.make_task_dict('CUSTOMER',
-        ('large_structures', "Will there be large structures at your event", False, 10),
-        ('electircal_equipment', "Will there be electrical cabling", False, 20),
-        ('water_hazards', "Will there be bodies of water at your event", False, 15),
-        ('hazardous_materials', "Does your event involve hazardous materials ", False, 41),
+        ('large_structures', "Will there be large structures at your event", False, 10, None),
+        ('electircal_equipment', "Will there be electrical cabling", False, 20, None),
+        ('water_hazards', "Will there be bodies of water at your event", False, 15, None),
+        ('hazardous_materials', "Does your event involve hazardous materials ", False, 41, None),
         task_info="""In order to assess your need for a <b>Risk Assessment Management Plan</b> (RAMP) we require some information on the nature of your event."""
     ))
     cust_upload_ramp.set_data(task_data = FileUpload.make_task_dict(True, 'CUSTOMER',
         task_info="""Please upload a completed <b>Risk Assessment Management Plan</b> (RAMP). 
 A template can be found on the DigiApproval website (<a href=\"link.to/ramp_template\">link</a>)"""))    
     cust_insurance_req.set_data(task_data = ChooseBranch.make_task_dict('CUSTOMER',
-        ('need_insurance', "My event falls under the requirements of public liability insurance", 1),
-        ('no_insurance', "My event does not fall under the requirements of Public Liability Insurance",2),
+        ('need_insurance', "My event falls under the requirements of public liability insurance", 1, None),
+        ('no_insurance', "My event does not fall under the requirements of Public Liability Insurance", 2, None),
         task_info="""Some events require the holding of Public Liability Insurance. If you are unsure about if it is required for your event, please refer to our help page (<a href=\"link.to/insurance_help\">link</a>)"""
     ))
     cust_upload_insure.set_data(task_data = FileUpload.make_task_dict(True, 'CUSTOMER'),
@@ -452,8 +471,8 @@ If you need assistance applying for cover, please refer to our help page (<a hre
     
     #S3: Approval stage
     appr_review1.set_data(task_data = ChooseBranches.make_task_dict('APPROVER', 0,
-        ('waste_plan', "Assign Waste Management Plan", 1),
-        ('traffic_plan', "Assign Traffic Management Plan", 2),
+        ('waste_plan', "Assign Waste Management Plan", 1, None),
+        ('traffic_plan', "Assign Traffic Management Plan", 2, None),
         task_info = """Please review the previously completed stages and, if appropriate, assign further tasks for the customer to complete"""
         
     ))    

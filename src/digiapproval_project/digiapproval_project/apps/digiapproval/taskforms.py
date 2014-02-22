@@ -1,13 +1,15 @@
+import uuid
+from exceptions import TypeError, AttributeError
+
 from django.shortcuts import render, redirect
-from . import models
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.core.mail import send_mail
 from django.template import Context, loader
-from exceptions import TypeError, AttributeError
-import uuid
 from SpiffWorkflow.specs import ExclusiveChoice, MultiChoice
 
+from . import models
+from .taskform_types import TASKFORM_FIELD_TYPES
 
 class AbstractForm(object):
     """
@@ -54,9 +56,9 @@ class AbstractForm(object):
             task_data=ChooseBranch.make_task_dict(
                 'APPROVER',
                 ('restart_section',
-                 "Previous section needs to be re-completed", 1),
+                 "Previous section needs to be re-completed", 1, None),
                 ('continue',
-                 "Previous section was completed acceptably", 2),
+                 "Previous section was completed acceptably", 2, None),
                 task_info=kwargs.get('task_info', ""),
                 options={'display_previous_task': True}
                 ))
@@ -84,6 +86,14 @@ class AbstractForm(object):
         self.task_dict = self.task_model.task
         self.actor = self.task_dict['actor']
         self.validate_task_data(self.task_dict)
+        
+        # Load existing semantic field data
+        semantic_field_data = self.workflow_model.workflow.get_data('semantic_field_data', {})
+        if 'fields' in self.task_dict:
+            for field in self.task_dict['fields'].values():
+                if 'semantic_field' in field and field['semantic_field'] in semantic_field_data:
+                    field['value'] = semantic_field_data[field['semantic_field']]
+                    # TODO: If a field's value has been auto-filled, lock/disable the field
 
     @staticmethod
     def validate_task_data(task_data, *args, **kwargs):
@@ -97,14 +107,25 @@ class AbstractForm(object):
         if 'task_info' not in task_data['data']:
             task_data['actor']['task_info'] = ""
         if 'fields' in task_data:
+            semantic_field_types = dict([(s.name, s.field_type)
+                                         for s in models.SemanticFieldType.objects.all()])
             for field in task_data['fields'].values():
                 if 'label' not in field or \
                    'type' not in field or \
                    'mandatory' not in field or \
                    type(field['mandatory']) is not bool or \
-                   field['type'] not in field_types:
+                   field['type'] not in TASKFORM_FIELD_TYPES:
                     raise AttributeError("field must have label, legal type " +
                                          "and boolean mandatory")
+                if 'semantic_field' in field and field['semantic_field']:
+                    if field['semantic_field'] not in semantic_field_types:
+                        raise AttributeError("Semantic field '%s' does not exist" %
+                                             field['semantic_field'])
+                    elif field['type'] != semantic_field_types[field['semantic_field']]:
+                        raise AttributeError("Semantic field '%s' expects field of type '%s', got '%s'" %
+                                             (field['semantic_field'],
+                                              semantic_field_types[field['semantic_field']],
+                                              field['type']))
 
     @staticmethod
     def make_task_dict(form, actor, *args, **kwargs):
@@ -115,16 +136,16 @@ class AbstractForm(object):
         elif form not in form_classes:
             raise AttributeError("form must be key of form_classes")
 
-        task_info = kwargs.get('task_info', '')
-        options = kwargs.get('options', {})
-
-        return {'form': form,
-                'actor': actor,
-                'fields': {},
-                'data': {'task_info': task_info},
-                'options': options,
-                'nice_name': form_classes[form].__name__
-                }
+        task_dict = {
+            'form': form,
+            'actor': actor,
+            'fields': {},
+            'data': {'task_info': kwargs.get('task_info', '')},
+            'options': kwargs.get('options', {}),
+            'nice_name': form_classes[form].__name__
+        }
+        
+        return task_dict
 
     def form_request(self, request):
         """Checks if user is permitted to view this form. if return is not none
@@ -201,8 +222,20 @@ class AbstractForm(object):
 
         Doesn't just get next task due to Join tasks being separate
         instances."""
-        # redirect
-
+        
+        # Save semantic field data
+        # We assume that the semantic field types/data is valid at this point
+        if 'fields' in self.task_dict:
+            for field in self.task_dict['fields'].values():
+                if 'semantic_field' in field and field['semantic_field']:
+                    #print "Saving semantic field: %s => %s" % (field['semantic_field'], str(field['value']))
+                    # create semantic_field_data dictionary if it doesn't already exist
+                    if 'semantic_field_data' not in self.workflow_model.workflow.data:
+                        self.workflow_model.workflow.data['semantic_field_data'] = {}
+                    self.workflow_model.workflow.data['semantic_field_data'][field['semantic_field']] = \
+                        field['value']
+        
+        # Complete task and redirect
         self.complete_task()
 
         waiting_tasks = self.workflow_model.get_ready_task_forms(
@@ -236,8 +269,7 @@ class AcceptAgreement(AbstractForm):
 
     @staticmethod
     def make_task_dict(mandatory, agreement, actor, *args, **kwargs):
-        """Builds a valid taskdict.
-        Fields given as *args parameter in form ()"""
+        """Builds a valid taskdict. Accepts semantic_field as keyword argument"""
         if 'label' in kwargs:
             label = kwargs['label']
         else:
@@ -247,7 +279,8 @@ class AcceptAgreement(AbstractForm):
         task_dict['fields']['acceptance'] = {'label': label,
                                              'mandatory': mandatory,
                                              'type': 'checkbox',
-                                             'value': False}
+                                             'value': False,
+                                             'semantic_field': kwargs.get('semantic_field', None)}
         task_dict['data']['agreement'] = agreement
         AcceptAgreement.validate_task_data(task_dict)
         return task_dict
@@ -300,16 +333,16 @@ class FieldEntry(AbstractForm):
     def make_task_dict(actor, *args, **kwargs):
         """Builds a task dictionary.
 
-        Accepts *args of (name, label, ftype, required).
+        Accepts *args of (name, label, ftype, required, semantic_field).
 
         Only text currently supported for ftype
         """
         task_dict = AbstractForm.make_task_dict("field_entry", actor,
                                                 *args, **kwargs)
-        for (field_name, label, ftype, mandatory) in args:
+        for (field_name, label, ftype, mandatory, semantic_field) in args:
             task_dict['fields'][field_name] = {
                 'label': label, 'mandatory': mandatory,
-                'type': ftype, 'value': False
+                'type': ftype, 'value': False, 'semantic_field': semantic_field
             }
         FieldEntry.validate_task_data(task_dict)
         return task_dict
@@ -376,16 +409,17 @@ class CheckTally(AbstractForm):
     def make_task_dict(actor, *args, **kwargs):
         """Builds a task dictionary.
 
-        Accepts *args of (name, label, mandatory, score).
+        Accepts *args of (name, label, mandatory, score, semantic_field).
 
         Only text currently supported for ftype.
         """
         task_dict = AbstractForm.make_task_dict("check_tally", actor, *args,
                                                 **kwargs)
-        for (field_name, label, mandatory, score) in args:
+        for (field_name, label, mandatory, score, semantic_field) in args:
             task_dict['fields'][field_name] = {
                 'label': label, 'mandatory': mandatory,
-                'type': 'checkbox', 'value': False, 'score': score
+                'type': 'checkbox', 'value': False, 'score': score,
+                'semantic_field': semantic_field
             }
         CheckTally.validate_task_data(task_dict)
         return task_dict
@@ -463,13 +497,14 @@ class ChooseBranch(AbstractForm):
     @staticmethod
     def make_task_dict(actor, *args, **kwargs):
         """Constructs a task_dict for this taskform using provided args (name,
-        label, number), Actor must be CUSTOMER or APPROVER"""
+        label, number, semantic_field), Actor must be CUSTOMER or APPROVER"""
         task_dict = AbstractForm.make_task_dict("choose_branch", actor, *args,
                                                 **kwargs)
-        for (name, label, number) in args:
+        for (name, label, number, semantic_field) in args:
             task_dict['fields'][name] = {
                 'label': label, 'mandatory': False,
-                'type': 'radio', 'value': False, 'number': number
+                'type': 'radio', 'value': False, 'number': number,
+                'semantic_field': semantic_field
             }
         ChooseBranch.validate_task_data(task_dict)
         return task_dict
@@ -554,10 +589,11 @@ class ChooseBranches(AbstractForm):
         label, number), Actor must be CUSTOMER or APPROVER"""
         task_dict = AbstractForm.make_task_dict("choose_branches", actor,
                                                 *args, **kwargs)
-        for (name, label, number) in args:
+        for (name, label, number, semantic_field) in args:
             task_dict['fields'][name] = {
                 'label': label, 'mandatory': False,
-                'type': 'checkbox', 'value': False, 'number': number
+                'type': 'checkbox', 'value': False, 'number': number,
+                'semantic_field': semantic_field
             }
         task_dict['options']['minimum_choices'] = minimum_choices
         ChooseBranches.validate_task_data(task_dict)
@@ -635,10 +671,12 @@ class FileUpload(AbstractForm):
         task_dict['fields']['file_name'] = {
             'label': 'Name of File: ', 'mandatory': mandatory,
             'type': 'text', 'value': "",
+            'semantic_field': kwargs.get('semantic_field_filename', None)
         }
         task_dict['fields']['file'] = {
             'label': 'Upload File:', 'mandatory': mandatory,
             'type': 'file', 'value': None,
+            'semantic_field': kwargs.get('semantic_field_file', None)
         }
         FileUpload.validate_task_data(task_dict)
         return task_dict
@@ -811,11 +849,4 @@ form_classes = {
     "choose_branches": ChooseBranches,
     "file_upload": FileUpload,
     "subworkflow": Subworkflow,
-}
-
-field_types = {
-    'checkbox': 'Checkbox',
-    'text': 'Text Entry',
-    'radio': 'Radio Button',
-    'file': 'File Upload',
 }

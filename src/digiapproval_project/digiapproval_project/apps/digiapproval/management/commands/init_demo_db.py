@@ -25,5 +25,6 @@ class Command(BaseCommand):
         testdata.create_approvers()
         testdata.create_organisations()
         testdata.create_customers()
+        testdata.create_semantic_field_types()
         testdata.create_workflow_specs()
         testdata.create_workflows()
