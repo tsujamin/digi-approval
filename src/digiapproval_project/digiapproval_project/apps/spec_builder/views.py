@@ -608,7 +608,8 @@ def check_tally_connect(request, spec_model, origin_task):
     })
 
 def disconnect_check_tally(request, spec_model, origin_task, disconnected_task):
-    pass
+    """Prevents check_tally tasks being disconnected, modification of checktally handled in connect_check_tally"""
+    raise PermissionDenied
 
 def check_tally_dict(request, spec_model, task_spec):
     """controlller for dictionary editing of check_tally tasks (modification of
