@@ -539,7 +539,7 @@ def check_tally_connect(request, spec_model, origin_task):
     error = None
     # if outputs is not 0, assume connect task completed
     completed = not (len(origin_task.outputs) is 0)
-    if request.method == "POST" and not completed:
+    if request.method == "POST":
         new_tasks = {}
         for task_type in ['success', 'fail']:
             post_task_type = request.POST.get((task_type + '_task'), '')
@@ -565,6 +565,12 @@ def check_tally_connect(request, spec_model, origin_task):
             if task is None or len(new_tasks) is not 2:
                 error = "Must select valid tasks for success and fail branches"
         if not error:  # No outstanding errors, lets connect
+            #delete previously connected
+            if completed:
+                origin_task.default_task_spec = None
+                while origin_task.outputs != []:
+                    origin_task.disconnect(origin_task.outputs[0]) 
+                print origin_task.outputs         
             from SpiffWorkflow.operators import Attrib, GreaterThan, \
                 Equal, LessThan
             origin_task.set_data(min_score=0)  # default required score
@@ -578,7 +584,14 @@ def check_tally_connect(request, spec_model, origin_task):
                                    new_tasks['fail'])
             origin_task.connect(new_tasks['fail'])  # Default taskspec
             spec_model.save()
-            return redirect('view_spec', spec_model.id)
+            return redirect('connect_task', spec_model.id, origin_task.name)
+    #work out success/fail tasks
+    #work out success/fail tasks
+    fail_task_name = origin_task.default_task_spec if completed else ""
+    not_default_tasks = [task for task in origin_task.outputs 
+                if task.name != origin_task.default_task_spec]
+    success_task_name = not_default_tasks[0].name if len(not_default_tasks) is not 0 else fail_task_name
+    
     return render(request, 'spec_builder/taskforms/CheckTallyConnect.html', {
         'spec_model': spec_model,
         'origin_task': origin_task,
@@ -588,7 +601,10 @@ def check_tally_connect(request, spec_model, origin_task):
                         in CONNECTABLE_TASKS.items()},
         'task_types': ['success', 'fail'],
         'error': error,
-        'completed': completed
+        'completed': completed,
+        'success_task_name': success_task_name,
+        'fail_task_name': fail_task_name,
+        
     })
 
 def disconnect_check_tally(request, spec_model, origin_task, disconnected_task):
