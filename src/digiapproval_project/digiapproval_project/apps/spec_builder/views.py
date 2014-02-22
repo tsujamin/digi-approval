@@ -158,7 +158,21 @@ def delete_task(request, spec_id, task_name):
     
     return redirect('view_spec', spec_id)
     
+def disconnect_task(request, spec_id, task_name):
+    spec_model = get_object_or_404(approval_models.WorkflowSpec,
+                                    id=spec_id)
+    origin_task = spec_model.spec.task_specs.get(task_name)
     
+    disconnected_task = spec_model.spec.task_specs.get(
+        request.POST.get('disconnect', ''))
+    
+    if not origin_task or not disconnected_task:
+        raise Http404("Unknown or Illegal tasks")
+        
+    origin_task.disconnect(disconnected_task)
+    spec_model.save()
+    return redirect('connect_task', spec_id=spec_id, task_name=task_name)
+        
 
 @login_required_super
 def connect_task_controller(request, spec_id, task_name):

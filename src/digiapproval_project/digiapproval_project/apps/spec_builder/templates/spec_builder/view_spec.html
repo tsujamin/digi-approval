@@ -22,7 +22,7 @@
     <li>
       {{task}}
       <ul>
-        <li><a href="{% url 'connect_task' spec_id=spec_model.id task_name=task %}">Connect a task</a></li>
+        <li><a href="{% url 'connect_task' spec_id=spec_model.id task_name=task %}">Modify connected tasks</a></li>
           {% ifnotequal task 'Start' %}
           <li><a href="{% url 'delete_task' spec_id=spec_model.id task_name=task %}">Delete this task</a></li>
           {% endifnotequal %}

@@ -19,4 +19,6 @@ urlpatterns = patterns(
         name="task_dict"),  
     url(r'^delete_task/(?P<spec_id>\d+)/(?P<task_name>.+)/$', 
         views.delete_task, name="delete_task"),
+    url(r'^disconnect_task/(?P<spec_id>\d+)/(?P<task_name>.+)/$', 
+        views.disconnect_task, name="disconnect_task"),
 )
