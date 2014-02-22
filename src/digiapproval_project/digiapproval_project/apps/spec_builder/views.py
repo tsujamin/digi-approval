@@ -227,7 +227,7 @@ def create_task_from_request(request, spec_model):
     task_label = request.POST.get('task_label', False)
     return create_task(task_name, task_label, spec_model)
 
-
+@login_required_super
 def task_dict(request, spec_id, task_name):
     """Generic handler for task_dict editing"""
     spec_model = get_object_or_404(approval_models.WorkflowSpec,
