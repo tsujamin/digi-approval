@@ -159,6 +159,7 @@ def delete_task(request, spec_id, task_name):
     return redirect('view_spec', spec_id)
     
 def disconnect_task(request, spec_id, task_name):
+    """Entrypoint for task disconnect controllers"""
     spec_model = get_object_or_404(approval_models.WorkflowSpec,
                                     id=spec_id)
     origin_task = spec_model.spec.task_specs.get(task_name)
@@ -168,8 +169,13 @@ def disconnect_task(request, spec_id, task_name):
     
     if not origin_task or not disconnected_task:
         raise Http404("Unknown or Illegal tasks")
-        
-    origin_task.disconnect(disconnected_task)
+    
+    #Check for special case taskform
+    origin_form_type = origin_task.data.get('task_data',{}).get('form', None)
+    if origin_form_type in DISCONNECT_SPECIAL_CASES:
+        DISCONNECT_SPECIAL_CASES[origin_form_type](spec_model, origin_task, disconnected_task)
+    else:
+        origin_task.disconnect(disconnected_task)
     spec_model.save()
     return redirect('connect_task', spec_id=spec_id, task_name=task_name)
         
@@ -433,6 +439,9 @@ def choose_branch_connect(request, spec_model, origin_task):
                         in CONNECTABLE_TASKS.items()},
         'error': error,
     })
+    
+def disconnect_choose_branch(spec_model, origin_task, disconnected_task):
+    pass
 
 
 def choose_branches_connect(request, spec_model, origin_task):
@@ -479,6 +488,9 @@ def choose_branches_connect(request, spec_model, origin_task):
                          in CONNECTABLE_TASKS.items()},
          'error': error, }
         )
+        
+def disconnect_choose_branches(spec_model, origin_task, disconnected_task):
+    pass
 
 
 def choose_branches_dict(request, spec_model, task_spec):
@@ -552,6 +564,8 @@ def check_tally_connect(request, spec_model, origin_task):
         'completed': completed
     })
 
+def disconnect_check_tally(spec_model, origin_task, disconnected_task):
+    pass
 
 def check_tally_dict(request, spec_model, task_spec):
     """controlller for dictionary editing of check_tally tasks (modification of
@@ -634,6 +648,12 @@ CONNECTABLE_TASKS = {
     'check_tally': ('Checkbox Exclusive Branch', taskspecs.ExclusiveChoice,
                     check_tally_connect)
 
+}
+
+DISCONNECT_SPECIAL_CASES = {
+    'choose_branch': disconnect_choose_branch,
+    'choose_branches': disconnect_choose_branches,
+    'check_tally': disconnect_check_tally
 }
 
 TASK_DICT_METHODS = {
