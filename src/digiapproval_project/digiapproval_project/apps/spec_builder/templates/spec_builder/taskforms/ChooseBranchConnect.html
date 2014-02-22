@@ -17,9 +17,13 @@
       Default Task ({{origin_task.default_task_spec}})      
       <button type="submit" name="update" class="btn btn-default">Update</button><p>
       <div class="form-group">
-        <select name="update_default" class="form-control">
+        {{current_default}}
+        <select name="updated_default" class="form-control">
           {% for task, type in existing_tasks.items %}
-          <option value="{{task}}">{{task}} ({{type}})</option>
+          <option value="{{task}}"
+          {% ifequal task origin_task.default_task_spec %}
+            selected
+          {%endifequal%}>{{task}} ({{type}})</option>
           {% endfor %}
         </select>
       </div>

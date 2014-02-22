@@ -165,16 +165,17 @@ def disconnect_task(request, spec_id, task_name):
     origin_task = spec_model.spec.task_specs.get(task_name)
     
     disconnected_task = spec_model.spec.task_specs.get(
-        request.POST.get('disconnect', ''))    
-    if not origin_task or not disconnected_task:
+        request.POST.get('disconnect', '')) #may be null if not disconnect operation   
+    if not origin_task:
         raise Http404("Unknown or Illegal tasks")
     
     #Check for special case taskform
     origin_form_type = origin_task.data.get('task_data',{}).get('form', None)
     if origin_form_type in DISCONNECT_SPECIAL_CASES:
         return DISCONNECT_SPECIAL_CASES[origin_form_type](request, spec_model, origin_task, disconnected_task)
-    origin_task.disconnect(disconnected_task)
-    spec_model.save()
+    if disconnected_task in origin_task.outputs:
+        origin_task.disconnect(disconnected_task)
+        spec_model.save()
     return render(request, 'spec_builder/connect_task.html', {
         'spec_model': spec_model,
         'origin_task': origin_task,
@@ -446,8 +447,26 @@ def choose_branch_connect(request, spec_model, origin_task):
         'error': error,
     })
     
-def disconnect_choose_branch(request, spec_model, origin_task, disconnected_task):
-    pass
+def disconnect_choose_branch(request, spec_model, origin_task, disconnected_task):    
+    if 'update' in request.POST:
+        new_default = origin_task = spec_model.spec.task_specs.get(
+            request.POST.get('updated_default', '0xBADBADBAD'))
+        raise NotImplementedError
+        #unsure how to remove only the default_task_spec from array when multiple exist
+    elif disconnected_task and disconnected_task in origin_task.outputs and \
+        disconnected_task.name != origin_task.default_task_spec:        
+        del origin_task.data['task_data']['fields'][disconnected_task.name]
+        origin_task.disconnect(disconnected_task)
+        spec_model.save()
+        
+    return render(request, 'spec_builder/taskforms/ChooseBranchConnect.html', {
+        'spec_model': spec_model,
+        'origin_task': origin_task,
+        'existing_tasks': {k: type(v).__name__ for k, v
+                           in spec_model.spec.task_specs.items()},
+        'legal_tasks': {k: (v[0], v[1].__name__) for k, v
+                        in CONNECTABLE_TASKS.items()},
+    })
 
 
 def choose_branches_connect(request, spec_model, origin_task):
@@ -500,6 +519,8 @@ def choose_branches_connect(request, spec_model, origin_task):
 def disconnect_choose_branches(request, spec_model, origin_task, disconnected_task):
     #choose_branches disconnect controller. removes the field associated with disconnected task
     error = ''
+    if not disconnected_task or not disconnected_task in origin_task.outputs:
+        raise Http404("Unknown or Illegal origin task")
     
     minimum_choices = origin_task.get_data('task_data')['options'].get('minimum_choices',0)
     if not (len(origin_task.outputs) - 1) < minimum_choices:
