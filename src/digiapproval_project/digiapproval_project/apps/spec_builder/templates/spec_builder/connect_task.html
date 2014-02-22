@@ -5,6 +5,7 @@
 <div class="col-md-6">
   {% if origin_task.outputs %}
   <h3>Currently connected</h3>
+  <b> {% if disconnect_error %}{{disconnect_error}}{%endif%}</b>
   <form action="{% url 'disconnect_task' spec_id=spec_model.id task_name=origin_task.name %}" method="POST" role="form">
     {% csrf_token %}
     <ul>

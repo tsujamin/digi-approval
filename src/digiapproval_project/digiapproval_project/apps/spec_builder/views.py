@@ -165,19 +165,25 @@ def disconnect_task(request, spec_id, task_name):
     origin_task = spec_model.spec.task_specs.get(task_name)
     
     disconnected_task = spec_model.spec.task_specs.get(
-        request.POST.get('disconnect', ''))
-    
+        request.POST.get('disconnect', ''))    
     if not origin_task or not disconnected_task:
         raise Http404("Unknown or Illegal tasks")
     
     #Check for special case taskform
     origin_form_type = origin_task.data.get('task_data',{}).get('form', None)
     if origin_form_type in DISCONNECT_SPECIAL_CASES:
-        DISCONNECT_SPECIAL_CASES[origin_form_type](spec_model, origin_task, disconnected_task)
-    else:
-        origin_task.disconnect(disconnected_task)
+        return DISCONNECT_SPECIAL_CASES[origin_form_type](request, spec_model, origin_task, disconnected_task)
+    origin_task.disconnect(disconnected_task)
     spec_model.save()
-    return redirect('connect_task', spec_id=spec_id, task_name=task_name)
+    return render(request, 'spec_builder/connect_task.html', {
+        'spec_model': spec_model,
+        'origin_task': origin_task,
+        'existing_tasks': {k: type(v).__name__ for k, v
+                           in spec_model.spec.task_specs.items()},
+        'legal_tasks': {k: (v[0], v[1].__name__) for k, v
+                        in CONNECTABLE_TASKS.items()},
+        'disconnect_error': disconnect_error
+    })
         
 
 @login_required_super
@@ -440,7 +446,7 @@ def choose_branch_connect(request, spec_model, origin_task):
         'error': error,
     })
     
-def disconnect_choose_branch(spec_model, origin_task, disconnected_task):
+def disconnect_choose_branch(request, spec_model, origin_task, disconnected_task):
     pass
 
 
@@ -480,17 +486,38 @@ def choose_branches_connect(request, spec_model, origin_task):
     return render(
         request,
         'spec_builder/taskforms/ChooseBranchesConnect.html',
-        {'spec_model': spec_model,
-         'origin_task': origin_task,
-         'existing_tasks': {k: type(v).__name__ for k, v
-                            in spec_model.spec.task_specs.items()},
-         'legal_tasks': {k: (v[0], v[1].__name__) for k, v
-                         in CONNECTABLE_TASKS.items()},
-         'error': error, }
-        )
+        {
+            'spec_model': spec_model,
+             'origin_task': origin_task,
+             'existing_tasks': {k: type(v).__name__ for k, v
+                                in spec_model.spec.task_specs.items()},
+             'legal_tasks': {k: (v[0], v[1].__name__) for k, v
+                             in CONNECTABLE_TASKS.items()},
+             'error': error, 
+        }
+    )
         
-def disconnect_choose_branches(spec_model, origin_task, disconnected_task):
-    pass
+def disconnect_choose_branches(request, spec_model, origin_task, disconnected_task):
+    #choose_branches disconnect controller. removes the field associated with disconnected task
+    error = ''
+    
+    minimum_choices = origin_task.get_data('task_data')['options'].get('minimum_choices',0)
+    if not (len(origin_task.outputs) - 1) < minimum_choices:
+        del origin_task.data['task_data']['fields'][disconnected_task.name]
+        origin_task.disconnect(disconnected_task)
+        spec_model.save()
+    else:    
+        error =  "Cannot delete as remaining tasks less than minimum required"
+
+    return render(request, 'spec_builder/taskforms/ChooseBranchesConnect.html', {
+        'spec_model': spec_model,
+        'origin_task': origin_task,
+        'existing_tasks': {k: type(v).__name__ for k, v
+                           in spec_model.spec.task_specs.items()},
+        'legal_tasks': {k: (v[0], v[1].__name__) for k, v
+                        in CONNECTABLE_TASKS.items()},
+        'disconnect_error': error
+    })
 
 
 def choose_branches_dict(request, spec_model, task_spec):
@@ -564,7 +591,7 @@ def check_tally_connect(request, spec_model, origin_task):
         'completed': completed
     })
 
-def disconnect_check_tally(spec_model, origin_task, disconnected_task):
+def disconnect_check_tally(request, spec_model, origin_task, disconnected_task):
     pass
 
 def check_tally_dict(request, spec_model, task_spec):
