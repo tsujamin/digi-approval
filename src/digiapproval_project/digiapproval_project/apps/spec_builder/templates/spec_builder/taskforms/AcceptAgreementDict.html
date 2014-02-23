@@ -16,6 +16,15 @@
     </label>
 </div>
 <div class="form-group">
+    <label for="semantic_field">Semantic Field Type</label>
+    <select name="semantic_field" class="form-control">
+        <option value=""{% if not field.semantic_field %} selected{% endif %}>N/A</option>
+        {% for semantic_field_type in semantic_field_types %}
+        <option value="{{ semantic_field_type.name }}"{% if field.semantic_field == semantic_field_type.name %} selected{% endif %}>{{ semantic_field_type.name }}</option>
+        {% endfor %}
+    </select>
+</div>
+<div class="form-group">
   <button type="submit" name="submit" class="btn btn-default">Save Changes</button>
 </div>
 {% endblock %}

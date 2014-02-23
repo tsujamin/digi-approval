@@ -252,7 +252,7 @@ def task_dict(request, spec_id, task_name):
             task_data = task_spec.data['task_data']
             task_data['actor'] = request.POST.get('actor')
             task_data['task_info'] = request.POST.get('task_info')
-
+            AbstractForm.validate_task_data(task_data)
             spec_model.save()
             return redirect('task_dict', spec_id, task_name)
     # redirect to appropriate task_dict controller
@@ -273,7 +273,8 @@ def accept_agreement_dict(request, spec_model, task_spec):
         'acceptance', {'label': 'Do you accept this agreement?',
                        'mandatory': True,
                        'type': 'checkbox',
-                       'value': False})
+                       'value': False,
+                       'semantic_field': None})
     if request.method == 'POST':
         if ('agreement' in request.POST and
                 len(request.POST.get('agreement')) is not 0):
@@ -285,14 +286,18 @@ def accept_agreement_dict(request, spec_model, task_spec):
             field['mandatory'] = True
         else:
             field['mandatory'] = False
+        if 'semantic_field' in request.POST:
+            field['semantic_field'] = request.POST['semantic_field']
         task_spec.get_data('task_data')['fields']['acceptance'] = field
-    spec_model.save()
-
+        AbstractForm.validate_task_data(task_spec.get_data('task_data'))
+        spec_model.save()
+    
     return render(request, 'spec_builder/taskforms/AcceptAgreementDict.html', {
         'spec_model': spec_model,
         'task': task_spec,
         'agreement': agreement,
-        'field': field
+        'field': field,
+        'semantic_field_types': approval_models.SemanticFieldType.objects.filter(field_type='checkbox'),
     })
 
 
@@ -303,6 +308,7 @@ def field_entry_dict(request, spec_model, task_spec):
             name = request.POST.get('new_name', False)
             label = request.POST.get('new_label', False)
             ftype = request.POST.get('new_type', False)
+            semantic_field = request.POST.get('new_semantic_field', None)
             if 'new_mandatory' in request.POST:
                 mandatory = True
             else:
@@ -310,7 +316,7 @@ def field_entry_dict(request, spec_model, task_spec):
             if name and label and len(name) is not 0 \
                     and len(label) is not 0 and ftype in TASKFORM_FIELD_TYPES:
                 fields[name] = {'label': label, 'mandatory': mandatory,
-                                'type': ftype, 'value': False}
+                                'type': ftype, 'value': False, 'semantic_field': semantic_field}
         else:
             for field in fields:
                 if field+'_delete' in request.POST:
@@ -325,14 +331,19 @@ def field_entry_dict(request, spec_model, task_spec):
                     fields[field]['mandatory'] = False
                 if request.POST.get(field+'_type', False) in TASKFORM_FIELD_TYPES:
                     fields[field]['type'] = request.POST.get(field+'_type')
+                if field + '_semantic_field' in request.POST:
+                    fields[field]['semantic_field'] = request.POST[field + '_semantic_field']
         task_spec.get_data('task_data')['fields'] = fields
+        AbstractForm.validate_task_data(task_spec.get_data('task_data'))
         spec_model.save()
 
     return render(request, 'spec_builder/taskforms/FieldEntryDict.html', {
         'spec_model': spec_model,
         'task': task_spec,
         'fields': task_spec.get_data('task_data')['fields'],
-        'field_types': TASKFORM_FIELD_TYPES
+        'field_types': TASKFORM_FIELD_TYPES,
+        # Filtering of semantic_field_types is done per-field in the template
+        'semantic_field_types': approval_models.SemanticFieldType.objects.all(),
     })
 
 
@@ -340,26 +351,34 @@ def file_upload_dict(request, spec_model, task_spec):
     file_name_field = task_spec.get_data('task_data')['fields'].get(
         'file_name', {
             'label': 'Name of File: ', 'mandatory': True,
-            'type': 'text', 'value': "", })
+            'type': 'text', 'value': "", 'semantic_field': None})
     file_field = task_spec.get_data('task_data')['fields'].get(
         'file', {
             'label': 'Upload File:', 'mandatory': True,
-            'type': 'file', 'value': None, })
+            'type': 'file', 'value': None, 'semantic_field': None})
 
     if 'mandatory' in request.POST:
         file_field['mandatory'] = file_name_field['mandatory'] = True
     else:
         file_field['mandatory'] = file_name_field['mandatory'] = False
 
+    if 'semantic_field_filename' in request.POST:
+        file_name_field['semantic_field'] = request.POST['semantic_field_filename']
+    if 'semantic_field_file' in request.POST:
+        file_field['semantic_field'] = request.POST['semantic_field_file']
+    
     task_spec.get_data('task_data')['fields']['file'] = file_field
     task_spec.get_data('task_data')['fields']['file_name'] = file_name_field
+    AbstractForm.validate_task_data(task_spec.get_data('task_data'))
     spec_model.save()
-    print task_spec.get_data('task_data')
 
     return render(request, 'spec_builder/taskforms/FileUploadDict.html', {
         'spec_model': spec_model,
         'task': task_spec,
-        'mandatory': file_field['mandatory']
+        'mandatory': file_field['mandatory'],
+        'semantic_field_filename': file_name_field.get('semantic_field', None),
+        'semantic_field_file': file_field.get('semantic_field', None),
+        'semantic_field_types': approval_models.SemanticFieldType.objects.filter(field_type__in=('file', 'text')),
     })
 
 
@@ -390,9 +409,10 @@ def choose_branch_connect(request, spec_model, origin_task):
 
             origin_task.data['task_data']['fields'][next_task.name] = {
                 'label': label, 'mandatory': False,
-                'type': 'radio', 'value': False, 'number': task_number
+                'type': 'radio', 'value': False, 'number': task_number,
+                'semantic_field': request.POST.get('semantic_field', None)
             }
-
+            AbstractForm.validate_task_data(origin_task.data['task_data'])
             spec_model.save()
             return redirect('view_spec', spec_model.id)
 
@@ -404,6 +424,7 @@ def choose_branch_connect(request, spec_model, origin_task):
         'legal_tasks': {k: (v[0], v[1].__name__) for k, v
                         in CONNECTABLE_TASKS.items()},
         'error': error,
+        'semantic_field_types': approval_models.SemanticFieldType.objects.filter(field_type='radio'),
     })
 
 
@@ -434,9 +455,10 @@ def choose_branches_connect(request, spec_model, origin_task):
 
             origin_task.data['task_data']['fields'][next_task.name] = {
                 'label': label, 'mandatory': False,
-                'type': 'checkbox', 'value': False, 'number': task_number
+                'type': 'checkbox', 'value': False, 'number': task_number,
+                'semantic_field': request.POST.get('semantic_field', None)
             }
-
+            AbstractForm.validate_task_data(origin_task.data['task_data'])
             spec_model.save()
             return redirect('view_spec', spec_model.id)
 
@@ -449,7 +471,9 @@ def choose_branches_connect(request, spec_model, origin_task):
                             in spec_model.spec.task_specs.items()},
          'legal_tasks': {k: (v[0], v[1].__name__) for k, v
                          in CONNECTABLE_TASKS.items()},
-         'error': error, }
+         'error': error,
+         'semantic_field_types': approval_models.SemanticFieldType.objects.filter(field_type='checkbox'),
+        }
         )
 
 
@@ -457,6 +481,7 @@ def choose_branches_dict(request, spec_model, task_spec):
     if 'choices' in request.POST:
         task_spec.get_data('task_data')['options']['minimum_choices'] = \
             int(request.POST.get('choices'))
+        AbstractForm.validate_task_data(task_spec.get_data('task_data'))
         spec_model.save()
 
     return render(request, 'spec_builder/taskforms/ChooseBranchesDict.html', {
@@ -484,7 +509,6 @@ def check_tally_connect(request, spec_model, origin_task):
             # else connecting to new task
             elif post_task_type == (task_type + '_create_task'):
                 label = request.POST.get(task_type + '_task_label', '')
-                print label
                 if label and label != '':
                     new_tasks[task_type] = create_task(
                         request.POST.get(task_type + '_create_task', None),
@@ -510,6 +534,7 @@ def check_tally_connect(request, spec_model, origin_task):
                                             Attrib('min_score')),
                                    new_tasks['fail'])
             origin_task.connect(new_tasks['fail'])  # Default taskspec
+            AbstractForm.validate_task_data(origin_task.get_data('task_data'))
             spec_model.save()
             return redirect('view_spec', spec_model.id)
     return render(request, 'spec_builder/taskforms/CheckTallyConnect.html', {
@@ -542,6 +567,7 @@ def check_tally_dict(request, spec_model, task_spec):
             label = request.POST.get('new_label', False)
             score = request.POST.get('new_score', '')
             score = int(score) if (score != '') else 0  # convert score to int
+            semantic_field = request.POST.get('new_semantic_field', None)
             if 'new_mandatory' in request.POST:
                 mandatory = True
             else:
@@ -550,7 +576,7 @@ def check_tally_dict(request, spec_model, task_spec):
                     and len(label) is not 0:
                 fields[name] = {'label': label, 'mandatory': mandatory,
                                 'type': 'checkbox', 'value': False,
-                                'score': score}
+                                'score': score, 'semantic_field': semantic_field}
         else:
             for field in fields:
                 if (field + '_delete') in request.POST:
@@ -569,6 +595,7 @@ def check_tally_dict(request, spec_model, task_spec):
                 if score:
                     fields[field]['score'] = score
         task_spec.get_data('task_data')['fields'] = fields
+        AbstractForm.validate_task_data(task_spec.get_data('task_data'))
         spec_model.save()
 
     return render(request, 'spec_builder/taskforms/CheckTallyDict.html', {
@@ -576,7 +603,8 @@ def check_tally_dict(request, spec_model, task_spec):
         'task': task_spec,
         'fields': task_spec.get_data('task_data')['fields'],
         'field_types': TASKFORM_FIELD_TYPES,
-        'min_score': min_score
+        'min_score': min_score,
+        'semantic_field_types': approval_models.SemanticFieldType.objects.filter(field_type='checkbox')
     })
 
 
