@@ -377,6 +377,9 @@ class SemanticFieldType(models.Model):
     name = models.CharField(max_length=36)
     field_type = models.CharField(max_length=36,
                                   choices=TASKFORM_FIELD_TYPES.items())
+    
+    def __unicode__(self):
+        return u'%s (%s)' % (self.name, self.field_type)
 
 
 class Message(models.Model):
