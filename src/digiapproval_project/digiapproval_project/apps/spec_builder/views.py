@@ -14,7 +14,7 @@ import re
 
 
 def index(request):
-    return redirect('home')
+    return redirect('builder_home')
 
 
 @login_required_super
