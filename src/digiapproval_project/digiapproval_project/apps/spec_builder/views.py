@@ -183,7 +183,6 @@ def disconnect_task(request, spec_id, task_name):
                            in spec_model.spec.task_specs.items()},
         'legal_tasks': {k: (v[0], v[1].__name__) for k, v
                         in CONNECTABLE_TASKS.items()},
-        'disconnect_error': disconnect_error
     })
         
 
@@ -292,7 +291,7 @@ def task_dict(request, spec_id, task_name):
               request.POST.get('actor') in ['APPROVER', 'CUSTOMER']):
             task_data = task_spec.data['task_data']
             task_data['actor'] = request.POST.get('actor')
-            task_data['task_info'] = request.POST.get('task_info')
+            task_data['data']['task_info'] = request.POST.get('task_info')
 
             spec_model.save()
             return redirect('task_dict', spec_id, task_name)

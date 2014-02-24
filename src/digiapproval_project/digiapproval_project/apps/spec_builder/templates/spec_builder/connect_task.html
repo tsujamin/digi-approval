@@ -23,7 +23,7 @@
   {% endif %}
   
   {% endblock %}
-  <form action="" method="POST" role="form">
+  <form action="{% url 'connect_task' spec_id=spec_model.id task_name=origin_task.name %}" method="POST" role="form">
     {% csrf_token %}
     <b>{% if error %}{{error}}{% endif %}</b><br>
     
