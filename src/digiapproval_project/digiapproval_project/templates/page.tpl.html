@@ -44,6 +44,9 @@
                 <li><a href="{% url 'approver_worklist' %}">Approver Worklist</a></li>
                 <li><a href="{% url 'delegator_worklist' %}">Delegator Worklist</a></li>
                 {% endif %}
+                {% if user.is_superuser %}
+                <li><a href="{% url 'builder_home' %}">Workflow Builder</a></li>
+                {% endif %}
                 {% endif %}
                 {% endblock %}
               </ul>

@@ -14,7 +14,7 @@ import re
 
 
 def index(request):
-    return redirect('home')
+    return redirect('builder_home')
 
 
 @login_required_super
@@ -44,6 +44,12 @@ def builder_home(request):
 @login_required_super
 def new_spec(request):
     """Creates new task from provided group and name"""
+    
+    request.breadcrumbs([
+        portal_breadcrumb(),
+        ('New Workflow Specification', request.path_info)
+    ])
+    
     if request.method == "POST":
         group = get_object_or_404(Group,
                                   id=request.POST.get('spec_owner', -1))
@@ -110,6 +116,11 @@ def view_spec(request, spec_id):
     """
     spec = get_object_or_404(approval_models.WorkflowSpec,
                              id=spec_id)
+    request.breadcrumbs([
+        portal_breadcrumb(),
+        spec_breadcrumb(spec)
+    ])                         
+    
     if request.method == "POST":
         if 'toggle_public' in request.POST:
             spec.public = not spec.public
@@ -165,9 +176,18 @@ def disconnect_task(request, spec_id, task_name):
     origin_task = spec_model.spec.task_specs.get(task_name)
     
     disconnected_task = spec_model.spec.task_specs.get(
-        request.POST.get('disconnect', '')) #may be null if not disconnect operation   
-    if not origin_task or not spec_model:
+        request.POST.get('disconnect', '')) #may be null if not disconnect operation
+        
+    if not origin_task and not spec_model:
         raise Http404("Unknown or Illegal tasks/spec")
+    
+    request.breadcrumbs([
+        portal_breadcrumb(),
+        spec_breadcrumb(spec_model),
+        ('Connect: "' + origin_task.name +'"', 
+            reverse('connect_task', kwargs={ 'spec_id': spec_model.id,
+                'task_name': origin_task.name }))
+    ])
     
     #Check for special case taskform
     origin_form_type = origin_task.data.get('task_data',{}).get('form', None)
@@ -176,14 +196,10 @@ def disconnect_task(request, spec_id, task_name):
     if disconnected_task in origin_task.outputs:
         origin_task.disconnect(disconnected_task)
         spec_model.save()
-    return render(request, 'spec_builder/connect_task.html', {
-        'spec_model': spec_model,
-        'origin_task': origin_task,
-        'existing_tasks': {k: type(v).__name__ for k, v
-                           in spec_model.spec.task_specs.items()},
-        'legal_tasks': {k: (v[0], v[1].__name__) for k, v
-                        in CONNECTABLE_TASKS.items()},
-    })
+    return redirect(reverse('connect_task', kwargs={
+        'spec_id': spec_model.id,
+        'task_name': origin_task.name
+    }))
         
 
 @login_required_super
@@ -197,6 +213,12 @@ def connect_task_controller(request, spec_id, task_name):
 
     if origin_task is None:
         raise Http404('Unknown or Illegal origin task')
+
+    request.breadcrumbs([
+        portal_breadcrumb(),
+        spec_breadcrumb(spec_model),
+        ('Connect: "' + origin_task.name +'"', request.path_info)
+    ])
 
     # Test for special connect_method for the taskform of origin_task
     # (IE branching taskforms)
@@ -279,6 +301,13 @@ def task_dict(request, spec_id, task_name):
         raise Http404('Unknown or Illegal origin task')
     else:
         task_type = task_spec.data['task_data'].get('form', False)
+        
+    request.breadcrumbs([
+        portal_breadcrumb(),
+        spec_breadcrumb(spec_model),
+        ('Edit: "' + task_name + '"', request.path_info)
+    ])      
+    
     if request.method == "POST":
         if 'delete_dict' in request.POST:
             if task_type in CONNECTABLE_TASKS:
@@ -455,9 +484,10 @@ def disconnect_choose_branch(request, spec_model, origin_task, disconnected_task
                 get_existing_task(origin_task.default_task_spec, spec_model))
             origin_task.default_task_spec = None
             origin_task.connect(new_default)
-            
-    elif disconnected_task and disconnected_task in origin_task.outputs and \
-        disconnected_task.name != origin_task.default_task_spec:        
+    
+    elif disconnected_task.name == origin_task.default_task_spec:
+        error = "Cannot disconnect the default task"        
+    elif disconnected_task and disconnected_task in origin_task.outputs:        
         del origin_task.data['task_data']['fields'][disconnected_task.name]
         origin_task.disconnect(disconnected_task)
         spec_model.save()
@@ -469,6 +499,7 @@ def disconnect_choose_branch(request, spec_model, origin_task, disconnected_task
                            in spec_model.spec.task_specs.items()},
         'legal_tasks': {k: (v[0], v[1].__name__) for k, v
                         in CONNECTABLE_TASKS.items()},
+        'disconnect_error': error
     })
 
 
@@ -520,7 +551,9 @@ def choose_branches_connect(request, spec_model, origin_task):
     )
         
 def disconnect_choose_branches(request, spec_model, origin_task, disconnected_task):
-    #choose_branches disconnect controller. removes the field associated with disconnected task
+    #choose_branches disconnect controller. removes the field associated with disconnected task, 
+    #doesnt redirect due to own error rendering
+    
     error = ''
     if not disconnected_task or not disconnected_task in origin_task.outputs:
         raise Http404("Unknown or Illegal origin task")
@@ -701,6 +734,14 @@ def subworkflow_dict(request, spec_model, task_spec):
         'specs': approval_models.WorkflowSpec.objects.all(),
         'current_sub_id': sub_id
     })
+
+def portal_breadcrumb():
+    return ('Workflow Builder', reverse('builder_home'))
+
+def spec_breadcrumb(spec_model):
+    return ('Workflow: "' + spec_model.name + '"', 
+            reverse('view_spec', kwargs={'spec_id': spec_model.id}))
+            
 
 
 CONNECTABLE_TASKS = {

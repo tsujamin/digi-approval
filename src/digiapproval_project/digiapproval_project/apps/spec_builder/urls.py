@@ -6,7 +6,7 @@ urlpatterns = patterns(
     '',
     # main pages
     url(r'^$', views.index, name='index'),
-    url(r'^builder_home/$', views.builder_home, name="home"),
+    url(r'^builder_home/$', views.builder_home, name="builder_home"),
     url(r'^new_spec/$', views.new_spec, name="new_spec"),
     url(r'^view_spec/(?P<spec_id>\d+)/$', views.view_spec, name="view_spec"),
     url(r'^view_spec/(?P<spec_id>\d+)/svg/$', views.view_spec_svg,
