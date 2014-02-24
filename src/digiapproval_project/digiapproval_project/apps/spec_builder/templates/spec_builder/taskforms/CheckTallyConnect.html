@@ -6,26 +6,23 @@
   {% if origin_task.outputs %}
   <h3>Currently connected</h3>
   <ul>
-    {% for task in origin_task.outputs %}
-    <li>{{task.name}}</li>
-    {% endfor %}
+    <li>{{success_task_name}} (Success Branch)</li>
+    <li>{{fail_task_name}} (Fail/Default Branch)</li>
   </ul>
   <hr>
   {% endif %}
-  {% if completed %}
-    <b>Tasks already connected</b>
-  {% else %}
+  <!--show different forms based on whether the task has already been initialised -->
   <form action="" method="POST" role="form">
     {% csrf_token %}
     {%if error %}<b>{{error}}</b><br>{% endif %}
     <!-- iterate though success and fail options -->
     {% for task_type in task_types %}
-    <h3>Connect {{task_type}} task</h3>
+    <h3>{% if completed %} Modify {% else %} Connect {% endif %} {{task_type}} task</h3>
     
     <div class="radio">
       <label>
         <input type="radio" name="{{task_type|add:'_task'}}" value="{{task_type|add:'_existing_task'}}" id="1" checked>
-        <b>Connect to existing task</b>
+        <b>Connect to existing task {{task_type}}</b>
       </label>
     </div>
     <!--select pre-created task to connect to-->  
@@ -33,7 +30,13 @@
       <label for="{{task_type|add:'_existing_task'}}" class="sr-only">Connect to existing task</label>
       <select name="{{task_type|add:'_existing_task'}}" class="form-control">
         {% for task, type in existing_tasks.items %}
-        <option value="{{task}}">{{task}} ({{type}})</option>
+            <option value="{{task}}" 
+              {% ifequal task_type 'success' %}
+                {%ifequal task success_task_name %} selected {%endifequal%}
+              {% endifequal %} {%ifequal task_type 'fail' %}  
+                {%ifequal task fail_task_name %} selected {%endifequal%}
+              {% endifequal %}>
+              {{task}} ({{type}})</option>
         {% endfor %}
       </select>
     </div>
@@ -58,11 +61,10 @@
     </div>
     {% endfor %}
     <div class="form-group">
-      <button type="submit" name="create" class="btn btn-default">Create</button>
+      <button type="submit" name="create" class="btn btn-default">{%if completed %} Update {% else %} Create {% endif %}</button>
     </div>
     
   </form>
-  {% endif %}
 </div>
 <div clas="col-md-6">
   <h3>Placeholder</h3>

@@ -3,16 +3,27 @@
 
 {% block content %}
 <div class="col-md-6">
+  {% block currently_conected %}
+  
   {% if origin_task.outputs %}
   <h3>Currently connected</h3>
-  <ul>
-    {% for task in origin_task.outputs %}
-    <li>{{task.name}}</li>
-    {% endfor %}
-  </ul>
+  <b> {% if disconnect_error %}{{disconnect_error}}{%endif%}</b>
+  <form action="{% url 'disconnect_task' spec_id=spec_model.id task_name=origin_task.name %}" method="POST" role="form">
+    {% csrf_token %}
+    <ul>
+      {% for task in origin_task.outputs %}
+        <li>
+          {{task.name}}
+          <button type="submit" name="disconnect" value="{{task.name}}" class="btn btn-default">Disconnect</button>
+        </li>
+      {% endfor %}
+    </ul>
+  </form>
   <hr>
   {% endif %}
-  <form action="" method="POST" role="form">
+  
+  {% endblock %}
+  <form action="{% url 'connect_task' spec_id=spec_model.id task_name=origin_task.name %}" method="POST" role="form">
     {% csrf_token %}
     <b>{% if error %}{{error}}{% endif %}</b><br>
     
