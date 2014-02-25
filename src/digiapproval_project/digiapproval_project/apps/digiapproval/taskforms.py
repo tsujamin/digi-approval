@@ -55,9 +55,9 @@ class AbstractForm(object):
         review_task.set_data(
             task_data=ChooseBranch.make_task_dict(
                 'APPROVER',
-                ('restart_section',
+                (first_task.name,
                  "Previous section needs to be re-completed", 1, None),
-                ('continue',
+                (next_task.name,
                  "Previous section was completed acceptably", 2, None),
                 task_info=kwargs.get('task_info', ""),
                 options={'display_previous_task': True}

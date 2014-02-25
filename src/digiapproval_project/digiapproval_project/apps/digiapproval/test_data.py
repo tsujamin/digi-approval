@@ -356,14 +356,14 @@ def workflowspec_four():
     approver_agreement.set_data(task_data = AcceptAgreement.make_task_dict(True, lorum_ipsum,'APPROVER'))
     
     customer_choice.set_data(task_data = ChooseBranches.make_task_dict('CUSTOMER', 1,
-        ('agreement', "Read and accept agreement", 1, None),
-        ('field_entry', "Go straight to field entry", 2, None),
-        ('cust_upload', "Upload most recently signed bank checque", 3, None),)
+        (cust_agreement.name, "Read and accept agreement", 1, None),
+        (cust_fieldentry.name, "Go straight to field entry", 2, None),
+        (cust_upload.name, "Upload most recently signed bank checque", 3, None),)
     )
     
     approver_choice.set_data(task_data = ChooseBranch.make_task_dict('APPROVER', 
-        ('agreement', "Read and accept agreement", 1, None),
-        ('skip', "Skip to next action", 2, None))
+        (approver_agreement.name, "Read and accept agreement", 1, None),
+        (task_join1.name, "Skip to next action", 2, None))
     )
     
     return (4, wf_spec)
@@ -445,8 +445,8 @@ def workflowspec_realistic_one():
 If you have any concern during your application process please contact your assigned assessor."""
     ))
     cust_event_attendance.set_data(task_data = ChooseBranch.make_task_dict('CUSTOMER',
-        ('need_ramp', "Over 50 participants are expected to attend", 1, None),
-        ('assess_ramp', "Fewer than 50 participants are expected to attend ", 2, None),
+        (cust_upload_ramp.name, "Over 50 participants are expected to attend", 1, None),
+        (cust_ramp_tally.name, "Fewer than 50 participants are expected to attend ", 2, None),
         task_info="""In order to assess your need for a <b>Risk Assessment Management Plan</b> (RAMP) we require some information on the number of expected attendies."""
     ))
     cust_ramp_tally.set_data(task_data = CheckTally.make_task_dict('CUSTOMER',
@@ -460,8 +460,8 @@ If you have any concern during your application process please contact your assi
         task_info="""Please upload a completed <b>Risk Assessment Management Plan</b> (RAMP). 
 A template can be found on the DigiApproval website (<a href=\"link.to/ramp_template\">link</a>)"""))    
     cust_insurance_req.set_data(task_data = ChooseBranch.make_task_dict('CUSTOMER',
-        ('need_insurance', "My event falls under the requirements of public liability insurance", 1, None),
-        ('no_insurance', "My event does not fall under the requirements of Public Liability Insurance", 2, None),
+        (cust_upload_insure.name, "My event falls under the requirements of public liability insurance", 1, None),
+        (cust_insure_review.name, "My event does not fall under the requirements of Public Liability Insurance",2, None),
         task_info="""Some events require the holding of Public Liability Insurance. If you are unsure about if it is required for your event, please refer to our help page (<a href=\"link.to/insurance_help\">link</a>)"""
     ))
     cust_upload_insure.set_data(task_data = FileUpload.make_task_dict(True, 'CUSTOMER'),
@@ -471,8 +471,8 @@ If you need assistance applying for cover, please refer to our help page (<a hre
     
     #S3: Approval stage
     appr_review1.set_data(task_data = ChooseBranches.make_task_dict('APPROVER', 0,
-        ('waste_plan', "Assign Waste Management Plan", 1, None),
-        ('traffic_plan', "Assign Traffic Management Plan", 2, None),
+        (cust_waste_plan.name, "Assign Waste Management Plan", 1, None),
+        (cust_traffic_plan.name, "Assign Traffic Management Plan", 2, None),
         task_info = """Please review the previously completed stages and, if appropriate, assign further tasks for the customer to complete"""
         
     ))    

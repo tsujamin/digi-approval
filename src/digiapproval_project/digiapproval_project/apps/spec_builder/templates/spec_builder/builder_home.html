@@ -1,5 +1,5 @@
 {% extends "digiapproval/base.tpl.html" %}
-{% block title %} Workflow Specs{% endblock %}
+{% block title %} Workflow Specifications{% endblock %}
 
 {%block content %}
 <div class="col-md-7">
@@ -15,7 +15,7 @@
           {% if spec.public %} Public {% else %} Private {% endif %}
         </button>
         <button type="submit" name="edit" value="edit" class="btn btn-default">Edit Workflow</button>
-     </form></li>
+     </form></li><p>
       {% endfor %}
     </ul>
   {% endfor %}
