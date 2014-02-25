@@ -10,10 +10,10 @@ from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 
 from registration.signals import user_registered
 from jsonfield import JSONField
+from SpiffWorkflow.storage.NetworkXSerializer import NetworkXSerializer
 
 from .fields import WorkflowField, WorkflowSpecField
-
-from SpiffWorkflow.storage.NetworkXSerializer import NetworkXSerializer
+from .taskform_types import TASKFORM_FIELD_TYPES
 
 
 class UserFile(models.Model):
@@ -371,6 +371,15 @@ class Task(models.Model):
     workflow = models.ForeignKey(Workflow)
     task = JSONField()
     uuid = models.CharField(max_length="36")
+
+
+class SemanticFieldType(models.Model):
+    name = models.CharField(max_length=36)
+    field_type = models.CharField(max_length=36,
+                                  choices=TASKFORM_FIELD_TYPES.items())
+    
+    def __unicode__(self):
+        return u'%s (%s)' % (self.name, self.field_type)
 
 
 class Message(models.Model):

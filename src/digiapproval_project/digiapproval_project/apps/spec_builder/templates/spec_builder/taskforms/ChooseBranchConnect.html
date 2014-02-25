@@ -41,4 +41,14 @@
   <label for="label">Choice Label</label>
   <input type="text" name="label" class="form-control" placeholder="Continue to this task">
 </div>
+<div class="form-group">
+    <label for="semantic_field">Semantic Field Type</label>
+    {% comment %}TODO: Fix this when we have disconnecting tasks{% endcomment %}
+    <select name="semantic_field" class="form-control">
+    <option value="" selected>N/A</option>
+    {% for semantic_field_type in semantic_field_types %}
+    <option value="{{ semantic_field_type.name }}">{{ semantic_field_type.name }}</option>
+    {% endfor %}
+    </select>
+</div>
 {% endblock %}
