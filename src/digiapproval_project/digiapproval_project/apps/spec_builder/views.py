@@ -336,9 +336,9 @@ def task_dict(request, spec_id, task_name):
 
 
 def accept_agreement_dict(request, spec_model, task_spec):
-    agreement = task_spec.get_data('task_data')['data'].get(
+    agreement = task_spec.get_data('task_data')['data'].setdefault(
         'agreement', 'No Agreement is configured')
-    field = task_spec.get_data('task_data')['fields'].get(
+    field = task_spec.get_data('task_data')['fields'].setdefault(
         'acceptance', {'label': 'Do you accept this agreement?',
                        'mandatory': True,
                        'type': 'checkbox',
