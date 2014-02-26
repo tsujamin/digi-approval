@@ -559,8 +559,12 @@ def view_task_data(request, task_uuid):
         (spiff_task.get_name(), request.path_info)
         ])
 
-    #iterates and replaces values of file fields with link
+    # iterates and replaces:
+    #  title: underscores with spaces, converts to titlecase
+    #  values: file fields get link or virus status
     for field in task.task['fields']:
+        task.task['fields'][field]['title'] = field.replace("_", " ").title()
+
         if task.task['fields'][field]['type'] == 'file':
             task_id = task.task['fields'][field]['value']
             user_file = get_object_or_404(UserFile, id=task_id)
