@@ -195,7 +195,7 @@ class WorkflowSpec(models.Model):
         # we're deleting elements but it's ok because edges is a list not an
         # iterator
         for u, v, key, data in graph.edges(data=True, keys=True):
-            if data['label'] == '(otherwise)':
+            if 'label' in data and data['label'] == '(otherwise)':
                 graph.remove_edge(u, v, key)
 
         return graph
