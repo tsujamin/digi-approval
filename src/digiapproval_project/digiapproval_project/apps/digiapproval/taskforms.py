@@ -743,6 +743,7 @@ class Subworkflow(AbstractForm):
             workflow = workflowspec.start_workflow(
                 self.workflow_model.customer)
             
+            workflow.label = self.workflow_model.label
             workflow.parent_workflow = self.workflow_model
             workflow.parent_task = self.task_model
             # TODO: what if a subworkflow uses the same fieldtype for a completely different purpose?
