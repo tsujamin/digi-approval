@@ -14,7 +14,7 @@ Approver: {{task.workflow.approver.get_full_name}}</p>
     {% if field.1.type == 'file' %}
       <a href="{{field.1.value}}">Click to download</a> 
     {% elif field.1.type == 'checkbox' %}
-      {% if field.1.value %}Yes{% else %}No%{% endif %}
+      {% if field.1.value %}Yes{% else %}No{% endif %}
     {% else %} 
       {{field.1.value}} 
     {% endif %}
