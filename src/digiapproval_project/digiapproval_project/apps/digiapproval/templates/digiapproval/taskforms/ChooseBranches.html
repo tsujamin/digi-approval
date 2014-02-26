@@ -5,7 +5,9 @@
     {% for field, items in form_fields.items %}
     <div class="checkbox">
         <label>
-            <input type="checkbox" name="{{field}}"/>{{items.label}}
+            <input type="checkbox" name="{{field}}"
+            {% comment %}The onclick handler is required for checkboxes{% endcomment %}
+            {% if items.disabled %}readonly onclick="return false"{% endif %} />{{items.label}}
         </label>
     </div>
     {% endfor %}

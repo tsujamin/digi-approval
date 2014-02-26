@@ -6,14 +6,18 @@
     {% ifequal items.type 'checkbox' %}
     <div class="checkbox">
         <label>
-            <input type="checkbox" name="{{field}}">{{items.label}}
+            <input type="checkbox" name="{{field}}"
+            {% comment %}The onclick handler is required for checkboxes{% endcomment %}
+            {% if items.disabled %}readonly onclick="return false"{% endif %}>{{items.label}}
         </label>
     </div>
     {% else %}
     <div class="form-group">
         <label for="{{field}}">{{items.label}}</label>
         <input type="{{ items.type }}" class="form-control" name="{{ field }}" 
-        value={% if items.value %} "{{ items.value }}" {% else %} "" {% endif %}/>
+        value={% if items.value %} "{{ items.value }}" {% else %} "" {% endif %}
+        {% comment %}The onclick handler is required for checkboxes{% endcomment %}
+        {% if items.disabled %}readonly onclick="return false"{% endif %}/>
     </div>
     {% endifequal %}
     {% endfor %}

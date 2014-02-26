@@ -31,11 +31,11 @@ def builder_home(request):
         elif 'edit' in request.POST:
             return redirect('view_spec', spec_id=spec.id)
     wf_spec_ordered = {}  # {owner: [specs],...}
-    for spec in approval_models.WorkflowSpec.objects.all():
+    for spec in approval_models.WorkflowSpec.objects.all().order_by('name'):
         if spec.owner.name not in wf_spec_ordered:
             wf_spec_ordered[spec.owner.name] = []
         wf_spec_ordered[spec.owner.name].append(spec)
-
+    wf_spec_ordered = sorted(wf_spec_ordered.items())
     return render(request, 'spec_builder/builder_home.html', {
         'spec_list': wf_spec_ordered,
     })
@@ -336,9 +336,9 @@ def task_dict(request, spec_id, task_name):
 
 
 def accept_agreement_dict(request, spec_model, task_spec):
-    agreement = task_spec.get_data('task_data')['data'].get(
+    agreement = task_spec.get_data('task_data')['data'].setdefault(
         'agreement', 'No Agreement is configured')
-    field = task_spec.get_data('task_data')['fields'].get(
+    field = task_spec.get_data('task_data')['fields'].setdefault(
         'acceptance', {'label': 'Do you accept this agreement?',
                        'mandatory': True,
                        'type': 'checkbox',
