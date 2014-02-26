@@ -73,6 +73,7 @@ class CustomerUnitTest(TestCase):
 
     def test_customer_gets_workflow(self):
         """Test that when we create a workflow, the customer gets it."""
+        self.data.create_semantic_field_types()
         self.data.create_workflow_specs()
         w = to_workflow((self.data.CUSTOMERS[0], self.data.WORKFLOW_SPECS[0],
                          None))
@@ -84,6 +85,7 @@ class CustomerUnitTest(TestCase):
 
     def test_organisation_workflow_propagation(self):
         """Verify that workflows propagate around organisations as expected."""
+        self.data.create_semantic_field_types()
         self.data.create_workflow_specs()
         w = to_workflow((self.data.ORGANISATIONS[0],
                          self.data.WORKFLOW_SPECS[0], None))
@@ -109,6 +111,7 @@ class WorkflowUnitTests(TestCase):
         self.data.create_approvers()
         self.data.create_organisations()
         self.data.create_customers()
+        self.data.create_semantic_field_types()
         self.data.create_workflow_specs()
         self.data.create_workflows()
 
