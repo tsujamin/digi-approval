@@ -29,9 +29,9 @@
   {% comment %}TODO: JavaScript front-end filtering of semantic field types{% endcomment %}
   <label for="new_semantic_field">Semantic Field Type</label>
   <select name="new_semantic_field" class="form-control">
-    <option name="">N/A</option>
+    <option value="">N/A</option>
     {% for semantic_field_type in semantic_field_types %}
-    <option name="{{ semantic_field_type.name }}">{{ semantic_field_type.name }}</option>
+    <option value="{{ semantic_field_type.name }}">{{ semantic_field_type.name }}</option>
     {% endfor %}
   </select>
 </div>
