@@ -742,8 +742,13 @@ class Subworkflow(AbstractForm):
                 id=self.task_dict['data']['workflowspec_id'])
             workflow = workflowspec.start_workflow(
                 self.workflow_model.customer)
+            
             workflow.parent_workflow = self.workflow_model
             workflow.parent_task = self.task_model
+            # TODO: what if a subworkflow uses the same fieldtype for a completely different purpose?
+            workflow.workflow.data['semantic_field_data'] = \
+                semantic_field_data = self.workflow_model.workflow.get_data('semantic_field_data', {})
+            
             workflow.save()
             self.task_dict['data']['workflow_id'] = workflow.id
             self.task_model.save()
@@ -759,6 +764,7 @@ class Subworkflow(AbstractForm):
             pk=self.task_dict['data']['workflow_id'])
         if workflow.completed:
             self.complete_task()
+            # TODO: copying semantic field data back to the parent?
 
     @staticmethod
     def validate_task_data(task_data):
