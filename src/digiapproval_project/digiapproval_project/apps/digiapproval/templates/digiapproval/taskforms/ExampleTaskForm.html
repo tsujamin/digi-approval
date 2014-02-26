@@ -6,7 +6,9 @@
     <div class="form-group"> <!-- Replace class with appropriate bootstrap class-->
         <label> <!-- Label for current field -->
             <input type="{{ items.type }}" name="{{ field }}"
-            value={% if items.value %} "{{ items.value }}" {% else %} "" {% endif %}/>{{items.label}} <!-- Creates field with specified field type -->
+            value={% if items.value %} "{{ items.value }}" {% else %} "" {% endif %}
+            {% comment %}The onclick handler is required for checkboxes{% endcomment %}
+            {% if items.disabled %}readonly onclick="return false"{% endif %}/>{{items.label}} <!-- Creates field with specified field type -->
         </label>
     </div>
     {% endfor %}
