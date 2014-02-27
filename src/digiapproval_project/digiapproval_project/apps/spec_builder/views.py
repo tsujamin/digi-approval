@@ -4,8 +4,8 @@ from django.contrib.auth.models import Group
 from digiapproval_project.apps.digiapproval.auth_decorators import \
     login_required_super
 from digiapproval_project.apps.digiapproval import models as approval_models
-from digiapproval_project.apps.digiapproval.taskforms import AbstractForm, \
-    field_types
+from digiapproval_project.apps.digiapproval.taskforms import AbstractForm
+from digiapproval_project.apps.digiapproval.taskform_types import TASKFORM_FIELD_TYPES
 from SpiffWorkflow.specs import WorkflowSpec
 from SpiffWorkflow import specs as taskspecs
 from django.core.urlresolvers import reverse
@@ -14,7 +14,7 @@ import re
 
 
 def index(request):
-    return redirect('home')
+    return redirect('builder_home')
 
 
 @login_required_super
@@ -31,11 +31,11 @@ def builder_home(request):
         elif 'edit' in request.POST:
             return redirect('view_spec', spec_id=spec.id)
     wf_spec_ordered = {}  # {owner: [specs],...}
-    for spec in approval_models.WorkflowSpec.objects.all():
+    for spec in approval_models.WorkflowSpec.objects.all().order_by('name'):
         if spec.owner.name not in wf_spec_ordered:
             wf_spec_ordered[spec.owner.name] = []
         wf_spec_ordered[spec.owner.name].append(spec)
-
+    wf_spec_ordered = sorted(wf_spec_ordered.items())
     return render(request, 'spec_builder/builder_home.html', {
         'spec_list': wf_spec_ordered,
     })
@@ -44,6 +44,12 @@ def builder_home(request):
 @login_required_super
 def new_spec(request):
     """Creates new task from provided group and name"""
+    
+    request.breadcrumbs([
+        portal_breadcrumb(),
+        ('New Workflow Specification', request.path_info)
+    ])
+    
     if request.method == "POST":
         group = get_object_or_404(Group,
                                   id=request.POST.get('spec_owner', -1))
@@ -110,6 +116,11 @@ def view_spec(request, spec_id):
     """
     spec = get_object_or_404(approval_models.WorkflowSpec,
                              id=spec_id)
+    request.breadcrumbs([
+        portal_breadcrumb(),
+        spec_breadcrumb(spec)
+    ])                         
+    
     if request.method == "POST":
         if 'toggle_public' in request.POST:
             spec.public = not spec.public
@@ -145,6 +156,51 @@ def view_spec(request, spec_id):
                        if k not in CONNECTABLE_TASKS}
     })
 
+def delete_task(request, spec_id, task_name):
+    """Deletes a taskspec from a worflow spec"""
+    spec_model = get_object_or_404(approval_models.WorkflowSpec,
+                                    id=spec_id)
+    task = spec_model.spec.task_specs.get(task_name)
+    if not task or task_name == 'Start' or len(task.inputs) is not 0:
+        raise Http404("Unknown or Illegal origin task")
+    
+    task.delete()
+    spec_model.save()
+    
+    return redirect('view_spec', spec_id)
+    
+def disconnect_task(request, spec_id, task_name):
+    """Entrypoint for task disconnect controllers"""
+    spec_model = get_object_or_404(approval_models.WorkflowSpec,
+                                    id=spec_id)
+    origin_task = spec_model.spec.task_specs.get(task_name)
+    
+    disconnected_task = spec_model.spec.task_specs.get(
+        request.POST.get('disconnect', '')) #may be null if not disconnect operation
+        
+    if not origin_task and not spec_model:
+        raise Http404("Unknown or Illegal tasks/spec")
+    
+    request.breadcrumbs([
+        portal_breadcrumb(),
+        spec_breadcrumb(spec_model),
+        ('Connect: "' + origin_task.name +'"', 
+            reverse('connect_task', kwargs={ 'spec_id': spec_model.id,
+                'task_name': origin_task.name }))
+    ])
+    
+    #Check for special case taskform
+    origin_form_type = origin_task.data.get('task_data',{}).get('form', None)
+    if origin_form_type in DISCONNECT_SPECIAL_CASES:
+        return DISCONNECT_SPECIAL_CASES[origin_form_type](request, spec_model, origin_task, disconnected_task)
+    if disconnected_task in origin_task.outputs:
+        origin_task.disconnect(disconnected_task)
+        spec_model.save()
+    return redirect(reverse('connect_task', kwargs={
+        'spec_id': spec_model.id,
+        'task_name': origin_task.name
+    }))
+        
 
 @login_required_super
 def connect_task_controller(request, spec_id, task_name):
@@ -157,6 +213,12 @@ def connect_task_controller(request, spec_id, task_name):
 
     if origin_task is None:
         raise Http404('Unknown or Illegal origin task')
+
+    request.breadcrumbs([
+        portal_breadcrumb(),
+        spec_breadcrumb(spec_model),
+        ('Connect: "' + origin_task.name +'"', request.path_info)
+    ])
 
     # Test for special connect_method for the taskform of origin_task
     # (IE branching taskforms)
@@ -227,7 +289,7 @@ def create_task_from_request(request, spec_model):
     task_label = request.POST.get('task_label', False)
     return create_task(task_name, task_label, spec_model)
 
-
+@login_required_super
 def task_dict(request, spec_id, task_name):
     """Generic handler for task_dict editing"""
     spec_model = get_object_or_404(approval_models.WorkflowSpec,
@@ -239,6 +301,13 @@ def task_dict(request, spec_id, task_name):
         raise Http404('Unknown or Illegal origin task')
     else:
         task_type = task_spec.data['task_data'].get('form', False)
+        
+    request.breadcrumbs([
+        portal_breadcrumb(),
+        spec_breadcrumb(spec_model),
+        ('Edit: "' + task_name + '"', request.path_info)
+    ])      
+    
     if request.method == "POST":
         if 'delete_dict' in request.POST:
             if task_type in CONNECTABLE_TASKS:
@@ -251,8 +320,8 @@ def task_dict(request, spec_id, task_name):
               request.POST.get('actor') in ['APPROVER', 'CUSTOMER']):
             task_data = task_spec.data['task_data']
             task_data['actor'] = request.POST.get('actor')
-            task_data['task_info'] = request.POST.get('task_info')
-
+            task_data['data']['task_info'] = request.POST.get('task_info')
+            AbstractForm.validate_task_data(task_data)
             spec_model.save()
             return redirect('task_dict', spec_id, task_name)
     # redirect to appropriate task_dict controller
@@ -267,13 +336,14 @@ def task_dict(request, spec_id, task_name):
 
 
 def accept_agreement_dict(request, spec_model, task_spec):
-    agreement = task_spec.get_data('task_data')['data'].get(
+    agreement = task_spec.get_data('task_data')['data'].setdefault(
         'agreement', 'No Agreement is configured')
-    field = task_spec.get_data('task_data')['fields'].get(
+    field = task_spec.get_data('task_data')['fields'].setdefault(
         'acceptance', {'label': 'Do you accept this agreement?',
                        'mandatory': True,
                        'type': 'checkbox',
-                       'value': False})
+                       'value': False,
+                       'semantic_field': None})
     if request.method == 'POST':
         if ('agreement' in request.POST and
                 len(request.POST.get('agreement')) is not 0):
@@ -285,14 +355,18 @@ def accept_agreement_dict(request, spec_model, task_spec):
             field['mandatory'] = True
         else:
             field['mandatory'] = False
+        if 'semantic_field' in request.POST:
+            field['semantic_field'] = request.POST['semantic_field']
         task_spec.get_data('task_data')['fields']['acceptance'] = field
-    spec_model.save()
-
+        AbstractForm.validate_task_data(task_spec.get_data('task_data'))
+        spec_model.save()
+    
     return render(request, 'spec_builder/taskforms/AcceptAgreementDict.html', {
         'spec_model': spec_model,
         'task': task_spec,
         'agreement': agreement,
-        'field': field
+        'field': field,
+        'semantic_field_types': approval_models.SemanticFieldType.objects.filter(field_type='checkbox'),
     })
 
 
@@ -303,14 +377,15 @@ def field_entry_dict(request, spec_model, task_spec):
             name = request.POST.get('new_name', False)
             label = request.POST.get('new_label', False)
             ftype = request.POST.get('new_type', False)
+            semantic_field = request.POST.get('new_semantic_field', None)
             if 'new_mandatory' in request.POST:
                 mandatory = True
             else:
                 mandatory = False
             if name and label and len(name) is not 0 \
-                    and len(label) is not 0 and ftype in field_types:
+                    and len(label) is not 0 and ftype in TASKFORM_FIELD_TYPES:
                 fields[name] = {'label': label, 'mandatory': mandatory,
-                                'type': ftype, 'value': False}
+                                'type': ftype, 'value': False, 'semantic_field': semantic_field}
         else:
             for field in fields:
                 if field+'_delete' in request.POST:
@@ -323,16 +398,21 @@ def field_entry_dict(request, spec_model, task_spec):
                     fields[field]['mandatory'] = True
                 else:
                     fields[field]['mandatory'] = False
-                if request.POST.get(field+'_type', False) in field_types:
+                if request.POST.get(field+'_type', False) in TASKFORM_FIELD_TYPES:
                     fields[field]['type'] = request.POST.get(field+'_type')
+                if field + '_semantic_field' in request.POST:
+                    fields[field]['semantic_field'] = request.POST[field + '_semantic_field']
         task_spec.get_data('task_data')['fields'] = fields
+        AbstractForm.validate_task_data(task_spec.get_data('task_data'))
         spec_model.save()
 
     return render(request, 'spec_builder/taskforms/FieldEntryDict.html', {
         'spec_model': spec_model,
         'task': task_spec,
         'fields': task_spec.get_data('task_data')['fields'],
-        'field_types': field_types
+        'field_types': TASKFORM_FIELD_TYPES,
+        # Filtering of semantic_field_types is done per-field in the template
+        'semantic_field_types': approval_models.SemanticFieldType.objects.all(),
     })
 
 
@@ -340,26 +420,34 @@ def file_upload_dict(request, spec_model, task_spec):
     file_name_field = task_spec.get_data('task_data')['fields'].get(
         'file_name', {
             'label': 'Name of File: ', 'mandatory': True,
-            'type': 'text', 'value': "", })
+            'type': 'text', 'value': "", 'semantic_field': None})
     file_field = task_spec.get_data('task_data')['fields'].get(
         'file', {
             'label': 'Upload File:', 'mandatory': True,
-            'type': 'file', 'value': None, })
+            'type': 'file', 'value': None, 'semantic_field': None})
 
     if 'mandatory' in request.POST:
         file_field['mandatory'] = file_name_field['mandatory'] = True
     else:
         file_field['mandatory'] = file_name_field['mandatory'] = False
 
+    if 'semantic_field_filename' in request.POST:
+        file_name_field['semantic_field'] = request.POST['semantic_field_filename']
+    if 'semantic_field_file' in request.POST:
+        file_field['semantic_field'] = request.POST['semantic_field_file']
+    
     task_spec.get_data('task_data')['fields']['file'] = file_field
     task_spec.get_data('task_data')['fields']['file_name'] = file_name_field
+    AbstractForm.validate_task_data(task_spec.get_data('task_data'))
     spec_model.save()
-    print task_spec.get_data('task_data')
 
     return render(request, 'spec_builder/taskforms/FileUploadDict.html', {
         'spec_model': spec_model,
         'task': task_spec,
-        'mandatory': file_field['mandatory']
+        'mandatory': file_field['mandatory'],
+        'semantic_field_filename': file_name_field.get('semantic_field', None),
+        'semantic_field_file': file_field.get('semantic_field', None),
+        'semantic_field_types': approval_models.SemanticFieldType.objects.filter(field_type__in=('file', 'text')),
     })
 
 
@@ -390,9 +478,10 @@ def choose_branch_connect(request, spec_model, origin_task):
 
             origin_task.data['task_data']['fields'][next_task.name] = {
                 'label': label, 'mandatory': False,
-                'type': 'radio', 'value': False, 'number': task_number
+                'type': 'radio', 'value': False, 'number': task_number,
+                'semantic_field': request.POST.get('semantic_field', None)
             }
-
+            AbstractForm.validate_task_data(origin_task.data['task_data'])
             spec_model.save()
             return redirect('view_spec', spec_model.id)
 
@@ -404,6 +493,35 @@ def choose_branch_connect(request, spec_model, origin_task):
         'legal_tasks': {k: (v[0], v[1].__name__) for k, v
                         in CONNECTABLE_TASKS.items()},
         'error': error,
+        'semantic_field_types': approval_models.SemanticFieldType.objects.filter(field_type='radio'),
+    })
+    
+def disconnect_choose_branch(request, spec_model, origin_task, disconnected_task):
+    error = None
+    if 'update' in request.POST:
+        new_default = get_existing_task(
+            request.POST.get('updated_default', '0xBADBADBAD'), spec_model)
+        if new_default and new_default is not spec_model.spec.start:
+            origin_task.outputs.remove(
+                get_existing_task(origin_task.default_task_spec, spec_model))
+            origin_task.default_task_spec = None
+            origin_task.connect(new_default)
+    
+    elif disconnected_task.name == origin_task.default_task_spec:
+        error = "Cannot disconnect the default task"        
+    elif disconnected_task and disconnected_task in origin_task.outputs:        
+        del origin_task.data['task_data']['fields'][disconnected_task.name]
+        origin_task.disconnect(disconnected_task)
+        spec_model.save()
+        
+    return render(request, 'spec_builder/taskforms/ChooseBranchConnect.html', {
+        'spec_model': spec_model,
+        'origin_task': origin_task,
+        'existing_tasks': {k: type(v).__name__ for k, v
+                           in spec_model.spec.task_specs.items()},
+        'legal_tasks': {k: (v[0], v[1].__name__) for k, v
+                        in CONNECTABLE_TASKS.items()},
+        'disconnect_error': error
     })
 
 
@@ -434,29 +552,61 @@ def choose_branches_connect(request, spec_model, origin_task):
 
             origin_task.data['task_data']['fields'][next_task.name] = {
                 'label': label, 'mandatory': False,
-                'type': 'checkbox', 'value': False, 'number': task_number
+                'type': 'checkbox', 'value': False, 'number': task_number,
+                'semantic_field': request.POST.get('semantic_field', None)
             }
-
+            AbstractForm.validate_task_data(origin_task.data['task_data'])
             spec_model.save()
             return redirect('view_spec', spec_model.id)
 
     return render(
         request,
         'spec_builder/taskforms/ChooseBranchesConnect.html',
-        {'spec_model': spec_model,
-         'origin_task': origin_task,
-         'existing_tasks': {k: type(v).__name__ for k, v
-                            in spec_model.spec.task_specs.items()},
-         'legal_tasks': {k: (v[0], v[1].__name__) for k, v
-                         in CONNECTABLE_TASKS.items()},
-         'error': error, }
-        )
+        {
+            'spec_model': spec_model,
+             'origin_task': origin_task,
+             'existing_tasks': {k: type(v).__name__ for k, v
+                                in spec_model.spec.task_specs.items()},
+             'legal_tasks': {k: (v[0], v[1].__name__) for k, v
+                             in CONNECTABLE_TASKS.items()},
+             'error': error, 
+             'semantic_field_types':
+                 approval_models.SemanticFieldType.objects.filter(field_type='checkbox'),
+        }
+    )
+        
+def disconnect_choose_branches(request, spec_model, origin_task, disconnected_task):
+    #choose_branches disconnect controller. removes the field associated with disconnected task, 
+    #doesnt redirect due to own error rendering
+    
+    error = ''
+    if not disconnected_task or not disconnected_task in origin_task.outputs:
+        raise Http404("Unknown or Illegal origin task")
+    
+    minimum_choices = origin_task.get_data('task_data')['options'].get('minimum_choices',0)
+    if not (len(origin_task.outputs) - 1) < minimum_choices:
+        del origin_task.data['task_data']['fields'][disconnected_task.name]
+        origin_task.disconnect(disconnected_task)
+        spec_model.save()
+    else:    
+        error =  "Cannot delete as remaining tasks less than minimum required"
+
+    return render(request, 'spec_builder/taskforms/ChooseBranchesConnect.html', {
+        'spec_model': spec_model,
+        'origin_task': origin_task,
+        'existing_tasks': {k: type(v).__name__ for k, v
+                           in spec_model.spec.task_specs.items()},
+        'legal_tasks': {k: (v[0], v[1].__name__) for k, v
+                        in CONNECTABLE_TASKS.items()},
+        'disconnect_error': error
+    })
 
 
 def choose_branches_dict(request, spec_model, task_spec):
     if 'choices' in request.POST:
         task_spec.get_data('task_data')['options']['minimum_choices'] = \
             int(request.POST.get('choices'))
+        AbstractForm.validate_task_data(task_spec.get_data('task_data'))
         spec_model.save()
 
     return render(request, 'spec_builder/taskforms/ChooseBranchesDict.html', {
@@ -472,7 +622,7 @@ def check_tally_connect(request, spec_model, origin_task):
     error = None
     # if outputs is not 0, assume connect task completed
     completed = not (len(origin_task.outputs) is 0)
-    if request.method == "POST" and not completed:
+    if request.method == "POST":
         new_tasks = {}
         for task_type in ['success', 'fail']:
             post_task_type = request.POST.get((task_type + '_task'), '')
@@ -484,7 +634,6 @@ def check_tally_connect(request, spec_model, origin_task):
             # else connecting to new task
             elif post_task_type == (task_type + '_create_task'):
                 label = request.POST.get(task_type + '_task_label', '')
-                print label
                 if label and label != '':
                     new_tasks[task_type] = create_task(
                         request.POST.get(task_type + '_create_task', None),
@@ -498,6 +647,11 @@ def check_tally_connect(request, spec_model, origin_task):
             if task is None or len(new_tasks) is not 2:
                 error = "Must select valid tasks for success and fail branches"
         if not error:  # No outstanding errors, lets connect
+            #delete previously connected
+            if completed:
+                origin_task.default_task_spec = None
+                while origin_task.outputs != []:
+                    origin_task.disconnect(origin_task.outputs[0]) 
             from SpiffWorkflow.operators import Attrib, GreaterThan, \
                 Equal, LessThan
             origin_task.set_data(min_score=0)  # default required score
@@ -510,8 +664,16 @@ def check_tally_connect(request, spec_model, origin_task):
                                             Attrib('min_score')),
                                    new_tasks['fail'])
             origin_task.connect(new_tasks['fail'])  # Default taskspec
+            AbstractForm.validate_task_data(origin_task.get_data('task_data'))
             spec_model.save()
-            return redirect('view_spec', spec_model.id)
+            return redirect('connect_task', spec_model.id, origin_task.name)
+    #work out success/fail tasks
+    #work out success/fail tasks
+    fail_task_name = origin_task.default_task_spec if completed else ""
+    not_default_tasks = [task for task in origin_task.outputs 
+                if task.name != origin_task.default_task_spec]
+    success_task_name = not_default_tasks[0].name if len(not_default_tasks) is not 0 else fail_task_name
+    
     return render(request, 'spec_builder/taskforms/CheckTallyConnect.html', {
         'spec_model': spec_model,
         'origin_task': origin_task,
@@ -521,9 +683,15 @@ def check_tally_connect(request, spec_model, origin_task):
                         in CONNECTABLE_TASKS.items()},
         'task_types': ['success', 'fail'],
         'error': error,
-        'completed': completed
+        'completed': completed,
+        'success_task_name': success_task_name,
+        'fail_task_name': fail_task_name,
+        
     })
 
+def disconnect_check_tally(request, spec_model, origin_task, disconnected_task):
+    """Prevents check_tally tasks being disconnected, modification of checktally handled in connect_check_tally"""
+    raise PermissionDenied
 
 def check_tally_dict(request, spec_model, task_spec):
     """controlller for dictionary editing of check_tally tasks (modification of
@@ -542,6 +710,7 @@ def check_tally_dict(request, spec_model, task_spec):
             label = request.POST.get('new_label', False)
             score = request.POST.get('new_score', '')
             score = int(score) if (score != '') else 0  # convert score to int
+            semantic_field = request.POST.get('new_semantic_field', None)
             if 'new_mandatory' in request.POST:
                 mandatory = True
             else:
@@ -550,7 +719,7 @@ def check_tally_dict(request, spec_model, task_spec):
                     and len(label) is not 0:
                 fields[name] = {'label': label, 'mandatory': mandatory,
                                 'type': 'checkbox', 'value': False,
-                                'score': score}
+                                'score': score, 'semantic_field': semantic_field}
         else:
             for field in fields:
                 if (field + '_delete') in request.POST:
@@ -569,14 +738,16 @@ def check_tally_dict(request, spec_model, task_spec):
                 if score:
                     fields[field]['score'] = score
         task_spec.get_data('task_data')['fields'] = fields
+        AbstractForm.validate_task_data(task_spec.get_data('task_data'))
         spec_model.save()
 
     return render(request, 'spec_builder/taskforms/CheckTallyDict.html', {
         'spec_model': spec_model,
         'task': task_spec,
         'fields': task_spec.get_data('task_data')['fields'],
-        'field_types': field_types,
-        'min_score': min_score
+        'field_types': TASKFORM_FIELD_TYPES,
+        'min_score': min_score,
+        'semantic_field_types': approval_models.SemanticFieldType.objects.filter(field_type='checkbox')
     })
 
 
@@ -594,6 +765,14 @@ def subworkflow_dict(request, spec_model, task_spec):
         'current_sub_id': sub_id
     })
 
+def portal_breadcrumb():
+    return ('Workflow Builder', reverse('builder_home'))
+
+def spec_breadcrumb(spec_model):
+    return ('Workflow: "' + spec_model.name + '"', 
+            reverse('view_spec', kwargs={'spec_id': spec_model.id}))
+            
+
 
 CONNECTABLE_TASKS = {
     #name : ('Nice Name', spiff taskspec, connect method)
@@ -606,6 +785,12 @@ CONNECTABLE_TASKS = {
     'check_tally': ('Checkbox Exclusive Branch', taskspecs.ExclusiveChoice,
                     check_tally_connect)
 
+}
+
+DISCONNECT_SPECIAL_CASES = {
+    'choose_branch': disconnect_choose_branch,
+    'choose_branches': disconnect_choose_branches,
+    'check_tally': disconnect_check_tally
 }
 
 TASK_DICT_METHODS = {

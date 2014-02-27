@@ -8,13 +8,13 @@ Approver: {{task.workflow.approver.get_full_name}}</p>
 <p class="lead">Entered data</p>
 <dl>
   {% for field in task.task.fields.items %}
-  <dt>{{field.0|title}}</dt>
+  <dt>{{field.1.title}}</dt>
   <dd><emph>{{field.1.label}}</emph> 
-    <!-- create link if file field -->
+    {# create link if file field #}
     {% if field.1.type == 'file' %}
       <a href="{{field.1.value}}">Click to download</a> 
-    {% elif field.1.type == 'checkbox' %}
-      {% if field.1.value %}Yes{% else %}No%{% endif %}
+    {% elif field.1.type == 'checkbox' or field.1.type == 'radio' %}
+      {% if field.1.value %}Yes{% else %}No{% endif %}
     {% else %} 
       {{field.1.value}} 
     {% endif %}

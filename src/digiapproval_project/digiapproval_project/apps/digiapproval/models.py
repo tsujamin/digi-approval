@@ -10,10 +10,10 @@ from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 
 from registration.signals import user_registered
 from jsonfield import JSONField
+from SpiffWorkflow.storage.NetworkXSerializer import NetworkXSerializer
 
 from .fields import WorkflowField, WorkflowSpecField
-
-from SpiffWorkflow.storage.NetworkXSerializer import NetworkXSerializer
+from .taskform_types import TASKFORM_FIELD_TYPES
 
 
 class UserFile(models.Model):
@@ -183,7 +183,7 @@ class WorkflowSpec(models.Model):
 
         for nodename in graph.nodes():
             node = graph.node[nodename]
-            if 'task_data' in node['data']['data']:
+            if 'data' in node['data'] and 'task_data' in node['data']['data']:
                 node['style'] = 'filled'
                 if node['data']['data']['task_data']['actor'] == 'CUSTOMER':
                     node['fillcolor'] = '#CCCCFF'
@@ -191,6 +191,12 @@ class WorkflowSpec(models.Model):
                     node['fillcolor'] = '#CCFFCC'
 
             node['label'] = node['label'].replace("\n", "\\n")
+
+        # we're deleting elements but it's ok because edges is a list not an
+        # iterator
+        for u, v, key, data in graph.edges(data=True, keys=True):
+            if 'label' in data and data['label'] == '(otherwise)':
+                graph.remove_edge(u, v, key)
 
         return graph
 
@@ -371,6 +377,15 @@ class Task(models.Model):
     workflow = models.ForeignKey(Workflow)
     task = JSONField()
     uuid = models.CharField(max_length="36")
+
+
+class SemanticFieldType(models.Model):
+    name = models.CharField(max_length=36)
+    field_type = models.CharField(max_length=36,
+                                  choices=TASKFORM_FIELD_TYPES.items())
+
+    def __unicode__(self):
+        return u'%s (%s)' % (self.name, self.field_type)
 
 
 class Message(models.Model):

@@ -1,5 +1,5 @@
 {% extends 'spec_builder/task_dict.html' %}
-{% block header %}Edit "Checkbox Exclusive Branch" for: "{{task.name}}" ({{spec_model.name}}) {% endblock %}
+{% block header %}Edit Checkbox Exclusive Branch for "{{task.name}}"{% endblock %}
 
 {% block taskdict_fields %}
 <!-- minimum branch score -->
@@ -31,6 +31,16 @@
   <input type="text" name="new_score" placeholder="0" class="form-control">
 </div>
 <div class="form-group">
+  {% comment %}TODO: JavaScript front-end filtering of semantic field types{% endcomment %}
+  <label for="new_semantic_field">Semantic Field Type</label>
+  <select name="new_semantic_field" class="form-control">
+    <option value="">N/A</option>
+    {% for semantic_field_type in semantic_field_types %}
+    <option value="{{ semantic_field_type.name }}">{{ semantic_field_type.name }}</option>
+    {% endfor %}
+  </select>
+</div>
+<div class="form-group">
   <button type="submit" name="new_field" class="btn btn-default">Add New Field</button>
 </div>
 
@@ -56,6 +66,16 @@
     <div class="form-group">
       <label for="{{field_name|add:'_score'}}">Score</label>
       <input type="text" name="{{field_name|add:'_score'}}" value="{{field_obj.score}}" placeholder="0" class="form-control">
+    </div>
+    <div class="form-group">
+      {% comment %}TODO: JavaScript front-end filtering of semantic field types{% endcomment %}
+      <label for="{{field_name|add:'_semantic_field'}}">Semantic Field Type</label>
+      <select name="{{field_name|add:'_semantic_field'}}" class="form-control">
+        <option value=""{% if not field_obj.semantic_field %} selected{% endif %}>N/A</option>
+        {% for semantic_field_type in semantic_field_types %}
+        <option value="{{ semantic_field_type.name }}"{% if semantic_field_type.name == field_obj.semantic_field %} selected{% endif %}>{{ semantic_field_type.name }}</option>
+        {% endfor %}
+      </select>
     </div>
   {% endfor %}
   

@@ -39,12 +39,19 @@
                 <li><a href="/pages/contact_us">Contact</a></li>
                 {% if user.is_authenticated %}
                 {% if user.customeraccount %}
+                {% if user.customeraccount.account_type == 'CUSTOMER' %}
                 <li><a href="{% url 'applicant_home' %}">Applicant Home</a></li>
+                {% elif user.customeraccount.account_type == 'ORGANISATION' %}
+                <li><a href="{% url 'modify_subaccounts' %}">My Members</a></li>
+                {% endif %}{# user.customeraccount.account_type #}
                 {% else %}
                 <li><a href="{% url 'approver_worklist' %}">Approver Worklist</a></li>
                 <li><a href="{% url 'delegator_worklist' %}">Delegator Worklist</a></li>
+                {% endif %}{# user.customeraccount #}
+                {% if user.is_superuser %}
+                <li><a href="{% url 'builder_home' %}">Workflow Builder</a></li>
                 {% endif %}
-                {% endif %}
+                {% endif %}{# user.is_authenticated #}
                 {% endblock %}
               </ul>
               <ul class="nav navbar-nav navbar-right">
@@ -65,11 +72,11 @@
                   {% endif %}
                   
                   
-                  <li>
+
                   {% if user.customeraccount.account_type == 'CUSTOMER' %}
+                  <li>
                     <a href="{% url 'remove_parentaccounts' %}">My Organisations</a>
-                  {% elif user.customeraccount.account_type == 'ORGANISATION' %}
-                    <a href="{% url 'modify_subaccounts' %}">My Members</a>
+                  </li>
                   {% endif %}
                   <li>
                     <a href="{% url 'auth_logout' %}">Log out</a>
