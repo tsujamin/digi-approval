@@ -496,7 +496,8 @@ def choose_branch_connect(request, spec_model, origin_task):
         'semantic_field_types': approval_models.SemanticFieldType.objects.filter(field_type='radio'),
     })
     
-def disconnect_choose_branch(request, spec_model, origin_task, disconnected_task):    
+def disconnect_choose_branch(request, spec_model, origin_task, disconnected_task):
+    error = None
     if 'update' in request.POST:
         new_default = get_existing_task(
             request.POST.get('updated_default', '0xBADBADBAD'), spec_model)

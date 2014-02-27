@@ -14,6 +14,7 @@ class AuthDecoratorUnitTest(TestCase):
         # we need workflowspecs for the approvers/delegators
         # to actually be approvers/delegators of anything
         # and therefore to pass the tests.
+        self.data.create_semantic_field_types()
         self.data.create_workflow_specs()
 
     def test_login_required_approver(self):

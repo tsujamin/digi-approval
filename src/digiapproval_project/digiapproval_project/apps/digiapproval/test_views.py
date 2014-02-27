@@ -65,6 +65,7 @@ class LoggedInApproverViewsUnitTests(TestCase):
         self.data.create_approvers()
         self.data.create_organisations()
         self.data.create_customers()
+        self.data.create_semantic_field_types()
         self.data.create_workflow_specs()
         self.client.login(username='Cal.McGregor',
                           password='alwaystheminister')
@@ -84,6 +85,7 @@ class LoggedInDelgatorViewsUnitTests(TestCase):
         self.data.create_approvers()
         self.data.create_organisations()
         self.data.create_customers()
+        self.data.create_semantic_field_types()
         self.data.create_workflow_specs()
         self.client.login(username='David.Potter',
                           password='harrysorrydavid')
@@ -105,6 +107,7 @@ class WorkflowViewsUnitTests(TestCase):
         self.data.create_approvers()
         self.data.create_organisations()
         self.data.create_customers()
+        self.data.create_semantic_field_types()
         self.data.create_workflow_specs()
         self.data.create_workflows()
 

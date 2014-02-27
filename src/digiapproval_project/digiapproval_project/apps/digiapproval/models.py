@@ -183,7 +183,7 @@ class WorkflowSpec(models.Model):
 
         for nodename in graph.nodes():
             node = graph.node[nodename]
-            if 'task_data' in node['data']['data']:
+            if 'data' in node['data'] and 'task_data' in node['data']['data']:
                 node['style'] = 'filled'
                 if node['data']['data']['task_data']['actor'] == 'CUSTOMER':
                     node['fillcolor'] = '#CCCCFF'
@@ -191,6 +191,12 @@ class WorkflowSpec(models.Model):
                     node['fillcolor'] = '#CCFFCC'
 
             node['label'] = node['label'].replace("\n", "\\n")
+
+        # we're deleting elements but it's ok because edges is a list not an
+        # iterator
+        for u, v, key, data in graph.edges(data=True, keys=True):
+            if 'label' in data and data['label'] == '(otherwise)':
+                graph.remove_edge(u, v, key)
 
         return graph
 
@@ -377,7 +383,7 @@ class SemanticFieldType(models.Model):
     name = models.CharField(max_length=36)
     field_type = models.CharField(max_length=36,
                                   choices=TASKFORM_FIELD_TYPES.items())
-    
+
     def __unicode__(self):
         return u'%s (%s)' % (self.name, self.field_type)
 
