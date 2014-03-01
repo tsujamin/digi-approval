@@ -5,7 +5,13 @@
 
 
 # Description of challenge
-What was in the scope?
+**What was in the scope?**
+
+A thriving, vibrant city should make it easy for citizens and small businesses to run public events. At the same time, regulations and permit systems are needed to make sure that events are run in a safe, community-friendly and sustainable way.
+
+Unfortunately, the proliferation of regulations and permits has made running events into something more akin to navigating a maze. The point of this challenge is to provide Canberrans with a simple, efficient way to navigate that maze.
+
+Our proof-of-concept system demonstrates a system to provide residents and businesses with a clear, streamlined way to navigate the various approvals required. The system provides a central point of contact so that, as far as possible, a single public servant sees the process through from start to finish and is able to help resolve problems as they come up. The system lay out the requirements clearly, helping directorates to ensure that applicants understand what is required of them and can meet those requirements with a minimum of fuss.
 
 # Methodology
 How did the team address the challenge?
@@ -13,8 +19,32 @@ How did the team address the challenge?
 # Proposed solution
 technical description of prototype; how does this (solution) add to Canberra becoming a digital city
 
-# Production system:
-address sustainability, scalability, integration, (approx.) cost
+
+
+# Production system
+**address sustainability, scalability, integration, (approx.) cost**
+
+The system has been designed with production in mind.
+
+## Sustainability
+Our system is sustainable from a number of different angles:
+
+ + ... directorates - they don't depend on us to set things up
+ + ... developers - open stack and toolset
+ + ... growing requirements - flexibility and power, generic design
+
+## Scalability
+
+ + ... technically - decoupled design, everything easily disaggregates and multiplies.
+ + ... across directorates - authentication system allows multiple directorates to use shared system: not only will they not step on each others toes, with subworkflows they will complement each other.
+ + ... 
+
+## Integration
+
+ + ... reporting
+ + ... existing workflows - modelling rather than replacing.
+
+## The bottom line
 
 # Concluding remarks
 **experience of the team's involvement in the competition; feedback/suggestions for next rounds**
