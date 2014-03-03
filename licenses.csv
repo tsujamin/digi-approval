@@ -1,0 +1,91 @@
+Package, License
+,
+Python Packages, License
+django, BSD
+south, Apache
+django-storage-swift, MIT
+iso8601, MIT
+oslo-config, Apache
+prettytable, BSD
+psycopg2, GPL with exceptions or ZPL
+python-keystoneclient, Apache
+python-swiftclient, Apache
+requests, Apache
+simplejson, MIT
+six, MIT
+wsgiref, PSF or ZPL
+amqp, LGPL
+anyjson, BSD
+billiard, BSD
+celery, BSD
+kombu, BSD
+pytz, MIT
+pyclamd, GPLv2
+SpiffWorkflow, LGPLv2
+lamson, GPL
+Jinja2, BSD
+MarkupSafe, BSD
+chardet, LGPL
+lockfile, MIT
+mock, BSD
+nose, LGPL
+python-daemon, Python Software Foundation License
+python-modargs, GPLv2
+jsonfield, MIT
+django-bootstrap3, Apache
+seacucumber, MIT
+boto, MIT
+dkimpy, BSD-like
+django-registration, BSD
+uWSGI, GPLv2
+django-breadcrumbs, BSD
+networkx, BSD
+pygraphviz, BSD
+,
+Chef Libraries, License
+application, Apache
+application_python, Apache
+apt, Apache
+aws, Apache
+bluepill, Apache
+build-essential, Apache
+chef_handler, Apache
+clamav, Apache
+cron, Apache
+database, Apache
+dmg, Apache
+erlang, Apache
+git, Apache
+gunicorn, Apache
+logrotate, Apache
+mysql, Apache
+nginx, Apache
+ohai, Apache
+openssl, Apache
+postgresql, Apache
+python, Apache
+python-build, Apache
+rabbitmq, Apache
+rsyslog, Apache
+runit, Apache
+simple_iptables, BSD
+statsd, Apache
+supervisor, Apache
+sysctl, Apache
+windows, Apache
+xfs, Apache
+yum, Apache
+yum-epel, Apache
+yum-erlang_solutions, Apache
+,
+Tools, License
+Ruby, Ruby License
+Python, Python Software Foundation License
+Vagrant, MIT
+Less, Apache
+nginx, BSD-like
+Postgres, Postgres License
+ClamAV, GPL
+RabbitMQ, MPL
+Swift, Apache
+Keystone, Apache
