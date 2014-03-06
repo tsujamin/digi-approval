@@ -1,4 +1,9 @@
-"""Miscellaneous authentication decorators to make our lives easier.
+"""This module contains a selection of authentication checking function decorators.
+These are used throughout the project to do role based/membership based authorisation
+of users and requests.
+
+For consistancy and maintanablility: all views/controllers requiring authentication should make use of these.
+
 """
 from django.contrib.auth.decorators import user_passes_test, \
     REDIRECT_FIELD_NAME

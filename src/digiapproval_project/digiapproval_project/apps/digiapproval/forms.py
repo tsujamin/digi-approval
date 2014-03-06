@@ -1,3 +1,6 @@
+"""Contains various forms, implemented using the django forms api,
+    used within the DigiApproval user/approver frontend"""
+
 from django import forms
 from django.forms.formsets import BaseFormSet
 from models import CustomerAccount

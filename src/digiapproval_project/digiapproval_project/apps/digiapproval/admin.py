@@ -1,3 +1,5 @@
+"""Contains model registration for django.admin page"""
+
 from django.contrib import admin
 from digiapproval_project.apps.digiapproval import models
 # Register your models here.

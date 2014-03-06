@@ -1,3 +1,12 @@
+"""Defines two new django mdoel fields: WorkflowField and WorkflowSpecField.
+
+These fields are used to store the json-serialised representations of their namesake
+SpiffWorkflow classes. The code is based on that of
+`django-json-field <https://github.com/derek-schaefer/django-json-field>
+
+Both classes take advantage of the JSON collumn type present in Postgres since 9.3
+"""
+
 from SpiffWorkflow.storage import JSONSerializer, DictionarySerializer
 from SpiffWorkflow import Workflow
 from SpiffWorkflow.specs import WorkflowSpec
@@ -12,6 +21,8 @@ _dserializer = DictionarySerializer()
 
 
 class WorkflowField(with_metaclass(models.SubfieldBase, models.Field)):
+    """ django model field for the storage of JSON serialised SpiffWorkflow.Workflow
+        instances"""
 
     description = "Workflow object"
     _jserializer = JSONSerializer()
@@ -45,6 +56,9 @@ class WorkflowField(with_metaclass(models.SubfieldBase, models.Field)):
 
 
 class WorkflowSpecField(with_metaclass(models.SubfieldBase, models.Field)):
+    """ django model field for the storage of JSON serialised ]\
+        SpiffWorkflow.spec.WorkflowSpec instances"""
+
 
     description = "WorkflowSpec object"
 

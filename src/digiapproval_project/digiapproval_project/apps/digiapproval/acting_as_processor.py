@@ -1,9 +1,13 @@
+"""Context processor to handle the acting_as functionality."""
+
 from django.core.exceptions import PermissionDenied
 from .models import CustomerAccount
-"""Context processor to handle our acting_as."""
 
 
 def acting_as(request):
+    """ Context processor to handle the 'acting_as' functionality of
+        CustomerAccounts with parent accounts.
+    """
     result = {'acting_as': {'name': None,
                             'others': []}}
 
