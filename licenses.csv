@@ -41,6 +41,7 @@ uWSGI, GPLv2
 django-breadcrumbs, BSD
 networkx, BSD
 pygraphviz, BSD
+sphinx, BSD
 ,
 Chef Libraries, License
 application, Apache

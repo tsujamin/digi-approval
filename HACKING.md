@@ -37,9 +37,9 @@ Grab the SSH key (`digiawspem.pem`) and put it in `~/.ssh`, with appropriate per
 
 ```shell
 # recommended but not essential: create a rvm for chef
-rvm use 2.0.0@chef --create 
+rvm use 2.0.0@chef --create
 
-gem install chef 
+gem install chef
 # if using w/o rvm, do sudo gem install
 ```
 
@@ -103,7 +103,7 @@ If you're having trouble figuring out what's going on (yay async!), then ```vagr
 
 ```shell
 sudo -s
-chef-solo -c /tmp/vagrant-chef-1/solo.rb -j /tmp/vagrant-chef-1/dna.json 
+chef-solo -c /tmp/vagrant-chef-1/solo.rb -j /tmp/vagrant-chef-1/dna.json
 ```
 
 You'll get *lots* more output. **Don't do this if you've just changed the Vagrantfile.**
@@ -168,7 +168,7 @@ print(a.result)
       value:                                  #actual value of the field
     }
   }
-  data: {                                     #arbitrary static pieces of data 
+  data: {                                     #arbitrary static pieces of data
     _simplename_: value
   }
   options: {                                  #options specific to the view
@@ -219,6 +219,19 @@ Because I don't hate myself, I'm not writing raw CSS, but rather using LESS. Unf
 
 If you're using node from homebrew on a mac, you may need to use `/usr/local/share/npm/bin/lessc`
 
+## Building Project Documentation ##
+
+Projcet documentation is build using sphinx.
+
+TL/DR:
+
+```shell
+cd /vagrant/sphinx
+make html
+open build/html/index
+```
+
+Documentation pages are written using reStrucuredText. Autodoc is configured such that it will generate documentation from infile doc-strings
 
 # Frequently Encountered Problems #
 
