@@ -16,7 +16,7 @@ Unfortunately, the proliferation of regulations and permits has made running eve
 Our proof-of-concept system demonstrates a system to provide residents and businesses with a clear, streamlined way to navigate the various approvals required. The system provides a central point of contact so that, as far as possible, a single public servant sees the process through from start to finish and is able to help resolve problems as they come up. The system lay out the requirements clearly, helping directorates to ensure that applicants understand what is required of them and can meet those requirements with a minimum of fuss.
 
 ## The scope of our system
-As a proof of concept, the system necessarily has a restricticted scope.
+As a proof of concept, the system necessarily has a restricted scope.
 
 Include in the scope was:
 
@@ -41,6 +41,7 @@ Acknowledge the excellent work of RR, and the project board generally in keeping
 ## The prototype in overview
 
 ### The core: Workflow Engine
+At the core of the solution is a "workflow engine".
 
 ### Customer experience
 
@@ -48,7 +49,7 @@ Acknowledge the excellent work of RR, and the project board generally in keeping
 
 #### Community groups
 
-### Directorate experience 
+### Directorate experience
 
  * Approver
  * Delegator
@@ -58,13 +59,150 @@ Acknowledge the excellent work of RR, and the project board generally in keeping
  * Point and click workflow design.
 
 ## The prototype: Tech Specs
+
+[django]: http://django.org "Django"
+[nginx]: http://nginx.org/en "nginx"
+[rabbitmq]: http://rabbitmq.com "RabbitMQ"
+[postgres]: http://postgresql.org "PostgreSQL"
+[swift]: http://swift.openstack.org "OpenStack Swift"
+[chef]: http://www.opscode.com/chef/ "Chef"
+[celery]: http://www.celeryproject.org/ "Celery"
+[clamav]: http://www.clamav.net/lang/en/ "Clam AntiVirus"
+[spiff]: https://github.com/knipknap/SpiffWorkflow "SpiffWorkflow"
+[bootstrap]: http://getbootstrap.com/ "Bootstrap"
+[h5bp]: http://html5boilerplate.com/ "HTML5 Boilerplate"
+[vagrant]: http://www.vagrantup.com/ "Vagrant"
+[devstack]: http://devstack.org/ "devstack"
+
  * not just what we used but why, and why it was awesome.
 
-## Making Canberra a digital city
+Our solution is a web application implemented with Python using the Django web framework. It can be decomposed into a web layer, an application layer, a set of asynchronous workers and a storage layer (file store and database).
 
-We need to tie into this stuff: http://www.cmd.act.gov.au/policystrategic/digitalcanberra
+![Application architecture](./tech-overview.png)
 
-The more we can do this the better.
+Each of these layers is horizontally scalable.
+
+Our system was built on:
+
+ * **Operating System**: CentOS 6.4 and RHEL 6
+     * Our stack should also port without issue to Solaris, as preferred by SSICT.
+ * **Provisioning**: [Chef Solo][chef], meeting the SSICT requirement for managed configuration over ad-hoc configuration.
+ * **Web server**: [nginx][nginx].
+ * **Application**: [Django][django]
+     * A preference for using existing modules as opposed to developing our own functionality.
+     * The workflow engine is [SpiffWorkflow][spiff].
+ * **Worker layer**: [RabbitMQ][rabbitmq], interfaced through [Celery][celery].
+    * Virus scanning workers implemented in [ClamAV][clamav].
+    * Email workers send mail through SendGrid, using the SMTP interface for simple transition to SSICT infrastructure.
+ * **Database**: [PostgreSQL][postgres].
+     * Transition to an Oracle database to meet SSICT requirements should be straightforward thanks to Django's database abstraction.
+ * **File storage**: [OpenStack Swift][swift].
+ * **Front end**: [Bootstrap][bootstrap] and [HTML5 boilerplate][h5bp]
+     * Developed with an eye towards standards compliance, accessibility and extensibility.
+
+### The choice to use FOSS
+
+We chose to build our solution on an open source stack. Practically, we had a number of reasons for chosing open source, including price, ease of access and cross-platform compatibility. More fundamentally, open source software has played a huge role in bringing technological innovations to those who would otherwise not have had access to them, and that's very much in line with how we saw the Digital Canberra Challenge. As detailed in the next section, we were very happy with the open source stack.
+
+### In retrospect: how did our technology stack perform?
+
+We were pleased with the performance of our technology stack.
+
+#### The good
+
+<< say some good things here >>
+ * Things worked. It's hard to overstate how well things worked.
+ * 
+
+#### The bad
+ * Amazon SES failed to send to ACT government, made the transition to SendGrid
+ * Chef ate huge amounts of time. We may have been better to pick a different configuration management system. However, it seems any system we could have picked would have involved a significant learning curve.
+     + On the plus side, it made transition from CentOS (which we used for local testing) to RHEL 6 (which we used on CentOS) reasonably painless.
+ * We found a number of open source components (most notably Spiff) had one or more issues which required our intervention to fix. Using them still provided a significant increase in productivity vis-a-vis writing equivalent functionality from scratch, and furthermore by contributing the changes upstream we are able to pass of the requirement of on-going maintenance elsewhere.
+ * Django performed well, although we found the templating language limiting. Perhaps swap it out for another?
+ * OpenStack proved tricky to set up. We eventually settled on [devstack][devstack], which was an OK choice, although we shouldn't have used the git head, but rather should have pinned a release as we hit regressions a couple of times.
+ * We attempted to use [vagrant][vagrant] to smooth out hardware and software differences. This worked well up until a point, which is discussed further in <<the very end>>.
+
+
+
+## How does this solution contribute to making Canberra a digital city
+
+[dcap]: http://www.cmd.act.gov.au/policystrategic/digitalcanberra/actionplan
+[spict]: http://www.cmd.act.gov.au/__data/assets/pdf_file/0011/247826/The_Strategic_Plan_for_ICT_2011-15.pdf
+[digicanberra]: http://www.cmd.act.gov.au/policystrategic/digitalcanberra
+
+This solution ties in with the _[Digital Canberra Action Plan][dcap]_ and _[The Strategic Plan for ICT 2011-2015][spict]_, which are whole-of-government initatives.
+
+> The ultimate goal of the Digital Canberra Action Plan is to make Canberra a leading digital city
+>
+> ([Digital Canberra Action Plan][dcap])
+
+(make the above a call-out box)
+
+> The Digital Canberra Action Plan is the roadmap of how we are going to:
+> + accelerate business engagement with the digital economy and help businesses access new customers and markets;
+> + promote Canberra as a modern, dynamic, digital city;
+> + use technology to be a more open government and to give citizens greater choice in how and when they use services; and
+> + be more innovative in how we engage with the community and local small business.
+>
+> ([Digital Canberra][digicanberra])
+
+DigiApproval strongly complements the objectives of the Digital Canberra Action Plan. In particular:
+ + by providing better visibility into permit applications, DigiApproval creates a more open government;
+ + as an online service, it provides citizens greater choice: applications can be completed in stages, in different places;
+ + having been designed with community groups in mind, it provides an innovative and improved experience for community groups and small businesses (<<link to community groups stuff?>>); and
+ + its overall effect is to bring a modern, dynamic, digital approach to the process of applying for permits.
+
+
+Furthermore, the DigiApproval system is aligned with the the goals and governing priciples of [The Strategic Plan for ICT 2011-2015][spict]. The Strategic Plan identifies 5 key goals for ICT within the ACT government:
+
+>1. Make living in Canberra easier by developing, with the community, an integrated, comprehensive and affordable range of readily accessible online services.  
+>2. Improve return on investment on public expenditure on ICT through implementing and sharing higher quality, more resilient systems.  
+>3. Use ICT to promote Open Government and online community engagement.  
+>4. Contribute to the achievement of its environmental targets by improving the energy efficiency of its ICT infrastructure and promoting the use of ICT to assist other sustainability initiatives.  
+>5. Develop its workforce and partnerships to provide the future capacity and skills to implement its ICT programs and strategies.
+
+In particular, the system targets Goal 1, as part of an "integrated, comprehensive and affordable range of readily accessible online services." In particular, it "will use ICT to provide simpler citizen-centric services, integrated across Directorates" (page 8).
+
+DigiApproval can contribute to the goals of being:
+ + **integrated**, including being **integrated across Directorates** :: 'manages the interface' by defining how information is passed.
+ + **comprehensive** :: can model arbitrary workflows; hence arbitrary permits, also aiding the integration across directorates
+ + **affordable** :: increases efficiency: will pay for itself.
+ + **readily accessible** :: requires no specialised software either on the user or Directorate end; just a web browser.
+ + **simpler** :: enables questions to be asked during the process. enables feedback to be given piecewise, without rejecting entire applications.
+ + **citizen-centric** :: citizen-first design via DCC. Addresses citizen pain points w/ single point of contact, visibility into the process.
+
+Furthermore, the solution is in line with a number of other goals:
+ + Goal 2:
+     * The DigiApproval system has been built in line with the Shared Services ICT requirements, so it can be implemented more cheaply and with less friction, _improving ROI_.
+     * The DigiApproval system is designed to be a _shared_, cross-Directorate system.
+ + Goal 3:
+     * ???
+ + Goal 4:
+     * Implementing the DigiApproval system will significantly decrease the amount of paper used in the approval process.
+ + Goal 5:
+     * By virtue of the Digital Canberra Challenge process, the project is being implemented as a public-private partnership, increasing the capacity within Canberra.
+
+Furthermore, the project can be implemented in line with the Governing Principles laid out on page 7 of the Strategic Plan.
+
+The principles are:
+> + investment should support Government policy and service delivery priorities.
+> + should be of a professional quality, lifecycle managed and supportable.
+> + investment should create improved performance, greater efficiency and/ or better community services.
+> + should be shared wherever possible across Government.
+> + should be acquired on a basis of value for money and total cost of ownership and be accessible to the ACT Government as a whole.
+> + should be supported by a level of targeted Research and Development investment to help Directorates realise the potential benefits of ICT.
+> + enabled business projects will be project managed, steered and governed by ICT trained and experienced staff.
+> + principles should be communicated and followed at all levels in a directorate.
+> + investment must have measurable outcomes.
+
+Investment in this system would be in line with those principles:
+ + It supports service delivery by assisting directorates to meet their legislative requirements for service delivery.
+ + It is of professional quality, and supportable << see sustainability under production system below >>
+ + It creates improved performance, greater efficiency and better community services, as outlined.
+ + It can be readily shared across government, and used for both citizen-facing and internal workflows.
+ + ???
+ + The outcome of an investment into the system can be measured in terms of reduction in directorate time and cost per application.
 
 
 # Production system
@@ -103,14 +241,14 @@ The differentiated registration for community groups is designed to maintain the
 The system has been designed and built such that if the DigiACTive team were hit by a bus, it would be possible to hire replacement staff that could quickly come up to speed on the system.
 
 To that end:
- + The system is built on widely used, open source software, as detailed in the technical specs. 
+ + The system is built on widely used, open source software, as detailed in the technical specs.
  + Our implementation has consistently preferred to integrate prebuilt software packages rather than reinvent the wheel. This means:
-    * Our code conforms to the convetions required by those packages.
+    * Our code conforms to the conventions required by those packages.
     * Our code base is small - only implementing those things not implemented in other software.
  + We have a unit test suite.
 
 #### Contributing to the open-source ecosystem
-As we have built on open-source software, we have often found that we need to fix a particular bug or extend a particular feature in the software we are using. We have consitently sought to contribute these changes back. This has a number of benefits:
+As we have built on open-source software, we have often found that we need to fix a particular bug or extend a particular feature in the software we are using. We have consistently sought to contribute these changes back. This has a number of benefits:
  + It contributes to the open-source eco-system, which we in turn benfit from.
  + It shifts the responsibility for maintaining our changes away from us and back to the original maintainer of the package, reducing our ongoing workload.
 
@@ -123,7 +261,7 @@ The system is designed to remain viable in the face of changing requirements.
 
  + ... technically - decoupled design, everything easily disaggregates and multiplies.
  + ... across directorates - authentication system allows multiple directorates to use shared system: not only will they not step on each others toes, with subworkflows they will complement each other.
- + ... 
+ + ...
 
 ## Integration
 
@@ -131,6 +269,12 @@ The system is designed to remain viable in the face of changing requirements.
  + ... existing workflows - modelling rather than replacing.
 
 ## The bottom line
+
+As the DigiApproval system is currently at proof of concept stage, preparing it for public deployment will require a further investment of time and money.
+
+DigiACTive estimates that the software could be ready for public deployment as early as July 2014.
+
+Under the terms of the competition, TAMS will receive a license for the current proof of concept system only. A final version of the software will be offered on a value pricing model.
 
 # Concluding remarks
 **experience of the team's involvement in the competition; feedback/suggestions for next rounds**
@@ -158,7 +302,7 @@ We have a number of suggestions for future competitions:
   + how we would go about expanding or winding up a company after the competition
 
  + SMEs have a disinct advantage compared to other entrants because of their existing company status: they don't need to spend any of their budget on forming a company. It may be worth considering evening out this advantage.
- 
+
  + The insurance requirement could be re-evaluated. We were requried to hold professional indemnity insurance to guard against direct loss to the government. However it is hard to see how the proof of concept could actually cause the government financial loss, given that it was not hosted on government servers, did not process payments, and did not process actual user data. TODO: the insurance will actually be really, really useful iff we proceed.
 
 
