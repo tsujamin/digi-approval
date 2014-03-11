@@ -1,6 +1,6 @@
 Package, License
 ,
-Python Packages, License
+Python Packages, License, Notes
 django, BSD
 south, Apache
 django-storage-swift, MIT
@@ -20,9 +20,9 @@ billiard, BSD
 celery, BSD
 kombu, BSD
 pytz, MIT
-pyclamd, GPLv2
+pyclamd, LGPLv3+, http://xael.org/norman/python/pyclamd/
 SpiffWorkflow, LGPLv2
-lamson, GPL
+lamson, GPL/BSD, (see http://lamsonproject.org/blog/2010-07-07.html)
 Jinja2, BSD
 MarkupSafe, BSD
 chardet, LGPL
@@ -30,14 +30,13 @@ lockfile, MIT
 mock, BSD
 nose, LGPL
 python-daemon, Python Software Foundation License
-python-modargs, GPLv2
+python-modargs, BSD, (https://gitorious.org/python-modargs/python-modargs/source/93dfa839144f77d9422091acaa835d3a72c69060:LICENSE) 
 jsonfield, MIT
 django-bootstrap3, Apache
 seacucumber, MIT
 boto, MIT
 dkimpy, BSD-like
 django-registration, BSD
-uWSGI, GPLv2
 django-breadcrumbs, BSD
 networkx, BSD
 pygraphviz, BSD
@@ -78,7 +77,7 @@ yum, Apache
 yum-epel, Apache
 yum-erlang_solutions, Apache
 ,
-Tools, License
+Tools, License, NB: We do not interact with the source of these tools: GPL is OK.
 Ruby, Ruby License
 Python, Python Software Foundation License
 Vagrant, MIT
@@ -89,3 +88,4 @@ ClamAV, GPL
 RabbitMQ, MPL
 Swift, Apache
 Keystone, Apache
+uWSGI, GPLv2
