@@ -7,33 +7,103 @@
 # Description of challenge
 **What was in the scope?**
 
-## Background
 A thriving, vibrant city should make it easy for citizens and small businesses to run public events. At the same time, regulations and permit systems are needed to make sure that events are run in a safe, community-friendly and sustainable way.
 
-Unfortunately, the proliferation of regulations and permits has made running events into something more akin to navigating a maze. The point of this challenge is to provide Canberrans with a simple, efficient way to navigate that maze.
+Unfortunately, the proliferation of regulations and permits has made running events into something more akin to navigating a maze. We set out to provide Canberrans with a simple, efficient way to navigate that maze.
 
 ## Our solution: a birds-eye view
-Our proof-of-concept system demonstrates a system to provide residents and businesses with a clear, streamlined way to navigate the various approvals required. The system provides a central point of contact so that, as far as possible, a single public servant sees the process through from start to finish and is able to help resolve problems as they come up. The system lay out the requirements clearly, helping directorates to ensure that applicants understand what is required of them and can meet those requirements with a minimum of fuss.
+Our proof-of-concept demonstrates a system to provide residents and businesses with a clear, streamlined way to navigate the various approvals required. The system provides a central point of contact so that, as far as possible, a single public servant sees the process through from start to finish and is able to help resolve problems as they come up. The system lays out the requirements clearly, helping directorates to ensure that applicants understand what is required of them and can meet those requirements with a minimum of fuss.
 
-## The scope of our system
-As a proof of concept, the system necessarily has a restricted scope.
+Our solution is browser-based application built on the concept of modelling approval processes as workflows. A workflow refers to a series of steps with a desired end point. Each step contains certain actions that need to be completed, either by a client or by directorate staff.
 
-Include in the scope was:
+> For example, a workflow could be:
++ Apply to use public unleased land
++ Apply for a liquor license
+>
+> Workflow steps could be:
+ + "Enter event details". Completed by a customer, by filling out an online form. The step would lay out what questions are mandatory and which are optional, and provide tips and a way to ask for advice.
+ + "Upload a risk management plan". Completed by a customer, by uploading a document. The step lays out the requirements for a risk managment plan, and provides a link to a template and the information that the document must include.
+ + "Review risk managment plan". Completed by an approver within a directorate, after reviewing a risk assessment plan. The step lays out the internal procedures for assessing these documents, so that there is consistency within the Directorate.
+
+(put this in a box)
+
+Within the system, several roles and interfaces exist to serve the needs of different stakeholders.
+
+
+ * **Customers** will be provided with an interface allowing new applications to be lodged, pending applications continued and completed applications reviewed
+ * **Delegators** have the power to delegate the processing of customers' applications to various **Approvers** within the appropriate area
+ * **Administrators** of the system are able to modify and implement new workflows in a point and click manner without the need to write additional code
+
+The system provides flexibility for modifying workflows to adapt to changing business rules and processes, improved consistency in the review and assessment process. The system can act as a **one-stop  shop** for permit applications for both customers and directorates.
+
+## << briefly outline scope and key players >>
+(somewhere, we need to put that TAMS->PACS was the sponsoring/involved directorate.)
 
 # Methodology
 **How did the team address the challenge?** (NB: this is not the same as the proposed solution. It's asking ... how we got there?)
 
- * Saw the challenge, rallied troops in CSSA. ended up with a group of 3.
- * ... germ of an idea: background in FSM, read an article about FSM v workflow engines. Saw the challenge, went: "Hmm, that might work."
- * Research: is that implemented in public source code? Yes
- * Can I wrap that in an open-source stack? Yes
- * How do we make this scale? Make sure things disaggregate nicely.
- * Let's test the concept: submit pitch, do verbal pitch
- * Let's refine the concept: meetings with Fleur, etc.
- * Let's build the concept
- * Repeat - test, refine, build
+DigiACTive tackled the challenge over the 2013-14 summer.
 
-Acknowledge the excellent work of RR, and the project board generally in keeping us on track.
+## Forming the team and the concept
+We first became aware of the challenge as individuals in late 2013. The challenge was discussed socially amongst the ANU's Computer Science Students' Association, and from that a loose, unnamed group was formed.
+
+We initialy approached the technical side of things in general terms:
+ + We firstly settled on the idea of a workflow engine, after briefly toying with an enhanced Smart Forms system and a Finite State Machine solution.
+ + Because we had existing expertise in development in the team, we built an open source stack around technologies we already knew and trusted.
+ + Due to the short time frame of the competition, we satisfied ourselves that the bulk of the project could be built by composing existing open source components.
+
+Once we satisfied ourselves that we could deliver, we proceeded to pitch our concept.
+
+## Pitching the team's solution
+
+The requirement to write a formal pitch was helpful in forcing us to do a more formal sort of design that we might otherwise have done. We had to consider scalability (although we perhaps understood it in a different, more technical, way to what the was expected) and sustainability, which lead us to do more careful design and planning. This up-front design stood us in good stead for implementation.
+
+We were somewhat surprised to be called in to do an in-person pitch, especially when we realised the sort of competition that we were up against. We found the process to be helpful in refining our understanding of the problem and the needs our solution was trying to meet.
+
+The entire pitching process was somewhat surreal: as three university students, we pitched in competition with more established teams and companies, and won.
+
+## Bake-off
+
+We were selected as one of two teams to proceed to implement a proof-of-concept. This is the point at which things really kicked into gear.
+
+The process of building our solution fell into a number of phases:
+ * Formalise the team structure and sign the necessary agreements.
+ * Scope out the project
+ * Build "Milestone 1": a prototype that ran a predefined static workflow
+ * Test Milestone 1
+ * Build "Milestone 2": an extension of the Milestone 1 prototype that supported dynamically editing workflows.
+
+The process was facilitated by the eGov cluster at NICTA, who did an admirable job and made the administrative side virtually effortless.
+
+### Formalising the team
+We turned our informal, unnamed team into DigiACTive Pty Ltd, signed the necessary project agreements and purchased the necessary insurance cover. This was a surprisingly challenging, time-consuming and expensive aspect.
+
+### Scope
+Nailing down the precise scope of the challenge also proved to be more involved than we expected, as we attempted to simultaneously include a reasonably large set of feature while making sure we could finish what we started within the timeframe. Ultimately a scope document was prepared and signed off on, which kept our scope managable.
+
+Throughout the process, there were a number of items that came up that would be within the scope of a fully deployed system, but which we did not want to commit to for the prototype. These items were collated into a Considerations Register administered by NICTA. This proved to be an excellent way of dealing with these considerations - they are now on record should we proceed to implement a production system, without them causing scope creep while working on the prototype.
+
+### Milestones
+
+Having defined the scope, we created a formal project plan, which split the project into two major milestones.
+
+* Milestone 1: a prototype that ran a predefined static workflow
+* Milestone 2: an extension of the Milestone 1 prototype that supported dynamically editing workflows.
+
+The system that we built is described in detail below << where >>. As far as the process of building goes, we found that Milestone 1 was more time-consuming than we expected, but Milestone 2 was slightly less time-consuming. <<moar?>>
+
+### Project wind-up
+
+Following a successful demonstration of Milestone 2 to TAMS, the team shifted to winding up the Digital Canberra Challenge competition requirements - preparing presentations, the source code, documentation, and this case study.
+
+We have also been investigating how to take the project further after the close of the competition.
+
+### Project governance
+
+Throughout the project, we had fortnightly meetings with the project board, consisting of a representative from DigiACTive, a representative from TAMS, and a representative from the eGov Cluster at NICTA.
+
+These meetings were incredibly valuable for keeping us on track and accountable for the progress we were making. We'd like to acknowledge the excellent work of Rachel Reid, who represented TAMS, and Michael Phillips who represented NICTA, as well as the vital administrative support of NICTA's Ana Belgun.
+
 
 # Proposed solution
 **technical description of prototype; how does this (solution) add to Canberra becoming a digital city**
@@ -42,6 +112,8 @@ Acknowledge the excellent work of RR, and the project board generally in keeping
 
 ### The core: Workflow Engine
 At the core of the solution is a "workflow engine".
+
+![sample workflow](sample-workflow.png)
 
 ### Customer experience
 
@@ -111,8 +183,8 @@ We were pleased with the performance of our technology stack.
 #### The good
 
 << say some good things here >>
- * Things worked. It's hard to overstate how well things worked.
- * 
+ * The stack performed exceptionally well at narrowing the functional areas we had to consider. So much was done for us that our actual application code comes in at less than five thousand SLOC (source lines of code) - an astonishingly low figure for what the system achieves.
+ * By and large, the stack was reliable and performant. We spent comparitively little time delving into the internals of the stack, and the majority of the time building on it.
 
 #### The bad
  * Amazon SES failed to send to ACT government, made the transition to SendGrid
