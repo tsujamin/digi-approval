@@ -64,7 +64,7 @@ DigiACTive tackled the challenge over the 2013-14 summer.
 ## Forming the team and the concept
 We first became aware of the challenge as individuals in late 2013. The challenge was discussed socially amongst the ANU's Computer Science Students' Association, and from that a loose, unnamed group was formed.
 
-We initialy approached the technical side of things in general terms:
+We initially approached the technical side of things in general terms:
  + We firstly settled on the idea of a workflow engine, after briefly toying with an enhanced Smart Forms system and a Finite State Machine solution.
  + Because we had existing expertise in development in the team, we built an open source stack around technologies we already knew and trusted.
  + Due to the short time frame of the competition, we verified that the bulk of the project could be built by composing existing open source components.
@@ -81,22 +81,21 @@ The entire pitching process was somewhat surreal: as three university students, 
 
 ## Bake-off
 
-We were selected as one of two teams to proceed to implement a proof-of-concept. This is the point at which things really kicked into gear.
-
-The process of building our solution fell into a number of phases:
+We were selected as one of two teams to proceed to implement a proof-of-concept.
+The process of building our solution then fell into a number of phases:
  * Formalise the team structure and sign the necessary agreements.
  * Scope out the project
  * Build "Milestone 1": a prototype that ran a predefined static workflow
  * Test Milestone 1
  * Build "Milestone 2": an extension of the Milestone 1 prototype that supported dynamically editing workflows.
 
-The process was facilitated by the eGov cluster at NICTA, who did an admirable job and made the administrative side virtually effortless.
+The process was facilitated by the eGov cluster at NICTA, who did an admirable job and made the administrative side much more manageable.
 
 ### Formalising the team
 We turned our informal, unnamed team into DigiACTive Pty Ltd, signed the necessary project agreements and purchased the necessary insurance cover. This was a surprisingly challenging, time-consuming and expensive aspect.
 
 ### Scope
-Nailing down the precise scope of the challenge also proved to be more involved than we expected, as we attempted to simultaneously include a reasonably large feature set while making sure we could finish what we started within the timeframe. Ultimately a scope document was prepared and signed off on, which kept our scope managable.
+Nailing down the precise scope of the challenge also proved to be more involved than we expected, as we attempted to simultaneously include a reasonably large feature set while making sure we could finish what we started within the timeframe. Ultimately a scope document was prepared and signed off on, which kept our scope manageable.
 
 Throughout the process, there were a number of items that came up that would be within the scope of a fully deployed system, but which we did not want to commit to for the prototype. These items were collated into a Considerations Register administered by NICTA. This proved to be an excellent way of dealing with these considerations - they are now on record should we proceed to implement a production system, without them causing scope creep while working on the prototype.
 
@@ -107,7 +106,7 @@ Having defined the scope, we created a formal project plan, which split the proj
 * Milestone 1: a prototype that ran a predefined static workflow
 * Milestone 2: an extension of the Milestone 1 prototype that supported dynamically editing workflows.
 
-The system that we built is described in detail below << where >>. As far as the process of building goes, we found that Milestone 1 was more time-consuming than we expected, but Milestone 2 was slightly less time-consuming. <<moar?>>
+The system that we built is described in detail below. As far as the process of building goes, we found that, for technical reasons, Milestone 1 was more time-consuming than we expected, but Milestone 2 was slightly less time-consuming. <<moar?>>
 
 ### Project wind-up
 
@@ -248,7 +247,7 @@ We chose to build our solution on an open source stack. Practically, we had a nu
 
 ### In retrospect: how did our technology stack perform?
 
-We were pleased with the performance of our technology stack.
+We were very pleased with the performance of our technology stack.
 
 #### The good
 
@@ -256,15 +255,13 @@ We were pleased with the performance of our technology stack.
  * By and large, the stack was reliable and performant. We spent comparitively little time delving into the internals of the stack, and the majority of the time building on it. It was fit for purpose.
 
 #### The bad
- * Amazon SES failed to send to ACT government, made the transition to SendGrid
- * Chef ate huge amounts of time. We may have been better to pick a different configuration management system. However, it seems any system we could have picked would have involved a significant learning curve.
-     + On the plus side, it made transition from CentOS (which we used for local testing) to RHEL 6 (which we used on CentOS) reasonably painless.
+ * We initially used Amazon SES for email, however, it failed to send to ACT government, so we made the transition to SendGrid.
+ * Chef proved incredibly difficult and time-consuming. We may have been better to pick a different configuration management system. However, it seems any system we could have picked would have involved a significant learning curve, and we certainly made a number of beginners mistakes.
+     + On the plus side, Chef made transition from CentOS (which we used for local testing) to RHEL 6 (which we used on AWS) reasonably painless.
  * We found a number of open source components (most notably Spiff) had one or more issues which required our intervention to fix. Using them still provided a significant increase in productivity vis-a-vis writing equivalent functionality from scratch, and furthermore by contributing the changes upstream we are able to pass of the requirement of on-going maintenance elsewhere.
- * Django performed well, although we found the templating language limiting. Perhaps swap it out for another?
- * OpenStack proved tricky to set up. We eventually settled on [devstack][devstack], which was an OK choice, although we shouldn't have used the git head, but rather should have pinned a release as we hit regressions a couple of times.
- * We attempted to use [vagrant][vagrant] to smooth out hardware and software differences. This worked well up until a point, which is discussed further in <<the very end>>.
-
-
+ * Django performed well, although we found the templating language limiting.
+ * OpenStack proved tricky to set up. We eventually settled on [devstack][devstack], which was decent choice, but suffered regressions a couple of times.
+ * We attempted to use [vagrant][vagrant] to smooth out hardware and software differences. This worked well up until a point, but wasn't quite as perfect as we had hoped. (See Other Remarks below.)
 
 ## How does this solution contribute to making Canberra a digital city
 
@@ -306,23 +303,19 @@ Furthermore, the DigiApproval system is aligned with the the goals and governing
 In particular, the system targets Goal 1, as part of an "integrated, comprehensive and affordable range of readily accessible online services." In particular, it "will use ICT to provide simpler citizen-centric services, integrated across Directorates" (page 8).
 
 DigiApproval can contribute to the goals of being:
- + **integrated**, including being **integrated across Directorates** :: 'manages the interface' by defining how information is passed.
- + **comprehensive** :: can model arbitrary workflows; hence arbitrary permits, also aiding the integration across directorates
- + **affordable** :: increases efficiency: will pay for itself.
- + **readily accessible** :: requires no specialised software either on the user or Directorate end; just a web browser.
- + **simpler** :: enables questions to be asked during the process. enables feedback to be given piecewise, without rejecting entire applications.
- + **citizen-centric** :: citizen-first design via DCC. Addresses citizen pain points w/ single point of contact, visibility into the process.
+ + **integrated**, including being **integrated across Directorates** - the system is designed to integrate application processes accross directorates by defining a shared vocabulary (the semantic tags described above) and a well-understood data flow. In this way, the system provides both sufficient flexibility and integration.
+ + **comprehensive**, as it can model arbitrary workflows - it would be suitable for any permit application, or even other government tasks that can be modelled as workflows.
+ + **affordable**, as it increases efficiency - reduced paper-work and speedier interaction with the client means that files can be processed and closed out faster.
+ + **readily accessible**, as it requires no specialised software either on the user or Directorate end; just a web browser.
+ + **simpler** for both citizens and directorates - by doing applications piece-wise and with an integrated communications register, it enables questions to be asked during the process, and enables feedback to be given on an on-going basis through the application process, rather than in one big hit.
+ + **citizen-centric**, as it was driven by citizen-lead design via the Digital Canberra Challenge. It addresses citizen pain points by incorporating a single point of contact, and visibility into the process.
 
 Furthermore, the solution is in line with a number of other goals:
  + Goal 2:
      * The DigiApproval system has been built in line with the Shared Services ICT requirements, so it can be implemented more cheaply and with less friction, _improving ROI_.
      * The DigiApproval system is designed to be a _shared_, cross-Directorate system.
- + Goal 3:
-     * ???
- + Goal 4:
-     * Implementing the DigiApproval system will significantly decrease the amount of paper used in the approval process.
- + Goal 5:
-     * By virtue of the Digital Canberra Challenge process, the project is being implemented as a public-private partnership, increasing the capacity within Canberra.
+ + Goal 4: Implementing the DigiApproval system will significantly decrease the amount of paper used in the approval process.
+ + Goal 5: By virtue of the Digital Canberra Challenge process, the project is being implemented as a public-private partnership, increasing the capacity within Canberra.
 
 Furthermore, the project can be implemented in line with the Governing Principles laid out on page 7 of the Strategic Plan.
 
@@ -331,18 +324,14 @@ The principles are:
 > + should be of a professional quality, lifecycle managed and supportable.
 > + investment should create improved performance, greater efficiency and/ or better community services.
 > + should be shared wherever possible across Government.
-> + should be acquired on a basis of value for money and total cost of ownership and be accessible to the ACT Government as a whole.
-> + should be supported by a level of targeted Research and Development investment to help Directorates realise the potential benefits of ICT.
-> + enabled business projects will be project managed, steered and governed by ICT trained and experienced staff.
-> + principles should be communicated and followed at all levels in a directorate.
+> + ...
 > + investment must have measurable outcomes.
 
 Investment in this system would be in line with those principles:
  + It supports service delivery by assisting directorates to meet their legislative requirements for service delivery.
- + It is of professional quality, and supportable << see sustainability under production system below >>
+ + It is of professional quality, and supportable - see the Sustainability section below.
  + It creates improved performance, greater efficiency and better community services, as outlined.
  + It can be readily shared across government, and used for both citizen-facing and internal workflows.
- + ???
  + The outcome of an investment into the system can be measured in terms of reduction in directorate time and cost per application.
 
 
@@ -422,45 +411,47 @@ Under the terms of the competition, TAMS will receive a license for the current 
 # Concluding remarks
 **experience of the team's involvement in the competition; feedback/suggestions for next rounds**
 
-The team came together from a group of friends at the Australian National University. We were not a pre-established company, but formed a proprietary limited company after progressing to the bake-off stage of the competition. While some of us had experience consulting in the private sector, none of us had worked with the public sector.
+We had an overwhelmingly positive experience of the competition. In the course of a few months, we have gone from a group of friends at the Australian National University to a proprietary limited company with a proof of concept system that has commercial potential. We have worked productively with NICTA and with TAMS to deliver on the agreed objectives.
 
-There are two main observations arising from our position.
+**From the point of view of DigiACTive, the Digital Canberra Challenge has been hugely successful.** The project was excellently managed by the eGov cluster, and TAMS has been incredibly helpful throught the process.
 
-### 1: Commercialisation
+## Suggestions for future rounds
 
-We entered the competition as a group of friends. In order to proceed in the bake-off, we required a formal legal structure. We consulted a lawyer, and opted to form a proprietary limited company. We were also required to acquire insurance as part of the bake-off agreement.
+In order to proceed in the bake-off, we required a formal legal structure. We consulted a lawyer, and opted to form a proprietary limited company. We were also required to acquire insurance as part of the bake-off agreement.
 
-We found the administrative process of forming a company, getting the necessary insurance, and sorting out the necessary legal documents to be immensely educational. On the other hand, we also found it to be incredibly time-consuming, expensive and frustrating. It consumed the bulk of our time for the first several weeks of the competition, and consumed well over half of (TODO more accurate %age) our total project budget.
+We were fortunate to have team members with experience as sole traders and in forming incorporated associations. Nonetheless, we found the administrative process of forming a company, getting the necessary insurance, and sorting out the necessary legal documents to be, on the one hand, immensely educational, and on the other hand, incredibly time-consuming, expensive and frustrating. It consumed the bulk of our time for the first several weeks of the competition, and consumed well over half of our total project budget.
 
 If we had an pre-existing company, we could have redirected our time and money towards a number of different things. For example, if we had been less pushed for time and money, we would have brought a graphic designer and a user experience specialist on board.
 
 On the plus side, being pushed to have a formal legal structure has set us up well to continue the project into the future. On the down side, if we choose not to proceed, we have to wrap up the company, sort out its tax affairs, and so on: we're left holding a time-consuming liability.
 
-We have a number of suggestions for future competitions:
- + Starting a company is not a straightforward process. We were fortunate to have team members with experience as sole traders and in forming incorporated associations, which helped, but we would have benefited from some sort of information session or infomation pack outlining matters such as:
+We therefore have a number of suggestions for future competitions:
+ + We would have benefited from some sort of information session or infomation pack outlining matters such as:
   + different business structures: e.g. company vs partnership
   + how to go about forming one: applying directly through ASIC v applying through e.g. MYOB CompanyDocs,
   + the legal agreements needed to protect us, e.g. a Shareholders' Agreement
   + the various different types of insurance we would require
   + how we would go about expanding or winding up a company after the competition
 
- + SMEs have a disinct advantage compared to other entrants because of their existing company status: they don't need to spend any of their budget on forming a company. It may be worth considering evening out this advantage.
+ + SMEs have a distinct advantage compared to other entrants because of their existing company structure: they don't need to spend any of their budget on forming a company. It may be worth considering evening out this advantage.
 
  + The insurance requirement could be re-evaluated. We were requried to hold professional indemnity insurance to guard against direct loss to the government. However it is hard to see how the proof of concept could actually cause the government financial loss, given that it was not hosted on government servers, did not process payments, and did not process actual user data. TODO: the insurance will actually be really, really useful iff we proceed.
 
 
-### 2: Public Sector thinking
-
-A major thing we had to adapt to is the very different way of thinking in the government space versus the innovation/start-up space.
-
-The process we had was very linear: gather requirements, develop a design document, build the system. This is in sharp contrast to the way we are used to operating: build a prototype, present it, see how people actually use it and what they want changed, fix the prototype in response, get more feed back and so on. We would have attempted to build a minimum viable product by iteration rather than through explicit design.
-
-This actually worked out better than we were expecting, because feedback was less interactive than we were used to. We didn't for example, have the opportunity to just hover over people's shoulders as they attempted to use the demonstration systems. Feedback took longer to get and was a very different sort of feedback to what we would have needed for the minimum viable product/iteration model to be effective.
-
-
 # Other remarks
 
-## Suggestions for future teams coming from non-commercial environments.
+We have one suggestion for future teams, and two specific suggestions for teams coming from non-commercial, academic or otherwise low-budget environments.
+
+## General
+A major thing we had to adapt to is the very different way of thinking in the government space versus the innovation/start-up space.
+
+The process we had was very linear: gather requirements, develop a design document, build the system. Approval and sign-off was required at each stage. This is in sharp contrast to the way we were used to operating: build a prototype, present it, see how people actually use it and what they want changed, fix the prototype in response, get more feedback and so on.
+
+Absent the more formal process, we would have attempted to build a minimum viable product by iteration rather than through explicit design. However, the formal process actually worked out better than we were expecting, because feedback was less interactive than we were used to. We didn't, for example, have the opportunity to just hover over peoples' shoulders as they attempted to use the demonstration systems. Feedback took longer to get and was a very different sort of feedback to what we would have needed for the minimum viable product/iteration model to be effective.
+
+From time to time we found the more formal process slow, restrictive and frustrating. We would advise future teams to stick at it and make sure it is done well - we found the things we hadn't designed as thoroughly to be the ones we struggled with more.
+
+## For those from non-commercial/academic environments in particular
 
  * One of our biggest and most surprising time-sinks arose from the different hardware we had. 2 of our members had MacBooks, and one had a laptop running some variant of Linux. Despite our best efforts to make the development environment consistent through the use of Vagrant, we found a lot of time still diappeared in the differences Vagrant couldn't quite smooth out. **It's worth getting identical systems somehow**: either by buying identical hardware, or by doing all your development in the cloud from the start.
 
