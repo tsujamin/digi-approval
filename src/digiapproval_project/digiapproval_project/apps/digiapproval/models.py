@@ -192,7 +192,8 @@ class WorkflowSpec(models.Model):
                 else:
                     node['fillcolor'] = '#CCFFCC'
 
-            node['label'] = node['label'].replace("\n", "\\n")
+            if 'label' in node:
+                node['label'] = node['label'].replace("\n", "\\n")
 
         # we're deleting elements but it's ok because edges is a list not an
         # iterator
