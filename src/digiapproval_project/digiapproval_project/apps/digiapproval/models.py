@@ -183,7 +183,9 @@ class WorkflowSpec(models.Model):
 
         for nodename in graph.nodes():
             node = graph.node[nodename]
-            if 'data' in node['data'] and 'task_data' in node['data']['data']:
+            if ('data' in node and
+                    'data' in node['data'] and
+                    'task_data' in node['data']['data']):
                 node['style'] = 'filled'
                 if node['data']['data']['task_data']['actor'] == 'CUSTOMER':
                     node['fillcolor'] = '#CCCCFF'
