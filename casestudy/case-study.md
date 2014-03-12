@@ -5,16 +5,19 @@
 
 
 # Description of challenge
-**What was in the scope?**
+(**What was in the scope?**)
 
 A thriving, vibrant city should make it easy for citizens and small businesses to run public events. At the same time, regulations and permit systems are needed to make sure that events are run in a safe, community-friendly and sustainable way.
 
 Unfortunately, the proliferation of regulations and permits has made running events into something more akin to navigating a maze. We set out to provide Canberrans with a simple, efficient way to navigate that maze.
 
 ## Our solution: a birds-eye view
-Our proof-of-concept demonstrates a system to provide residents and businesses with a clear, streamlined way to navigate the various approvals required. The system provides a central point of contact so that, as far as possible, a single public servant sees the process through from start to finish and is able to help resolve problems as they come up. The system lays out the requirements clearly, helping directorates to ensure that applicants understand what is required of them and can meet those requirements with a minimum of fuss.
+Our proof-of-concept demonstrates a system to that:
+ + provides residents and businesses with a clear, streamlined way to work through the various approvals they require.
+ + provides a central point of contact so that, as far as possible, a single public servant sees the process through from start to finish and is able to help resolve problems as they come up.
+ + lays out the requirements clearly, helping directorates to ensure that applicants understand what is required of them and can meet those requirements with a minimum of fuss.
 
-Our solution is browser-based application built on the concept of modelling approval processes as workflows. A workflow refers to a series of steps with a desired end point. Each step contains certain actions that need to be completed, either by a client or by directorate staff.
+Our solution is browser-based application built on the concept of modelling approval processes as **workflows**. A workflow is a series of steps with a desired end point. Each step contains certain actions that need to be completed, either by a client or by directorate staff.
 
 > For example, a workflow could be:
 + Apply to use public unleased land
@@ -23,21 +26,35 @@ Our solution is browser-based application built on the concept of modelling appr
 > Workflow steps could be:
  + "Enter event details". Completed by a customer, by filling out an online form. The step would lay out what questions are mandatory and which are optional, and provide tips and a way to ask for advice.
  + "Upload a risk management plan". Completed by a customer, by uploading a document. The step lays out the requirements for a risk managment plan, and provides a link to a template and the information that the document must include.
- + "Review risk managment plan". Completed by an approver within a directorate, after reviewing a risk assessment plan. The step lays out the internal procedures for assessing these documents, so that there is consistency within the Directorate.
+ + "Review risk management plan". Completed by an approver within a directorate, after reviewing a risk assessment plan. The step lays out the internal procedures for assessing these documents, so that there is consistency within the Directorate.
 
 (put this in a box)
 
-Within the system, several roles and interfaces exist to serve the needs of different stakeholders.
+The system has been designed around the needs of regular citizens, community groups, businesses and Directorates:
+ * Citizens are provided with an interface allowing new applications to be lodged, pending applications continued and completed applications reviewed.
+ * Community groups and businesses are provided with powerful tools to maintain the integrity of their accounts and data as their membership changes.
+ * Within directorates:
+  + Approvers are tasked with reviewing applications
+  + Delegators manage the workload of approvers, delegating the processing of customers' applications to various approvers within their area.
+  + Administrators are able to modify existing workflows and implement new workflows in a point and click manner.
 
+The system provides flexibility for modifying workflows to adapt to changing business rules and processes, improving consistency in the review and assessment process. The system can act as a **one-stop  shop** for permit applications for both customers and directorates.
 
- * **Customers** will be provided with an interface allowing new applications to be lodged, pending applications continued and completed applications reviewed
- * **Delegators** have the power to delegate the processing of customers' applications to various **Approvers** within the appropriate area
- * **Administrators** of the system are able to modify and implement new workflows in a point and click manner without the need to write additional code
+## Key Details
 
-The system provides flexibility for modifying workflows to adapt to changing business rules and processes, improved consistency in the review and assessment process. The system can act as a **one-stop  shop** for permit applications for both customers and directorates.
+| Competition  | [Digital Canberra Challenge][dcc] Round 1  |
+|--|--|
+| Challenge | **Quicker event approvals**: Improve the process for gaining permits for music & other cultural events in the ACT. |
+| Involved Parties | DigiACTive Pty Ltd, eGov Cluster (NICTA), ACT government|
+| ACT Government Involvement | Parks and City Services, TAMS |
+| Timeframe | ?? 1 November 2013 - 17 March 2014 |
+| Budget | $5000 for reimbursement of expenses |
+| Deliverables | Proof of Concept System, this Case Study
+| Contacts | DigiACTive: Daniel Axtens at [daniel@axtens.net](mailto:daniel@axtens.net)
 
-## << briefly outline scope and key players >>
-(somewhere, we need to put that TAMS->PACS was the sponsoring/involved directorate.)
+Due to the limited time-frame of the competiton, the scope of the proof of concept system was tightly restricted. <<moar>>
+
+[dcc]: http://digitalcanberrachallenge.com.au
 
 # Methodology
 **How did the team address the challenge?** (NB: this is not the same as the proposed solution. It's asking ... how we got there?)
@@ -50,7 +67,7 @@ We first became aware of the challenge as individuals in late 2013. The challeng
 We initialy approached the technical side of things in general terms:
  + We firstly settled on the idea of a workflow engine, after briefly toying with an enhanced Smart Forms system and a Finite State Machine solution.
  + Because we had existing expertise in development in the team, we built an open source stack around technologies we already knew and trusted.
- + Due to the short time frame of the competition, we satisfied ourselves that the bulk of the project could be built by composing existing open source components.
+ + Due to the short time frame of the competition, we verified that the bulk of the project could be built by composing existing open source components.
 
 Once we satisfied ourselves that we could deliver, we proceeded to pitch our concept.
 
@@ -58,7 +75,7 @@ Once we satisfied ourselves that we could deliver, we proceeded to pitch our con
 
 The requirement to write a formal pitch was helpful in forcing us to do a more formal sort of design that we might otherwise have done. We had to consider scalability (although we perhaps understood it in a different, more technical, way to what the was expected) and sustainability, which lead us to do more careful design and planning. This up-front design stood us in good stead for implementation.
 
-We were somewhat surprised to be called in to do an in-person pitch, especially when we realised the sort of competition that we were up against. We found the process to be helpful in refining our understanding of the problem and the needs our solution was trying to meet.
+Having submitted the written pitch, we were somewhat surprised to be called in to do an in-person pitch, especially when we realised the sort of competition that we were up against. However, we found the process to be helpful in refining our understanding of the problem and the needs our solution was trying to meet.
 
 The entire pitching process was somewhat surreal: as three university students, we pitched in competition with more established teams and companies, and won.
 
@@ -79,7 +96,7 @@ The process was facilitated by the eGov cluster at NICTA, who did an admirable j
 We turned our informal, unnamed team into DigiACTive Pty Ltd, signed the necessary project agreements and purchased the necessary insurance cover. This was a surprisingly challenging, time-consuming and expensive aspect.
 
 ### Scope
-Nailing down the precise scope of the challenge also proved to be more involved than we expected, as we attempted to simultaneously include a reasonably large set of feature while making sure we could finish what we started within the timeframe. Ultimately a scope document was prepared and signed off on, which kept our scope managable.
+Nailing down the precise scope of the challenge also proved to be more involved than we expected, as we attempted to simultaneously include a reasonably large feature set while making sure we could finish what we started within the timeframe. Ultimately a scope document was prepared and signed off on, which kept our scope managable.
 
 Throughout the process, there were a number of items that came up that would be within the scope of a fully deployed system, but which we did not want to commit to for the prototype. These items were collated into a Considerations Register administered by NICTA. This proved to be an excellent way of dealing with these considerations - they are now on record should we proceed to implement a production system, without them causing scope creep while working on the prototype.
 
@@ -113,22 +130,75 @@ These meetings were incredibly valuable for keeping us on track and accountable 
 ### The core: Workflow Engine
 At the core of the solution is a "workflow engine".
 
+What is a workflow engine?
+
 ![sample workflow](sample-workflow.png)
+
+#### What can the steps contain?
+#### How are multiple agencies handled?
 
 ### Customer experience
 
+Before an applicant can begin a workflow, they must register as a user.
+
+Both individual citizens and groups (incorporated and unincorporated)  can register as users of the system.
+
 #### Regular citizens
+
+
 
 #### Community groups
 
+There is a specialised process to handle the needs of community groups, as discussed in <<Ongoing use within community organisation>>
+
+#### User experience
+
+Once a user has registered and logged in, they are be presented with a dashboard showing at a glance:
+
+* **Workflows that they can commence.** Once a workflow is commenced, the directorate is notified, and the application is assigned to an approver.
+* **Any existing applications that they have begun**, and the stage those applications are at. Applicants can pull up the details of their applications and see the entire history in one place. They can then make sure that they have completed any steps necessary for them to complete. The approver responsible for their application is notified whenever the applicant completes a step.
+* **Links to access previous completed applications**, should they need to re-download any documents/approvals, and to help them avoid duplicating effort if they arrange repeated events.
+
+![Customer view](customer-portal.png)
+
 ### Directorate experience
 
- * Approver
- * Delegator
+#### Approver
+When an approver logs in, they can see at a glance:
 
-### Baked-in flexibility
+* The applications for which they are responsible.
+* The status of those applications:
+    * Are they waiting on the applicant?
+    * Are they waiting on another agency?
+    * Are they "in my court"?
 
- * Point and click workflow design.
+![Approver Portal](approver-portal.png)
+
+Approvers can then pull up an application for which they are responsible, see, in one place:
+
++ The entire history of the application
++ All the communications that have been exchanged
++ Any steps necessary to progress it.
+
+![Application View](internal-view.png)
+
+#### Delegators
+
+A delegator has a simple user interface to re-allocate in-progress workflows if needed. (For example, if an approver is ill or leaves the directorate.)
+
+### Baked-in flexibility: point and click workflow design.
+
+Finally, administrators can build workflows from scratch using a point-and-click editor. All aspects of the workflow can be configured: the tasks, their specifications, what information is provided to users, who is responsible for them, task dependencies and so on.
+
+![Workflow Editor](workflow-editor.png)
+
+Workflows are also automatically rendered as flowcharts, for validation against with exisiting directorate procedures. (Obviously `selection = 0` and `selection = 2` are not sufficient descriptors. This is a known bug and would be fixed for a production version.)
+
+![Sample workflow rendered](workflow.png)
+
+This ability to edit workflows online is a key feature which distinguishes our solution from, for example, [FoxOpen][foxopen].
+
+[foxopen]: http://www.foxopen.net/
 
 ## The prototype: Tech Specs
 
@@ -182,9 +252,8 @@ We were pleased with the performance of our technology stack.
 
 #### The good
 
-<< say some good things here >>
  * The stack performed exceptionally well at narrowing the functional areas we had to consider. So much was done for us that our actual application code comes in at less than five thousand SLOC (source lines of code) - an astonishingly low figure for what the system achieves.
- * By and large, the stack was reliable and performant. We spent comparitively little time delving into the internals of the stack, and the majority of the time building on it.
+ * By and large, the stack was reliable and performant. We spent comparitively little time delving into the internals of the stack, and the majority of the time building on it. It was fit for purpose.
 
 #### The bad
  * Amazon SES failed to send to ACT government, made the transition to SendGrid
@@ -285,8 +354,6 @@ The system has been designed with production in mind.
 ## Sustainability
 Our system is sustainable from a number of different angles. In particular, we have focused on **sustaining the capacity of the system to function as desired**, in particular by reducing dependence on the DigiACTive team.
 
- + ... directorates - they don't depend on us to set things up
-
 ### Implementation of the system within directorates
 Because of the point-and-click workflow editor, the system can be implemented across directorates without needing the DigiACTive team's intervention.
 
@@ -297,16 +364,13 @@ The system is designed to be tolerant to changes in staffing within a directorat
 
 The system is also designed to be tolerant to changes in business processes: the point-and-click editor enable these changes to be reflected in the workflow models "in house", without requiring DigiACTive to write any code.
 
- + ... improved sustainability of community organisations
 
 ### Ongoing use within community organisations
-A major complaint that drove the challenge was the need to reduce the duplicated effort that occurs when a community group runs similar events repeatedly.
+A major complaint that drove the challenge was the need to reduce the duplicated effort that occurs when a community group runs similar events repeatedly. The permanent archival of past applications means previous information is always available.
 
-The differentiated registration for community groups is designed to maintain their capacity in the face of changing membership.
+Furthermore, the differentiated registration for community groups is designed to maintain their capacity in the face of changing membership.
  + It allows group membership to change without losing any information: when a group member leaves the group, they do not take any information with them. All applications made on behalf of the community group stay on archive and are accessible to members of the group.
  + It maintains the integrity of the community group's application process: once a member leaves or is removed from the group, they can no longer take actions on behalf of the group.
-
- + ... developers - open stack and toolset
 
 ### Sustainable software stack and toolset
 
@@ -316,29 +380,36 @@ To that end:
  + The system is built on widely used, open source software, as detailed in the technical specs.
  + Our implementation has consistently preferred to integrate prebuilt software packages rather than reinvent the wheel. This means:
     * Our code conforms to the conventions required by those packages.
-    * Our code base is small - only implementing those things not implemented in other software.
+    * Our code base is small (less than five thousand SLOC) - only implementing those things not implemented in other software.
  + We have a unit test suite.
 
 #### Contributing to the open-source ecosystem
-As we have built on open-source software, we have often found that we need to fix a particular bug or extend a particular feature in the software we are using. We have consistently sought to contribute these changes back. This has a number of benefits:
+As we have built on open-source software, we have occasionally found that we need to fix a particular bug or extend a particular feature in the software we are using. We have consistently sought to contribute these changes back. This has a number of benefits:
  + It contributes to the open-source eco-system, which we in turn benfit from.
  + It shifts the responsibility for maintaining our changes away from us and back to the original maintainer of the package, reducing our ongoing workload.
-
- + ... growing requirements - flexibility and power, generic design
 
 ### Sustainable software
 The system is designed to remain viable in the face of changing requirements.
 
+ + The system has been built in a generic way, such that it can be extended without breaking existing functionality.
+ + The underlying workflow engine supports a number of features that have not been exposed in the user interface, so a number of feature requests are as simple as writing a front end.
+ + A lot of thought and careful planning has gone into the data model and interconnections - this gives us confidence that we can hook up the system to other systems such as a payment system without undue difficulty.
+
 ## Scalability
 
- + ... technically - decoupled design, everything easily disaggregates and multiplies.
- + ... across directorates - authentication system allows multiple directorates to use shared system: not only will they not step on each others toes, with subworkflows they will complement each other.
- + ...
+The system is designed to be scalable from the ground up.
+ + Technically, the system can easily scale up to arbitrary user load.  The system is "loosely coupled": everything easily disaggregates and multiplies.
+ + In terms of usage, the system can scale up from being used by a small test group to universal usage without issue, so long as the paper and online workflows are kept in sync.
+ + The system can scale across directorates:
+    * The authentication system allows multiple directorates to use shared system, without stepping on each others toes.
+    * Furthermore, with subworkflows - the ability to integrate workflows into other workflows - scaling up to more directorates and areas will enchance the system rather than degrade it.
 
 ## Integration
 
- + ... reporting
- + ... existing workflows - modelling rather than replacing.
+The system is designed to seamlessly integrate with existing directorate processes.
+
+ + The system has been built with the intention of allowing powerful reporting capabilities. This would be implemented in a production system.
+ + The system models exisiting workflows rather than requiring exisiting workflows to be replaced, thus reducing the friction for integration.
 
 ## The bottom line
 
@@ -384,12 +455,7 @@ A major thing we had to adapt to is the very different way of thinking in the go
 
 The process we had was very linear: gather requirements, develop a design document, build the system. This is in sharp contrast to the way we are used to operating: build a prototype, present it, see how people actually use it and what they want changed, fix the prototype in response, get more feed back and so on. We would have attempted to build a minimum viable product by iteration rather than through explicit design.
 
-**How has this worked out in practise? What was good/bad about doing it the government's way?**
-
- * Feedback is less interactive than we're used to. We don't get to just sit down with the people and watch how they use it. We may have ended up blocking on feedback which would have been terrible.
-
-#### What's in a name?
-Manager v delgator (even receptionist) -> we're not used to the technical business meanings.
+This actually worked out better than we were expecting, because feedback was less interactive than we were used to. We didn't for example, have the opportunity to just hover over people's shoulders as they attempted to use the demonstration systems. Feedback took longer to get and was a very different sort of feedback to what we would have needed for the minimum viable product/iteration model to be effective.
 
 
 # Other remarks
