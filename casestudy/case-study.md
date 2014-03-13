@@ -43,14 +43,14 @@ The system provides flexibility for modifying workflows to adapt to changing bus
 ## Key Details
 
 | Competition  | [Digital Canberra Challenge][dcc] Round 1  |
-|--|--|
+|:--:|:--|
 | Challenge | **Quicker event approvals**: Improve the process for gaining permits for music & other cultural events in the ACT. |
 | Involved Parties | DigiACTive Pty Ltd, eGov Cluster (NICTA), ACT government|
 | ACT Government Involvement | Parks and City Services, TAMS |
 | Timeframe | ?? 1 November 2013 - 17 March 2014 |
 | Budget | $5000 for reimbursement of expenses |
-| Deliverables | Proof of Concept System, this Case Study
-| Contacts | DigiACTive: Daniel Axtens at [daniel@axtens.net](mailto:daniel@axtens.net)
+| Deliverables | Proof of Concept System, this Case Study |
+| Contacts | DigiACTive: Daniel Axtens at [daniel@axtens.net](mailto:daniel@axtens.net) |
 
 Due to the limited time-frame of the competiton, the scope of the proof of concept system was tightly restricted. <<moar>>
 
