@@ -3,6 +3,26 @@
 
 # Executive Summary
 
+Description of challenge
+Methodology
+Proposed Solution
+Production
+Conclusion
+
+DigiACTive Pty Ltd set out to provide Canberrans with a simpler, more efficient way to get the various approvals required to run events. Through the Digital Canberra Challenge, with the involvment of Parks and City Services in TAMS, and the eGov cluster in NICTA, we scoped, designed and built a proof of concept system over the summer of 2013-2014.
+
+Our solution provides a one-stop shop for approvals, based on the concept of "workflows". Workflows are defined as a set of steps with a desired outcome. Workflow steps can collect information from clients by requiring them to fill out a form, answer questions, or upload a document. Steps can also require action from staff at the approving directorate, such as reviewing and verifying client information. Workflows can be built in the system with a point-and-click editor.
+
+Our solution addresses a number of citizen concerns:
+ + It provides a single point of contact for an application, so clients can ask questions and resolve issues along the way.
+ + It provides a consolidated communications register, so all communication is in one place.
+ + It keeps clients up to date on the progress of their application, and provides increased visibility into its progress.
+ + It keeps a record of past applications, to reduce the workload when similar events are run repeatedly.
+ + For events that require approval from a number of directorates, it provides simple integration of those workflows, without requiring the client to enter the same information over and over again.
+
+Our solution also increases directorate efficiency, and increases management visibility into staff workloads and performance.
+
+We believe our solution could be made production ready and deployed. It is sustainable, scalable, and in line with the Digital City Action Plan and the Strategic Plan for ICT 2011-2015.
 
 # Description of challenge
 (**What was in the scope?**)
