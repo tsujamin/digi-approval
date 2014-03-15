@@ -1,5 +1,6 @@
-# Digital Canberra Challenge: Round 1 - Case Study
-## DigiACTive Pty Ltd, March 2014
+% Digital Canberra Challenge: Round 1 - Case Study
+% DigiACTive Pty Ltd
+% March 2014
 
 # Executive Summary
 
@@ -14,6 +15,7 @@ DigiACTive Pty Ltd set out to provide Canberrans with a simpler, more efficient 
 Our solution provides a one-stop shop for approvals, based on the concept of "workflows". Workflows are defined as a set of steps with a desired outcome. Workflow steps can collect information from clients by requiring them to fill out a form, answer questions, or upload a document. Steps can also require action from staff at the approving directorate, such as reviewing and verifying client information. Workflows can be built in the system with a point-and-click editor.
 
 Our solution addresses a number of citizen concerns:
+
  + It provides a single point of contact for an application, so clients can ask questions and resolve issues along the way.
  + It provides a consolidated communications register, so all communication is in one place.
  + It keeps clients up to date on the progress of their application, and provides increased visibility into its progress.
@@ -33,6 +35,7 @@ Unfortunately, the proliferation of regulations and permits has made running eve
 
 ## Our solution: a birds-eye view
 Our proof-of-concept demonstrates a system to that:
+
  + provides residents and businesses with a clear, streamlined way to work through the various approvals they require.
  + provides a central point of contact so that, as far as possible, a single public servant sees the process through from start to finish and is able to help resolve problems as they come up.
  + lays out the requirements clearly, helping directorates to ensure that applicants understand what is required of them and can meet those requirements with a minimum of fuss.
@@ -40,17 +43,20 @@ Our proof-of-concept demonstrates a system to that:
 Our solution is browser-based application built on the concept of modelling approval processes as **workflows**. A workflow is a series of steps with a desired end point. Each step contains certain actions that need to be completed, either by a client or by directorate staff.
 
 > For example, a workflow could be:
-+ Apply to use public unleased land
-+ Apply for a liquor license
+>
+> + Apply to use public unleased land
+> + Apply for a liquor license
 >
 > Workflow steps could be:
- + "Enter event details". Completed by a customer, by filling out an online form. The step would lay out what questions are mandatory and which are optional, and provide tips and a way to ask for advice.
- + "Upload a risk management plan". Completed by a customer, by uploading a document. The step lays out the requirements for a risk managment plan, and provides a link to a template and the information that the document must include.
- + "Review risk management plan". Completed by an approver within a directorate, after reviewing a risk assessment plan. The step lays out the internal procedures for assessing these documents, so that there is consistency within the Directorate.
+>
+> + "Enter event details". Completed by a customer, by filling out an online form. The step would lay out what questions are mandatory and which are optional, and provide tips and a way to ask for advice.
+> + "Upload a risk management plan". Completed by a customer, by uploading a document. The step lays out the requirements for a risk managment plan, and provides a link to a template and the information that the document must include.
+> + "Review risk management plan". Completed by an approver within a directorate, after reviewing a risk assessment plan. The step lays out the internal procedures for assessing these documents, so that there is consistency within the Directorate.
 
 (put this in a box)
 
 The system has been designed around the needs of regular citizens, community groups, businesses and Directorates:
+
  * Citizens are provided with an interface allowing new applications to be lodged, pending applications continued and completed applications reviewed.
  * Community groups and businesses are provided with powerful tools to maintain the integrity of their accounts and data as their membership changes.
  * Within directorates:
@@ -85,6 +91,7 @@ DigiACTive tackled the challenge over the 2013-14 summer.
 We first became aware of the challenge as individuals in late 2013. The challenge was discussed socially amongst the ANU's Computer Science Students' Association, and from that a loose, unnamed group was formed.
 
 We initially approached the technical side of things in general terms:
+
  + We firstly settled on the idea of a workflow engine, after briefly toying with an enhanced Smart Forms system and a Finite State Machine solution.
  + Because we had existing expertise in development in the team, we built an open source stack around technologies we already knew and trusted.
  + Due to the short time frame of the competition, we verified that the bulk of the project could be built by composing existing open source components.
@@ -103,6 +110,7 @@ The entire pitching process was somewhat surreal: as three university students, 
 
 We were selected as one of two teams to proceed to implement a proof-of-concept.
 The process of building our solution then fell into a number of phases:
+
  * Formalise the team structure and sign the necessary agreements.
  * Scope out the project
  * Build "Milestone 1": a prototype that ran a predefined static workflow
@@ -275,6 +283,7 @@ We were very pleased with the performance of our technology stack.
  * By and large, the stack was reliable and performant. We spent comparitively little time delving into the internals of the stack, and the majority of the time building on it. It was fit for purpose.
 
 #### The bad
+
  * We initially used Amazon SES for email, however, it failed to send to ACT government, so we made the transition to SendGrid.
  * Chef proved incredibly difficult and time-consuming. We may have been better to pick a different configuration management system. However, it seems any system we could have picked would have involved a significant learning curve, and we certainly made a number of beginners mistakes.
      + On the plus side, Chef made transition from CentOS (which we used for local testing) to RHEL 6 (which we used on AWS) reasonably painless.
@@ -298,6 +307,7 @@ This solution ties in with the _[Digital Canberra Action Plan][dcap]_ and _[The 
 (make the above a call-out box)
 
 > The Digital Canberra Action Plan is the roadmap of how we are going to:
+>
 > + accelerate business engagement with the digital economy and help businesses access new customers and markets;
 > + promote Canberra as a modern, dynamic, digital city;
 > + use technology to be a more open government and to give citizens greater choice in how and when they use services; and
@@ -306,6 +316,7 @@ This solution ties in with the _[Digital Canberra Action Plan][dcap]_ and _[The 
 > ([Digital Canberra][digicanberra])
 
 DigiApproval strongly complements the objectives of the Digital Canberra Action Plan. In particular:
+
  + by providing better visibility into permit applications, DigiApproval creates a more open government;
  + as an online service, it provides citizens greater choice: applications can be completed in stages, in different places;
  + having been designed with community groups in mind, it provides an innovative and improved experience for community groups and small businesses (<<link to community groups stuff?>>); and
@@ -323,6 +334,7 @@ Furthermore, the DigiApproval system is aligned with the the goals and governing
 In particular, the system targets Goal 1, as part of an "integrated, comprehensive and affordable range of readily accessible online services." In particular, it "will use ICT to provide simpler citizen-centric services, integrated across Directorates" (page 8).
 
 DigiApproval can contribute to the goals of being:
+
  + **integrated**, including being **integrated across Directorates** - the system is designed to integrate application processes accross directorates by defining a shared vocabulary (the semantic tags described above) and a well-understood data flow. In this way, the system provides both sufficient flexibility and integration.
  + **comprehensive**, as it can model arbitrary workflows - it would be suitable for any permit application, or even other government tasks that can be modelled as workflows.
  + **affordable**, as it increases efficiency - reduced paper-work and speedier interaction with the client means that files can be processed and closed out faster.
@@ -331,6 +343,7 @@ DigiApproval can contribute to the goals of being:
  + **citizen-centric**, as it was driven by citizen-lead design via the Digital Canberra Challenge. It addresses citizen pain points by incorporating a single point of contact, and visibility into the process.
 
 Furthermore, the solution is in line with a number of other goals:
+
  + Goal 2:
      * The DigiApproval system has been built in line with the Shared Services ICT requirements, so it can be implemented more cheaply and with less friction, _improving ROI_.
      * The DigiApproval system is designed to be a _shared_, cross-Directorate system.
@@ -340,6 +353,7 @@ Furthermore, the solution is in line with a number of other goals:
 Furthermore, the project can be implemented in line with the Governing Principles laid out on page 7 of the Strategic Plan.
 
 The principles are:
+
 > + investment should support Government policy and service delivery priorities.
 > + should be of a professional quality, lifecycle managed and supportable.
 > + investment should create improved performance, greater efficiency and/ or better community services.
@@ -348,6 +362,7 @@ The principles are:
 > + investment must have measurable outcomes.
 
 Investment in this system would be in line with those principles:
+
  + It supports service delivery by assisting directorates to meet their legislative requirements for service delivery.
  + It is of professional quality, and supportable - see the Sustainability section below.
  + It creates improved performance, greater efficiency and better community services, as outlined.
@@ -368,6 +383,7 @@ Because of the point-and-click workflow editor, the system can be implemented ac
 
 ### Ongoing use of the system within directorates
 The system is designed to be tolerant to changes in staffing within a directorate.
+
  + The delegator/approver system provides a simple approach to re-allocating work as staff arrangements change. (TODO: a production system would need a "don't allocate more tasks to this approver" button) It provides direct visibility into the workload of approvers, and allows it to be adjusted as needed.
  + The system is also designed to be sustainable in the sense that it's integrity is not threatened when staff members leave. Each staff member has an individual user account, which can be easily deactivated when they leave.
 
@@ -378,6 +394,7 @@ The system is also designed to be tolerant to changes in business processes: the
 A major complaint that drove the challenge was the need to reduce the duplicated effort that occurs when a community group runs similar events repeatedly. The permanent archival of past applications means previous information is always available.
 
 Furthermore, the differentiated registration for community groups is designed to maintain their capacity in the face of changing membership.
+
  + It allows group membership to change without losing any information: when a group member leaves the group, they do not take any information with them. All applications made on behalf of the community group stay on archive and are accessible to members of the group.
  + It maintains the integrity of the community group's application process: once a member leaves or is removed from the group, they can no longer take actions on behalf of the group.
 
@@ -386,6 +403,7 @@ Furthermore, the differentiated registration for community groups is designed to
 The system has been designed and built such that if the DigiACTive team were hit by a bus, it would be possible to hire replacement staff that could quickly come up to speed on the system.
 
 To that end:
+
  + The system is built on widely used, open source software, as detailed in the technical specs.
  + Our implementation has consistently preferred to integrate prebuilt software packages rather than reinvent the wheel. This means:
     * Our code conforms to the conventions required by those packages.
@@ -394,6 +412,7 @@ To that end:
 
 #### Contributing to the open-source ecosystem
 As we have built on open-source software, we have occasionally found that we need to fix a particular bug or extend a particular feature in the software we are using. We have consistently sought to contribute these changes back. This has a number of benefits:
+
  + It contributes to the open-source eco-system, which we in turn benfit from.
  + It shifts the responsibility for maintaining our changes away from us and back to the original maintainer of the package, reducing our ongoing workload.
 
@@ -407,6 +426,7 @@ The system is designed to remain viable in the face of changing requirements.
 ## Scalability
 
 The system is designed to be scalable from the ground up.
+
  + Technically, the system can easily scale up to arbitrary user load.  The system is "loosely coupled": everything easily disaggregates and multiplies.
  + In terms of usage, the system can scale up from being used by a small test group to universal usage without issue, so long as the paper and online workflows are kept in sync.
  + The system can scale across directorates:
@@ -446,6 +466,7 @@ If we had an pre-existing company, we could have redirected our time and money t
 On the plus side, being pushed to have a formal legal structure has set us up well to continue the project into the future. On the down side, if we choose not to proceed, we have to wrap up the company, sort out its tax affairs, and so on: we're left holding a time-consuming liability.
 
 We therefore have a number of suggestions for future competitions:
+
  + We would have benefited from some sort of information session or infomation pack outlining matters such as:
   + different business structures: e.g. company vs partnership
   + how to go about forming one: applying directly through ASIC v applying through e.g. MYOB CompanyDocs,
