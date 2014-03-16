@@ -16,6 +16,7 @@
 \setlength{\parindent}{0.0in}
 \setlength{\parskip}{0.2in}
 \usepackage{longtable}
+\usepackage{float}
 
 
 %\usepackage{times}
@@ -23,7 +24,7 @@
 %\usepackage{libertine}
 \usepackage{graphicx}
 \usepackage{pdfpages}
-\usepackage{hyperref}
+\usepackage[colorlinks=true, urlcolor=blue]{hyperref}
 \renewcommand*\oldstylenums[1]{{\fontfamily{fxlj}\selectfont #1}}
 \title{Digital Canberra Challenge: Round 1 - Case Study}
 \author{DigiACTive Pty Ltd}
@@ -92,7 +93,7 @@ maze.
 
 \subsection{Our solution: a birds-eye view}
 
-Our proof-of-concept demonstrates a system to that:
+Our proof-of-concept demonstrates a system that:
 
 \begin{itemize}
 
@@ -191,7 +192,7 @@ Challenge & \textbf{Quicker event approvals}: Improve the process for gaining pe
 Involved Parties & DigiACTive Pty Ltd, eGov Cluster (NICTA), ACT
 government \\ \hline
 ACT Government Involvement & Parks and City Services, TAMS \\ \hline
-Timeframe & ?? 1 November 2013 - 17 March 2014 \\ \hline
+Timeframe & 1 November 2013 - 17 March 2014 \\ \hline
 Budget & \$5000 for reimbursement of expenses \\ \hline
 Deliverables & Proof of Concept System, this Case Study \\ \hline
 Contacts & DigiACTive: Daniel Axtens at
@@ -283,7 +284,27 @@ admirable job and made the administrative side much more manageable.
 We turned our unnamed team into DigiACTive Pty Ltd, signed the
 necessary project agreements and purchased the necessary insurance
 cover. This was a surprisingly challenging, time-consuming and expensive
-aspect.
+process.
+
+\subsubsection{Requirements Definition}
+
+We conducted a process of consultation with various stakeholders involved
+in events organisation to further refine the requirements our system should 
+meet. These stakeholders included:
+
+\begin{itemize}
+
+\item
+  The event coordinator of a major territory community festival.
+\item
+  Representatives from MusicACT: an organisation with regular exposure 
+  to event planning in the territory and responsible for proposing 
+  this problem for the inaugural Digital Canberra Challenge.
+\item
+  Parks and City Services as part of TAMS: The directorate responsible for
+  administering the current public unleased land approval process and the
+  potential future administrators of our proposed system.
+\end{itemize}
 
 \subsubsection{Scope}
 
@@ -311,11 +332,11 @@ the project into two major milestones.
 \item
   Milestone 1: a prototype that ran a predefined static workflow
 \item
-  Milestone 2: an extension of the Milestone 1 prototype that supported
-  dynamically editing workflows.
+  Milestone 2: an extension of the Milestone 1 prototype which supported
+  the dynamic editing of workflows.
 \end{itemize}
 
-The system that we built is described in detail below. 
+The system that we built is described in detail in Section~\ref{sec:solution}. 
 
 As far as the
 process of building goes, we found that, for technical reasons,
@@ -346,14 +367,14 @@ support of NICTA's Ana Belgun.
 
 \newpage
 \section{Proposed solution}
-
+\label{sec:solution}
 \subsection{The prototype in overview}
 
 \subsubsection{The core: Workflow Engine}
 
 At the core of the solution is a ``workflow engine''.
 
-The system is premised on the observation that most permit applications can be broken down into a number of interrelated steps, with well understood linkages between the steps. Some steps are taken by the customer, and some steps are taken by the approving agency. For example, a sample workflow is shown below in Figure~\ref{fig:sample-workflow}. Here, steps in <> are taken by the customer, and steps in <> are taken by the approving agency.
+The system is premised on the observation that most permit applications can be broken down into a number of interrelated steps, with well understood linkages between the steps. Some steps are taken by the customer, and some steps are taken by the approving agency. For example, a sample workflow is shown below in Figure~\ref{fig:sample-workflow}. Here, steps in blue are taken by the customer, and steps in green are taken by the approving agency.
 
 \begin{figure}[h!]
   \centering
@@ -362,7 +383,7 @@ The system is premised on the observation that most permit applications can be b
   \label{fig:sample-workflow}
 \end{figure}
 
-Notably, a workflow allows more flexible processes than a single, linear application. As shown in the sample workflow, steps can happen in parallel, certains steps can be repeated, and so on.
+Notably, a workflow allows more flexible processes than a single, linear application. As shown in the sample workflow, steps can happen in parallel, certain steps can be repeated, and so on.
 
 \paragraph{What can the steps contain?}
 
@@ -430,7 +451,7 @@ Throughout this process:
 \paragraph{User experience}
 
 Once a user has registered and logged in, they are be presented with a
-dashboard showing at a glance:
+dashboard (Figure~\ref{fig:customer-portal}) showing at a glance:
 
 \begin{itemize}
 
@@ -451,13 +472,18 @@ dashboard showing at a glance:
   duplicating effort if they arrange repeated events.
 \end{itemize}
 
-\includegraphics[width=0.9\textwidth]{customer-portal.png}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{customer-portal.png}
+  \caption{The customer portal.}
+  \label{fig:customer-portal}
+\end{figure}
 
 \subsubsection{Directorate experience}
 
 \paragraph{Approver}
 
-When an approver logs in, they can see at a glance:
+When an approver logs in, they can see at a glance (Figure~\ref{fig:approver-portal}):
 
 \begin{itemize}
 
@@ -477,10 +503,15 @@ When an approver logs in, they can see at a glance:
   \end{itemize}
 \end{itemize}
 
-\includegraphics[width=0.9\textwidth]{approver-portal.png}
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.9\textwidth]{approver-portal.png}
+  \caption{The approver portal.}
+  \label{fig:approver-portal}
+\end{figure}
 
-Approvers can then pull up an application for which they are
-responsible, see, in one place:
+Approvers can then pull up an application (Figure~\ref{fig:approver-workflow}) for which they are
+responsible and see in one place:
 
 \begin{itemize}
 
@@ -492,7 +523,12 @@ responsible, see, in one place:
   Any steps necessary to progress it.
 \end{itemize}
 
-\includegraphics[width=0.9\textwidth]{internal-view.png}
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.9\textwidth]{internal-view.png}
+  \caption{The workflow approval view.}
+  \label{fig:approver-workflow}
+\end{figure}
 
 \paragraph{Delegators}
 
@@ -503,19 +539,30 @@ directorate.)
 \subsubsection{Baked-in flexibility: point and click workflow design.}
 
 Finally, administrators can build workflows from scratch using a
-point-and-click editor. All aspects of the workflow can be configured:
+point-and-click editor (Figure~\ref{fig:workflow-editor}). All aspects of the workflow can be configured:
 the tasks, their specifications, what information is provided to users,
 who is responsible for them, task dependencies and so on.
 
-\includegraphics[width=0.9\textwidth]{workflow-editor.png}
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.9\textwidth]{workflow-editor.png}
+  \caption{The workflow editor.}
+  \label{fig:workflow-editor}
+\end{figure}
 
-Workflows are also automatically rendered as flowcharts, for validation
-against with exisiting directorate procedures. (Obviously
+
+Workflows are also automatically rendered as flowcharts (Figure~\ref{fig:workflow-flowchart}), 
+for validation against with exisiting directorate procedures. (Obviously
 \texttt{selection = 0} and \texttt{selection = 2} are not sufficient
 descriptors. This is a known bug and would be fixed for a production
 version.)
 
-\includegraphics[width=0.6\textwidth]{workflow.png}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\textwidth]{workflow.png}
+  \caption{A workflow flowchart.}
+  \label{fig:workflow-flowchart}
+\end{figure}
 
 This ability to edit workflows online is a key feature which
 distinguishes our solution from, for example,
