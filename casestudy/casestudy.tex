@@ -37,7 +37,7 @@
 DigiACTive Pty Ltd set out to provide Canberrans with a simpler, more
 efficient way to get the various approvals required to run events.
 Through the Digital Canberra Challenge, with the involvement of Parks and
-City Services in TAMS, and the eGov cluster in NICTA, we scoped,
+City Services in TAMS, and the eGov Cluster in NICTA, we scoped,
 designed and built a proof of concept system over the summer of
 2013-2014.
 
@@ -125,9 +125,11 @@ For example, a workflow could be:
   Apply to use public unleased land
 \item
   Apply for a liquor license
+\item
+  Apply for a fireworks display permit
 \end{itemize}
 
-Workflow steps could be:
+Workflow steps could include:
 
 \begin{itemize}
 
@@ -135,6 +137,8 @@ Workflow steps could be:
   ``Enter event details''. Completed by a customer, by filling out an
   online form. The step would lay out what questions are mandatory and
   which are optional, and provide tips and a way to ask for advice.
+\item
+  ``Preliminary risk assessment''. Completed by a customer, by filling out an online form. The step would ask a number of questions about the event's risk factors, and automatically apply business rules to determine whether a risk management plan is necessary.
 \item
   ``Upload a risk management plan''. Completed by a customer, by
   uploading a document. The step lays out the requirements for a risk
@@ -145,6 +149,8 @@ Workflow steps could be:
   directorate, after reviewing a risk assessment plan. The step lays out
   the internal procedures for assessing these documents, so that there
   is consistency within the Directorate.
+\item
+  ``Issue permit''. Completed by an approver within a directorate, after reviewing the entire application. The step allows the approver to create or upload a permit document that is consistent with legislative and administrative requirements.
 \end{itemize}
 \end{framed}
 
@@ -190,7 +196,7 @@ shop} for permit applications for both customers and directorates.
 Competition & \href{http://digitalcanberrachallenge.com.au}{Digital Canberra Challenge} Round 1 \\ \hline
 Challenge & \textbf{Quicker event approvals}: Improve the process for gaining permits for music \& other cultural events in the ACT. \\ \hline
 Involved Parties & DigiACTive Pty Ltd, eGov Cluster (NICTA), ACT
-government \\ \hline
+Government \\ \hline
 ACT Government Involvement & Parks and City Services, TAMS \\ \hline
 Timeframe & 1 November 2013 - 17 March 2014 \\ \hline
 Budget & \$5000 for reimbursement of expenses \\ \hline
@@ -213,8 +219,8 @@ DigiACTive tackled the challenge over the 2013-14 summer.
 \subsection{Forming the team and the concept}
 
 We first became aware of the challenge as individuals in late 2013. The
-challenge was discussed socially amongst the ANU's Computer Science
-Students' Association, and from that an unnamed group was formed.
+challenge was discussed informally amongst the ANU Computer Science
+Students' Association, and from that a team of three undergraduate ANU students was formed.
 
 We initially approached the technical side of things in general terms:
 
@@ -276,7 +282,7 @@ number of phases:
   supported dynamically editing workflows.
 \end{itemize}
 
-The process was facilitated by the eGov cluster at NICTA, who did an
+The process was facilitated by the eGov Cluster at NICTA, who did an
 admirable job and made the administrative side much more manageable.
 
 \subsubsection{Formalising the team}
@@ -301,7 +307,7 @@ meet. These stakeholders included:
   to event planning in the territory and responsible for proposing 
   this problem for the inaugural Digital Canberra Challenge.
 \item
-  Parks and City Services as part of TAMS: The directorate responsible for
+  Parks and City Services (TAMS): The directorate responsible for
   administering the current public unleased land approval process and the
   potential future administrators of our proposed system.
 \end{itemize}
@@ -318,7 +324,7 @@ Throughout the process, there were a number of items that came up that
 would be within the scope of a fully deployed system, but which we did
 not want to commit to for the prototype. These items were collated into
 a Considerations Register administered by NICTA. This proved to be an
-excellent way of dealing with these considerations - they are now on
+excellent way of dealing with these considerations -- they are now on
 record should we proceed to implement a production system, without them
 causing scope creep while working on the prototype.
 
@@ -399,11 +405,11 @@ Steps can include:
 
   In addition, check boxes can be used to determine the steps in the workflow:
   \begin{itemize}
-  \item A step can ask whether alcohol will be served at an event, and if so, the applicant will be directed to a liquor license permit.
+  \item A step can ask whether alcohol will be served at an event, and if so, the applicant will be directed to a liquor licence permit.
   \item A step can do a points-based assessment. For example, various hazards may be worth different numbers of points, and if a points threshold is reached, different risk assessment procedures can be applied.
   \end{itemize}
 \item Uploading a document, for example, a risk assessment and management plan, or a permit.
-\item Accepting an agreement, for example an Acceptable Use Agreement.
+\item Accepting an agreement, for example an Acceptable Use Agreement, or Permit Terms and Conditions.
 \end{itemize}
 
 Steps can have descriptive text attached to them. For example, a step which requires someone to upload a risk assessment can provide information about how to do a proper risk assessment, and a link to a template. Information can also be provided on steps done by approvers, to enhance the consistency of the approvals process.
@@ -412,18 +418,18 @@ Steps can have descriptive text attached to them. For example, a step which requ
 
 A major pain point for customers is dealing with multiple agencies: for example, when running an event, needing to deal with TAMS, JACS, AFP, and so on. It is often unclear when permits are required from these agencies and when they are not. Furthermore, each agency needs some of the same information, and some different information. 
 
-The system has a two-pronged approach to reducing the confusion inherent in multiple-agency applications.
+The system has a multi-pronged approach to reducing the confusion inherent in multiple-agency applications.
 \begin{itemize}
-\item Firstly, the system supports embedding workflows within other workflows. For example, if the workflow for the use of public unleased land determines that a liquor license is required, the system can embed the liquor license workflow. The liquor license workflow is still managed by the relevant directorate, not by TAMS, so there's no duplication of effort.
-
-\item Secondly, the process of sharing information is achieved by ``tagging'' common questions. For example, an event's date is common across all the permit applications, so every question that asks for the event date will be tagged with a common, descriptive tag. Then, if a step encounters a tagged question that has been answered earlier, it simply retrieves the previous answer rather than requiring the question to be answered again.
+\item The system supports embedding workflows within other workflows. For example, if the workflow for the use of public unleased land determines that a liquor license is required, the system can embed the liquor license workflow. The liquor license workflow is still managed by the relevant directorate, not by TAMS, so there's no duplication of effort.
+\item Embedded workflows can also be used to allow multiple-agency sign-off on a single approval decision. For example, many public unleased land applications must be approved by the ACT Insurance Authority. The system can automatically send the workflow to relevant ACTIA approvers, reducing the need for TAMS officials to manually inform other agencies.
+\item Information can be shared between related workflows by ``tagging'' common questions. For example, an event's date is common across all the permit applications, so every question that asks for the event date will be tagged with a common, descriptive tag. Then, if a step encounters a tagged question that has been answered earlier, it simply retrieves the previous answer rather than requiring the question to be answered again.
 \end{itemize}
 
 \subsubsection{Customer experience}
 
 Before an applicant can begin a workflow, they must register as a user.
 
-Both individual citizens and groups (incorporated and unincorporated)
+Both individual citizens and organisations (incorporated and unincorporated)
 can register as users of the system.
 
 There is a specialised process to handle the needs of organisations, be they businesses or community groups. The process is as follows.
@@ -432,19 +438,19 @@ Say there is a group called Community Group Inc that wishes to run an event. Jan
 
 \begin{itemize}
 \item Jane Citizen registers as a regular citizen on DigiApproval. At this point, she can make applications in her own name, but cannot do anything as Community Group Inc.
-\item The chair of Community Group Inc registers it a group on the DigiApproval system, and files it's username and password with its certificate of incorporation and other paperwork.
+\item The chair of Community Group Inc registers it a group on the DigiApproval system, and files its username and password in the organisation records.
 \item The chair of Community Group Inc adds Jane as a member of Community Group Inc on DigiApproval.
 \item Jane logs in to DigiApproval. Now, when she logs in, she is asked if she wishes to make applications in her own name, or on behalf of Community Group Inc. She selects Community Group Inc, and begins an application.
 \item At this point, John Constituent joins Community Group Inc and is put on a subcommittee helping with the application. John already has a DigiApproval account, so the chair of Community Group Inc adds his account to Community Group Inc.
 \item Now both John and Jane have access to the event application. Any notification regarding the event is sent to both of them.
-\item Community Group Inc successfully runs their event.
+\item Community Group Inc successfully obtains their approval and runs their event.
 \item John resigns from Community Group Inc, so the chair removes him from the group on DigiApproval. At this point, John can no longer make applications on behalf of Community Group Inc, ensuring the ongoing integrity of their account. John can still make applications in his own name, and any applications he was making in his own name are unaffected.
 \item Paul Participant joins Community Group Inc, and the chair makes him part of the group on DigiApproval. At this point, Paul can now see previous applications made by Community Group Inc, \emph{even applications made before he joined}. This way, when he comes to run their next event, he has access to all the risk management plans and other documentation that was previously submitted.
 \end{itemize}
 
 Throughout this process:
 \begin{itemize}
-\item Jane, John and Paul do not need the password to the Community Group Inc account. This means that when they leave, the password does not need to be changed. Realistically, changing a shared password when membership changes is easy to forget (and a massive annoyance), so this improves the integrity of the process without being a massive annoyance.
+\item Jane, John and Paul do not need the password to the Community Group Inc account. This means that when they leave, the password does not need to be changed. Realistically, changing a shared password when membership changes is easy to forget (and a massive annoyance), so this improves the security and integrity of the process without being a massive annoyance.
 \item The community group has ongoing access to all the documents submitted, regardless of changes in membership. When John leaves the group, he doesn't take any of the application history with him: it's linked to the group account, not to his.
 \end{itemize}
 
@@ -570,12 +576,6 @@ distinguishes our solution from, for example,
 
 \subsection{The prototype: Tech Specs}
 
-\begin{itemize}
-
-\item
-  not just what we used but why, and why it was awesome.
-\end{itemize}
-
 Our solution is a web application implemented with Python using the
 Django web framework. It can be decomposed into a web layer, an
 application layer, a set of asynchronous workers and a storage layer
@@ -684,7 +684,7 @@ We were very pleased with the performance of our technology stack.
   lines of code) - an astonishingly low figure for what the system
   achieves.
 \item
-  By and large, the stack was reliable and performant. We spent
+  By and large, the stack was reliable and high performance. We spent
   comparatively little time delving into the internals of the stack, and
   the majority of the time building on it. It was fit for purpose.
 \end{itemize}
@@ -711,21 +711,21 @@ We were very pleased with the performance of our technology stack.
     painless.
   \end{itemize}
 \item
-  We found a number of open source components (most notably Spiff) had
+  We found a number of open source components (most notably SpiffWorkflow) had
   one or more issues which required our intervention to fix. Using them
-  still provided a significant increase in productivity vis-a-vis
+  still provided a significant increase in productivity vis-\`{a}-vis
   writing equivalent functionality from scratch, and furthermore by
   contributing the changes upstream we are able to pass of the
   requirement of on-going maintenance elsewhere.
 \item
-  Django performed well, although we found the templating language
-  limiting.
+  Django performed well, although we found the standard Django template engine
+  limiting -- in hindsight, we would have installed an alternative template engine.
 \item
   OpenStack proved tricky to set up. We eventually settled on
-  \href{http://devstack.org/}{devstack}, which was decent choice, but
+  \href{http://devstack.org/}{DevStack}, which was decent choice, but
   suffered regressions a couple of times.
 \item
-  We attempted to use \href{http://www.vagrantup.com/}{vagrant} to
+  We attempted to use \href{http://www.vagrantup.com/}{Vagrant} to
   smooth out hardware and software differences. This worked well up
   until a point, but wasn't quite as perfect as we had hoped. (See Other
   Remarks below.)
@@ -1012,11 +1012,11 @@ To that end:
   \item
     Our code conforms to the conventions required by those packages.
   \item
-    Our code base is small (less than five thousand SLOC) - only
+    Our code base is small (less than five thousand SLOC) -- only
     implementing those things not implemented in other software.
   \end{itemize}
 \item
-  We have a unit test suite.
+  We have an automated unit test suite.
 \end{itemize}
 
 \paragraph{Contributing to the open-source ecosystem}
@@ -1053,7 +1053,7 @@ requirements.
   requests are as simple as writing a front end.
 \item
   A lot of thought and careful planning has gone into the data model and
-  interconnections - this gives us confidence that we can hook up the
+  interconnections -- this gives us confidence that we can hook up the
   system to other systems such as a payment system without undue
   difficulty.
 \end{itemize}
@@ -1079,7 +1079,7 @@ The system is designed to be scalable from the ground up.
   
   \item
     The authentication system allows multiple directorates to use shared
-    system, without stepping on each others toes.
+    system, without stepping on each others' toes.
   \item
     Furthermore, with subworkflows - the ability to integrate workflows
     into other workflows - scaling up to more directorates and areas
@@ -1101,6 +1101,8 @@ processes.
 \item
   The system models existing workflows rather than requiring existing
   workflows to be replaced, thus reducing the friction for integration.
+\item
+  The system architecture allows easy interfacing with external systems, such as existing document management systems or other web applications.
 \end{itemize}
 
 \subsection{The bottom line}
@@ -1128,7 +1130,7 @@ objectives.
 
 \textbf{From the point of view of DigiACTive, the Digital Canberra
 Challenge has been hugely successful.} The project was excellently
-managed by the eGov cluster, and TAMS has been incredibly helpful
+managed by the eGov Cluster, and TAMS has been incredibly helpful
 throughout the process.
 
 \subsection{Suggestions for future rounds}
@@ -1168,10 +1170,12 @@ We therefore have a number of suggestions for future competitions:
   different business structures: e.g.~company vs partnership
 \item
   how to go about forming one: applying directly through ASIC v applying
-  through e.g.~MYOB CompanyDocs,
+  through e.g.~MYOB CompanyDocs
 \item
   the legal agreements needed to protect us, e.g.~a Shareholders'
   Agreement
+\item
+  establishing appropriate accounting systems
 \item
   the various different types of insurance we would require
 \item
@@ -1223,7 +1227,7 @@ effective.
 
 From time to time we found the more formal process slow, restrictive and
 frustrating. We would advise future teams to stick at it and make sure
-it is done well - we found the things we hadn't designed as thoroughly
+it is done well -- we found the things we hadn't designed as thoroughly
 to be the ones we struggled with more.
 
 \subsection{For those from non-commercial/academic environments in
@@ -1232,16 +1236,16 @@ particular}
 \begin{itemize}
 \item
   One of our biggest and most surprising time-sinks arose from the
-  different hardware we had. 2 of our members had MacBooks, and one had
-  a laptop running some variant of Linux. Despite our best efforts to
+  different hardware we had. Two of our members had Macs, and one had
+  a PC running Linux. Despite our best efforts to
   make the development environment consistent through the use of
   Vagrant, we found a lot of time still disappeared in the differences
   Vagrant couldn't quite smooth out. \textbf{It's worth getting
-  identical systems somehow}: either by buying identical hardware, or by
+  identical systems somehow:} either by buying identical hardware, or by
   doing all your development in the cloud from the start.
 \item
   It's very tempting to not name a leader, especially as a group of
-  friends. However, \emph{there are no leaderless groups}: someone will
+  friends. However, \emph{there are no leaderless groups:} someone will
   end up leading; sometimes different people at different points, but
   someone must take the lead for things to get done. We would have
   benefitted from picking a leader at the start, and would advise future
