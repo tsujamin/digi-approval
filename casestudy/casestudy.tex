@@ -581,7 +581,12 @@ Django web framework. It can be decomposed into a web layer, an
 application layer, a set of asynchronous workers and a storage layer
 (file store and database).
 
-\includegraphics[width=0.8\textwidth]{./tech-overview.png}
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.8\textwidth]{./tech-overview.png}
+  \caption{Technical stack of project.}
+  \label{fig:solution-stack}
+\end{figure}
 
 Each of these layers is horizontally scalable.
 
@@ -590,7 +595,7 @@ Our system was built on:
 \begin{itemize}
 
 \item
-  \textbf{Operating System}: CentOS 6.4 and RHEL 6
+  \textbf{Operating System}: \href{https://www.centos.org/}{CentOS 6.4} and \href{http://www.redhat.com/products/enterprise-linux/}{RHEL 6}
 
   \begin{itemize}
   
@@ -626,7 +631,7 @@ Our system was built on:
     Virus scanning workers implemented in
     \href{http://www.clamav.net/lang/en/}{ClamAV}.
   \item
-    Email workers send mail through SendGrid, using the SMTP interface
+    Email workers send mail through \href{http://sendgrid.com/}{SendGrid}, using the SMTP interface
     for simple transition to SSICT infrastructure.
   \end{itemize}
 \item
@@ -1176,8 +1181,8 @@ We therefore have a number of suggestions for future competitions:
 \item
   SMEs have a distinct advantage compared to other entrants because of
   their existing company structure: they don't need to spend any of
-  their budget on forming a company. It may be worth considering evening
-  out this advantage.
+  their budget on forming a company. It may be worth considering a rebalancing
+  of this advantage.
 \item
   The insurance requirement could be re-evaluated. We were requried to
   hold professional indemnity insurance to guard against direct loss to
