@@ -1,35 +1,11 @@
 # Getting started
 
-## Flake8 ##
-Before doing anything, set up a Flake8 git hook.
-
-```sh
-sudo pip install flake8 || sudo easy_install flake8
-cp git/hooks/pre-commit .git/hooks/pre-commit
-```
-
-## Submodules ##
-
-Do this the first time you check out the repository:
-```shell
-git submodule init
-git submodule update
-```
-
 ## vagrant-bindfs ##
 Install our modified vagrant-bindfs plugin with CentOS 6 bindfs installation support:
 ```shell
 wget http://digiactive.com.au/digiactive-repo/gems/vagrant-bindfs-0.2.4.digiactive2.gem
 vagrant plugin install vagrant-bindfs-0.2.4.digiactive2.gem
 ```
-
-## vagrant-aws ##
-
-```shell
-vagrant plugin install vagrant-aws
-```
-
-Grab the SSH key (`digiawspem.pem`) and put it in `~/.ssh`, with appropriate permissions (600).
 
 ## Chef Development Only ##
 
@@ -48,9 +24,6 @@ gem install chef
 ## Basic Usage ##
 
  * Local: ```vagrant up local```
- * AWS omnibus: ```vagrant up aws --provider aws```. Be warned that output from Chef comes in very, very delayed chunks, rather than being live. You'll also need to reboot the machine for it to pick up the firewall rules. Avoid vagrant reload because that causes things to change IP address. Of course, by rebooting, you'll lose the devstack.
- * AWS storage only: try not to touch this - it's running nicely and changing it requires poking around in rofltron's dns.
- * AWS mini: `vagrant up aws-mini --provider aws`. Same caveats about firewalls apply, except rebooting doesn't affect storage any more.
 
 ### Easy new way ###
 
@@ -76,15 +49,6 @@ source ../../env/bin/activate
 python manage.py runserver 0.0.0.0:8000
 ```
 
-## Hacking on AWS ##
-
-Files are put on AWS with Rsync. However, things are only rsynced (rsunk?) on `up`, `provision`, and `reload`, which is kind of infrequent.
-
-If you want to manually do it, you're looking at something like:
-
-```shell
-/usr/bin/rsync --verbose --archive -z --exclude .vagrant/ --exclude Vagrantfile --exclude env --exclude chef-repo --exclude design --exclude casestudy --exclude pitch --exclude scope --exclude vagrant --exclude cookbooks --exclude .git --exclude "*.pyc" --exclude __pycache__ --exclude node_modules --exclude run --exclude logs --exclude local_settings.py -e "ssh -p 22 -o StrictHostKeyChecking=no -i '/HOMEPATH/YOU/.ssh/digiawspem.pem'" /path/to/digi-approval/ ec2-user@THE_IP_ADDRESS:/vagrant/
-```
 
 ## Hacking on chef ##
 
@@ -120,9 +84,6 @@ Password is set in the django_db cookbook in the default recipe, for now.
 Alternatively: `sudo -u postgres psql django`
 
 ## Mail (lamson) ##
-
-### AWS ###
-If you're on AWS, you automatically get the ability to send real email. You also get an SMTP server running on 25. If you want it to recieve email, you need to set Route 53 to point mail.digiactive.com.au at your instance. You can then send email with e.g. gmail.
 
 ### Local ###
 If you're on a local machine, you can recieve emails on port 25 still, and they'll be processed by lamson as per normal. You can send an email like so:
