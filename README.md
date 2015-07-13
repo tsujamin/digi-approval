@@ -1,7 +1,7 @@
 DigiApproval
 ============
 
-DigiApproval is a proof-of-concept web-based business workflow tool developed as an entry to the ACT Government's (Digital Canberra Challenge)[http://digitalcanberrachallenge.com.au/].
+DigiApproval is a proof-of-concept web-based business workflow tool developed as an entry to the ACT Government's [http://digitalcanberrachallenge.com.au/](Digital Canberra Challenge).
 
 Copyright
 =========
